@@ -43,9 +43,11 @@ BoundedContext Acervo implements Acervo {
 			String codigo
 		}
 
-		ValueObject Isbn10 extends Isbn
+		ValueObject Isbn10 extends @Isbn {
+		}
 
-		ValueObject Isbn13 extends Isbn
+		ValueObject Isbn13 extends @Isbn {
+		}
 	}
 
 	Aggregate Exemplar {

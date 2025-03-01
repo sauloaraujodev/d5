@@ -13,7 +13,7 @@
 		<relativePath>../parent</relativePath>
 	</parent>
 
-	<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(contextName)}</artifactId>
+	<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(boundedContext.name)}</artifactId>
 
 	<dependencies>
 		<dependency>

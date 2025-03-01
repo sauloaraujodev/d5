@@ -13,7 +13,7 @@
 		<relativePath>../parent</relativePath>
 	</parent>
 
-	<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(contextName)}-bdd</artifactId>
+	<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(boundedContext.name)}-bdd</artifactId>
 
 	<dependencyManagement>
 		<dependencies>
@@ -54,7 +54,7 @@
 	
 		<dependency>
 			<groupId>${groupId}</groupId>
-			<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(contextName)}</artifactId>
+			<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(boundedContext.name)}</artifactId>
 			<version>${"$"}{project.version}</version>
 			<scope>test</scope>			
 		</dependency>

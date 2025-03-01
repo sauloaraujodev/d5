@@ -1,6 +1,6 @@
 package dev.sauloaraujo.d5.generator;
 
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 
 import java.util.List;
@@ -8,9 +8,9 @@ import java.util.List;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
-public class UpperCamelToLowerHyphenMethodModel implements TemplateMethodModelEx {
+public class LowerCamelToUpperCamelMethodModel implements TemplateMethodModelEx {
 	public static String convert(String string) {
-		return UPPER_CAMEL.to(LOWER_HYPHEN, string);
+		return LOWER_CAMEL.to(UPPER_CAMEL, string);
 	}
 
 	@Override
