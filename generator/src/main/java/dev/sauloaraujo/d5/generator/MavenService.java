@@ -38,11 +38,8 @@ public class MavenService {
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, "presentation-vaadin"), "vaadin.ftlh",
 				dataModel);
-		freeMarkerService
-				.process(
-						fileService.moduleMainJavaSourceFile(outputPath, projectIdentifier, "presentation-vaadin",
-								packagePrefix, null, "VaadinApplication"),
-						"VaadinApplication.ftlh", dataModel);
+		freeMarkerService.process(fileService.moduleMainJavaSourceFile(outputPath, projectIdentifier,
+				"presentation-vaadin", packagePrefix, null, "VaadinApplication"), "VaadinApplication.ftlh", dataModel);
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, "presentation-backend"), "backend.ftlh",
 				dataModel);

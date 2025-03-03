@@ -15,6 +15,9 @@ public class UpperCamelToLowerUnderscoreMethodModel implements TemplateMethodMod
 
 	@Override
 	public Object exec(@SuppressWarnings("rawtypes") List arguments) throws TemplateModelException {
+		if (arguments.size() != 1) {
+			throw new IllegalArgumentException("arguments.size() != 1");
+		}
 		var argument = arguments.get(0);
 		if (argument != null) {
 			var string = argument.toString();

@@ -1,8 +1,6 @@
 package ${packagePrefix}.domain.${upperCamelToLowerUnderscore(boundedContext.name)}.${upperCamelToLowerUnderscore(aggregate.name)};
 
-import java.util.Date;
-import static java.util.Objects.deepEquals;
-import static java.util.Objects.hash;
+import java.util.*;
 
 public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObject.extends.name}</#if> {
 <#list valueObject.attributes as attribute>
@@ -45,7 +43,7 @@ public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObjec
 <#if valueObject.attributes?has_content>
 		var that = (${valueObject.name}) object;
 <#list valueObject.attributes as attribute>
-		if (!deepEquals(${attribute.name}, that.${attribute.name})) {
+		if (!Objects.deepEquals(${attribute.name}, that.${attribute.name})) {
 			return false;
 		}
 </#list>
@@ -55,6 +53,6 @@ public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObjec
 
 	@Override
 	public int hashCode() {
-		return <#if valueObject.extends??>31 * super.hashCode() + </#if>hash(<#list valueObject.attributes as attribute>${attribute.name}<#if !attribute?is_last>, </#if></#list>);
+		return <#if valueObject.extends??>31 * super.hashCode() + </#if>Objects.hash(<#list valueObject.attributes as attribute>${attribute.name}<#if !attribute?is_last>, </#if></#list>);
 	}	
 }

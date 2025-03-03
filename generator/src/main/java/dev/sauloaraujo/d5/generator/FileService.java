@@ -77,7 +77,12 @@ public class FileService {
 
 	public File moduleMainJavaSourceFile(String outputPath, String projectIdentifier, String module,
 			String packagePreffix, String subPackage, String className) {
-		var directory = moduleMainJavaSourceDirectory(outputPath, projectIdentifier, module, packagePreffix, subPackage);
+		var directory = moduleMainJavaSourceDirectory(outputPath, projectIdentifier, module, packagePreffix,
+				subPackage);
 		return new File(directory, className + ".java");
+	}
+
+	public File domainSharedDirectory(String outputPath, String projectIdentifier) {
+		return moduleDirectory(outputPath, projectIdentifier, "domain-common");
 	}
 }

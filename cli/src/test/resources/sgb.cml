@@ -132,7 +132,7 @@ BoundedContext Analise implements Analise {
 			aggregateRoot
 
 			-EmprestimoRegistroId id
-			-Exemplar exemplar			
+			-ExemplarId exemplar			
 			-Emprestimo emprestimo
 			Date devolucao nullable
 		}
