@@ -83,6 +83,6 @@ public class FileService {
 	}
 
 	public File domainSharedDirectory(String outputPath, String projectIdentifier) {
-		return moduleDirectory(outputPath, projectIdentifier, "domain-common");
+		return moduleDirectory(outputPath, projectIdentifier, "domain-shared");
 	}
 }

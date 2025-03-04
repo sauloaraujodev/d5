@@ -26,7 +26,7 @@ public class MavenService {
 
 		generate(fileService.projectPomFile(outputPath, projectIdentifier), "modules.ftlh", dataModel, false);
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, "parent"), "parent.ftlh", dataModel);
-		generate(fileService.modulePomFile(outputPath, projectIdentifier, "domain-common"), "common.ftlh", dataModel);
+		generate(fileService.modulePomFile(outputPath, projectIdentifier, "domain-shared"), "shared.ftlh", dataModel);
 
 		for (var boudedContext : model.getBoundedContexts()) {
 			generate(outputPath, projectIdentifier, boudedContext, dataModel);

@@ -56,6 +56,7 @@ public class DomainObjectService {
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("lowerCamelToUpperCamel", new LowerCamelToUpperCamelMethodModel());
 		dataModel.put("upperCamelToLowerUnderscore", new UpperCamelToLowerUnderscoreMethodModel());
+		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
 		dataModel.put("packagePrefix", packagePrefix);
 		dataModel.put("boundedContext", boundedContext);
 		dataModel.put("aggregate", aggregate);

@@ -18,7 +18,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${groupId}</groupId>
-			<artifactId>${projectIdentifier}-domain-common</artifactId>
+			<artifactId>${projectIdentifier}-domain-shared</artifactId>
 			<version>${"$"}{project.version}</version>
 		</dependency>
   </dependencies>

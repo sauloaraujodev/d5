@@ -13,5 +13,5 @@
 		<relativePath>../parent</relativePath>
 	</parent>
 
-	<artifactId>${projectIdentifier}-domain-common</artifactId>
+	<artifactId>${projectIdentifier}-domain-shared</artifactId>
 </project>

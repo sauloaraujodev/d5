@@ -6,8 +6,10 @@ import java.util.*;
 <#if attribute.import??>
 import ${attribute.import};
 </#if>
-</#list>
+<#if attribute?is_last>
 
+</#if>
+</#list>
 public class ${entity.name}<#if entity.extends??> extends ${entity.extends.name}</#if> {
 <#list attributesOrReferences(entity) as attribute>
 	private <#if attribute.type??>${attribute.type}</#if> <#if attribute.name??>${attribute.name}</#if>;
@@ -15,15 +17,15 @@ public class ${entity.name}<#if entity.extends??> extends ${entity.extends.name}
 
 	</#if>
 </#list>
-	public ${entity.name}(<#if entity.extends?? && entity.extends.attributes?has_content><#list entity.extends.attributes as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if entity.attributes?has_content>, </#if></#if><#list entity.attributes as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
+	public ${entity.name}(<#if entity.extends?? && attributesOrReferences(entity.extends)?has_content><#list attributesOrReferences(entity.extends) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if attributesOrReferences(entity)?has_content>, </#if></#if><#list attributesOrReferences(entity) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
 <#if entity.extends??>
-		super(<#list entity.extends.attributes as attribute>${attribute.name}<#sep>, </#list>);
+		super(<#list attributesOrReferences(entity.extends) as attribute>${attribute.name}<#sep>, </#list>);
 </#if>
-<#list entity.attributes as attribute>
+<#list attributesOrReferences(entity) as attribute>
 		set${lowerCamelToUpperCamel(attribute.name)}(${attribute.name});
 </#list>
 	}
-<#list entity.attributes as attribute>
+<#list attributesOrReferences(entity) as attribute>
 
 	public void set${lowerCamelToUpperCamel(attribute.name)}(${attribute.type} ${attribute.name}) {
 		this.${attribute.name} = <#if !attribute.nullable>Objects.requireNonNull(</#if>${attribute.name}<#if !attribute.nullable>)</#if>;

@@ -2,22 +2,30 @@ package ${packagePrefix}.domain.${upperCamelToLowerUnderscore(boundedContext.nam
 
 import java.util.*;
 
+<#list attributesOrReferences(valueObject) as attribute>
+<#if attribute.import??>
+import ${attribute.import};
+</#if>
+<#if attribute?is_last>
+
+</#if>
+</#list>
 public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObject.extends.name}</#if> {
-<#list valueObject.attributes as attribute>
+<#list attributesOrReferences(valueObject) as attribute>
 	private final ${attribute.type} ${attribute.name};
 	<#if attribute?is_last>
 
 	</#if>
 </#list>
-	public ${valueObject.name}(<#if valueObject.extends?? && valueObject.extends.attributes?has_content><#list valueObject.extends.attributes as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if valueObject.attributes?has_content>, </#if></#if><#list valueObject.attributes as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
+	public ${valueObject.name}(<#if valueObject.extends?? && attributesOrReferences(valueObject.extends)?has_content><#list attributesOrReferences(valueObject.extends) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if attributesOrReferences(valueObject)?has_content>, </#if></#if><#list attributesOrReferences(valueObject) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
 <#if valueObject.extends??>
-		super(<#list valueObject.extends.attributes as attribute>${attribute.name}<#sep>, </#list>);
+		super(<#list attributesOrReferences(valueObject.extends) as attribute>${attribute.name}<#sep>, </#list>);
 </#if>
-<#list valueObject.attributes as attribute>
+<#list attributesOrReferences(valueObject) as attribute>
 		this.${attribute.name} = ${attribute.name};
 </#list>
 	}
-<#list valueObject.attributes as attribute>
+<#list attributesOrReferences(valueObject) as attribute>
 
 	public ${attribute.type} get${lowerCamelToUpperCamel(attribute.name)}() {
 		return ${attribute.name};
@@ -40,9 +48,9 @@ public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObjec
 			return false;
 		}
 </#if>
-<#if valueObject.attributes?has_content>
+<#if attributesOrReferences(valueObject)?has_content>
 		var that = (${valueObject.name}) object;
-<#list valueObject.attributes as attribute>
+<#list attributesOrReferences(valueObject) as attribute>
 		if (!Objects.deepEquals(${attribute.name}, that.${attribute.name})) {
 			return false;
 		}
@@ -53,6 +61,6 @@ public class ${valueObject.name}<#if valueObject.extends??> extends ${valueObjec
 
 	@Override
 	public int hashCode() {
-		return <#if valueObject.extends??>31 * super.hashCode() + </#if>Objects.hash(<#list valueObject.attributes as attribute>${attribute.name}<#if !attribute?is_last>, </#if></#list>);
+		return <#if valueObject.extends??>31 * super.hashCode() + </#if>Objects.hash(<#list attributesOrReferences(valueObject) as attribute>${attribute.name}<#if !attribute?is_last>, </#if></#list>);
 	}	
 }
