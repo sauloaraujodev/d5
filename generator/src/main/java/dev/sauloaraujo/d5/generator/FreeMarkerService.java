@@ -18,6 +18,11 @@ public class FreeMarkerService {
 	private @Autowired Configuration configuration;
 
 	public void process(File file, String templateName, Map<String, Object> dataModel) {
+		dataModel.put("lowerCamelToUpperCamel", new LowerCamelToUpperCamelMethodModel());
+		dataModel.put("upperCamelToLowerCamel", new UpperCamelToLowerCamelMethodModel());
+		dataModel.put("upperCamelToLowerHyphen", new UpperCamelToLowerHyphenMethodModel());
+		dataModel.put("upperCamelToLowerUnderscore", new UpperCamelToLowerUnderscoreMethodModel());
+
 		file.getParentFile().mkdirs();
 		try (var writer = new FileWriter(file, UTF_8)) {
 			var template = configuration.getTemplate(templateName);

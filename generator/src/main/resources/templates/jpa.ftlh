@@ -1,3 +1,4 @@
+<#ftl output_format="XML">
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -15,15 +16,15 @@
 
 	<artifactId>${projectIdentifier}-infrastructure-jpa</artifactId>
 	
-	<dependencies>
+	<dependencies>	
 		<dependency>
 		    <groupId>org.flywaydb</groupId>
 		    <artifactId>flyway-core</artifactId>
 		</dependency>
 
 		<dependency>
-		    <groupId>org.modelmapper</groupId>
-		    <artifactId>modelmapper</artifactId>
+		    <groupId>org.mapstruct</groupId>
+		    <artifactId>mapstruct</artifactId>
 		</dependency>
 
 		<dependency>
@@ -43,6 +44,12 @@
 			<groupId>${"$"}{project.groupId}</groupId>
 			<artifactId>${projectIdentifier}-application</artifactId>
 			<version>${"$"}{project.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-test</artifactId>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>		
 </project>

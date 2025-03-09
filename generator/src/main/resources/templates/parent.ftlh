@@ -1,3 +1,4 @@
+<#ftl output_format="XML">
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -18,7 +19,7 @@
   	<version>${version}</version>
   
   	<packaging>pom</packaging>
-
+  	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -26,7 +27,7 @@
 					<groupId>com.google.cloud.tools</groupId>
 					<artifactId>jib-maven-plugin</artifactId>
 					<version>3.4.4</version>
-				</plugin>
+				</plugin>				
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -34,10 +35,10 @@
   	<dependencyManagement>
   		<dependencies>
 			<dependency>
-			    <groupId>org.modelmapper</groupId>
-			    <artifactId>modelmapper</artifactId>
-			    <version>3.2.2</version>
-			</dependency>
+			    <groupId>org.mapstruct</groupId>
+			    <artifactId>mapstruct</artifactId>
+			    <version>1.6.3</version>
+			</dependency>			
   		</dependencies>
   	</dependencyManagement>
 </project>

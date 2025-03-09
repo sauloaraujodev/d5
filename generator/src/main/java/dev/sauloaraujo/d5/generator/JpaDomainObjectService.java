@@ -1,11 +1,9 @@
 package dev.sauloaraujo.d5.generator;
 
-import static dev.sauloaraujo.d5.generator.FileService.SHARED_MODULE;
 import static dev.sauloaraujo.d5.generator.UpperCamelToLowerUnderscoreMethodModel.convert;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Set;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
 import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
@@ -16,22 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DomainObjectService {
+public class JpaDomainObjectService {
 	private @Autowired FileService fileService;
 	private @Autowired FreeMarkerService freeMarkerService;
-	private @Autowired SharedKernelService sharedKernelService;
 
 	public void generate(String outputPath, String projectIdentifier, String groupId, String version,
 			String packagePrefix, ContextMappingModel model) {
-		var sharedValueObjects = sharedKernelService.sharedValueObjects(model);
-
 		for (var boundedContext : model.getBoundedContexts()) {
 			for (var aggregate : boundedContext.getAggregates()) {
 				for (var domainObject : aggregate.getDomainObjects()) {
 					if (domainObject instanceof ValueObject) {
 						var valueObject = (ValueObject) domainObject;
-						generate(outputPath, projectIdentifier, packagePrefix, sharedValueObjects, boundedContext,
-								aggregate, valueObject);
+						generate(outputPath, projectIdentifier, packagePrefix, boundedContext, aggregate, valueObject);
 					} else if (domainObject instanceof Entity) {
 						var entity = (Entity) domainObject;
 						generate(outputPath, projectIdentifier, packagePrefix, boundedContext, aggregate, entity);
@@ -42,11 +36,8 @@ public class DomainObjectService {
 	}
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
-			Set<ValueObject> sharedValueObjects, BoundedContext boundedContext, Aggregate aggregate,
-			ValueObject valueObject) {
-		var directory = sharedValueObjects.contains(valueObject)
-				? fileService.moduleDirectory(outputPath, projectIdentifier, SHARED_MODULE)
-				: fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
+			BoundedContext boundedContext, Aggregate aggregate, ValueObject valueObject) {
+		var directory = fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
 
 		var packageName = packagePrefix + ".domain." + convert(boundedContext.getName()) + "."
 				+ convert(aggregate.getName());
@@ -61,7 +52,7 @@ public class DomainObjectService {
 		dataModel.put("aggregate", aggregate);
 		dataModel.put("valueObject", valueObject);
 
-		freeMarkerService.process(file, "ValueObject.ftlh", dataModel);
+		freeMarkerService.process(file, "JpaValueObject.ftlh", dataModel);
 	}
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
@@ -82,7 +73,7 @@ public class DomainObjectService {
 		dataModel.put("aggregate", aggregate);
 		dataModel.put("entity", entity);
 
-		freeMarkerService.process(file, "Entity.ftlh", dataModel);
+		freeMarkerService.process(file, "JpaEntity.ftlh", dataModel);
 
 		if (entity.isAggregateRoot()) {
 			file = new File(domainDirectory,

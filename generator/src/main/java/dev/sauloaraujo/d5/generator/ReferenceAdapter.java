@@ -21,7 +21,14 @@ public class ReferenceAdapter implements AttributeOrReference {
 	}
 
 	public String getType() {
-		return reference.getDomainObjectType().getName();
+		var domainObjectTypeName = reference.getDomainObjectType().getName();
+		var collectionType = reference.getCollectionType();
+		switch (collectionType) {
+		case NONE:
+			return domainObjectTypeName;
+		default:
+			return collectionType.getName() + "<" + domainObjectTypeName + ">";
+		}
 	}
 
 	public boolean isNullable() {
