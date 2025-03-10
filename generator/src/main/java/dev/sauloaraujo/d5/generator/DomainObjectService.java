@@ -1,9 +1,10 @@
 package dev.sauloaraujo.d5.generator;
 
+import static dev.sauloaraujo.d5.generator.FileService.JAVA_DIRECTORY;
+import static dev.sauloaraujo.d5.generator.FileService.MAIN_DIRECTORY;
 import static dev.sauloaraujo.d5.generator.FileService.SHARED_MODULE;
 import static dev.sauloaraujo.d5.generator.UpperCamelToLowerUnderscoreMethodModel.convert;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -44,15 +45,13 @@ public class DomainObjectService {
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			Set<ValueObject> sharedValueObjects, BoundedContext boundedContext, Aggregate aggregate,
 			ValueObject valueObject) {
-		var directory = sharedValueObjects.contains(valueObject)
-				? fileService.moduleDirectory(outputPath, projectIdentifier, SHARED_MODULE)
-				: fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
+		var module = sharedValueObjects.contains(valueObject) ? SHARED_MODULE
+				: fileService.domainModule(boundedContext);
 
-		var packageName = packagePrefix + ".domain." + convert(boundedContext.getName()) + "."
-				+ convert(aggregate.getName());
-		var packagePath = packageName.replace('.', '/');
+		var subPackage = "domain." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
-		var file = new File(directory, "src/main/java/" + packagePath + "/" + valueObject.getName() + ".java");
+		var file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+				packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
@@ -66,13 +65,12 @@ public class DomainObjectService {
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			BoundedContext boundedContext, Aggregate aggregate, Entity entity) {
-		var domainDirectory = fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
+		var module = fileService.domainModule(boundedContext);
 
-		var packageName = packagePrefix + ".domain." + convert(boundedContext.getName()) + "."
-				+ convert(aggregate.getName());
-		var packagePath = packageName.replace('.', '/');
+		var subPackage = "domain." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
-		var file = new File(domainDirectory, "src/main/java/" + packagePath + "/" + entity.getName() + ".java");
+		var file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+				packagePrefix, subPackage, entity.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
@@ -85,12 +83,12 @@ public class DomainObjectService {
 		freeMarkerService.process(file, "Entity.ftlh", dataModel);
 
 		if (entity.isAggregateRoot()) {
-			file = new File(domainDirectory,
-					"src/main/java/" + packagePath + "/" + entity.getName() + "Repository.java");
+			file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+					packagePrefix, subPackage, entity.getName() + "Repository");
 			freeMarkerService.process(file, "Repository.ftlh", dataModel);
 
-			file = new File(domainDirectory,
-					"src/main/java/" + packagePath + "/" + entity.getName() + "DomainService.java");
+			file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+					packagePrefix, subPackage, entity.getName() + "DomainService");
 			freeMarkerService.process(file, "DomainService.ftlh", dataModel);
 		}
 	}

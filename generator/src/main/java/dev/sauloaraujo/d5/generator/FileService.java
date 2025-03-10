@@ -41,16 +41,25 @@ class FileService {
 	}
 
 	File domainDirectory(String outputPath, String projectIdentifier, BoundedContext boundedContext) {
-		return domainDirectory(outputPath, projectIdentifier, boundedContext, DOMAIN_SUFFIX);
+		var module = domainModule(boundedContext);
+		return moduleDirectory(outputPath, projectIdentifier, module);
 	}
 
 	File bddDirectory(String outputPath, String projectIdentifier, BoundedContext boundedContext) {
-		return domainDirectory(outputPath, projectIdentifier, boundedContext, BDD_SUFFIX);
+		var module = bddModule(boundedContext);
+		return moduleDirectory(outputPath, projectIdentifier, module);
 	}
 
-	File domainDirectory(String outputPath, String projectIdentifier, BoundedContext boundedContext, String suffix) {
-		var module = DOMAIN_PREFIX + convert(boundedContext.getName()) + suffix;
-		return moduleDirectory(outputPath, projectIdentifier, module);
+	String domainModule(BoundedContext boundedContext) {
+		return domainModule(boundedContext, DOMAIN_SUFFIX);
+	}
+
+	String bddModule(BoundedContext boundedContext) {
+		return domainModule(boundedContext, BDD_SUFFIX);
+	}
+
+	String domainModule(BoundedContext boundedContext, String suffix) {
+		return DOMAIN_PREFIX + convert(boundedContext.getName()) + suffix;
 	}
 
 	File projectPomFile(String outputPath, String projectIdentifier) {
@@ -78,9 +87,9 @@ class FileService {
 	}
 
 	File classFile(String outputPath, String projectIdentifier, String module, String mainOrTest,
-			String javaOrResources, String packagePreffix, String subPackage, String className) {
+			String javaOrResources, String packagePrefix, String subPackage, String className) {
 		var directory = sourceDirectory(outputPath, projectIdentifier, module, mainOrTest, javaOrResources,
-				packagePreffix, subPackage);
+				packagePrefix, subPackage);
 		return new File(directory, className + JAVA_EXTENSION);
 	}
 

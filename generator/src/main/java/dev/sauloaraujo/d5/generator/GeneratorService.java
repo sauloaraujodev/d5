@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class GeneratorService {
 	private @Autowired MavenService mavenService;
 	private @Autowired DomainObjectService domainObjectService;
+	private @Autowired JpaService jpaService;
 
 	public void generate(String outputPath, String projectIdentifier, String groupId, String version,
 			String packagePrefix, File cmlFile) {
@@ -19,5 +20,6 @@ public class GeneratorService {
 		var model = resource.getContextMappingModel();
 		mavenService.generate(outputPath, projectIdentifier, groupId, version, packagePrefix, model);
 		domainObjectService.generate(outputPath, projectIdentifier, groupId, version, packagePrefix, model);
+		jpaService.generate(outputPath, projectIdentifier, groupId, version, packagePrefix, model);
 	}
 }
