@@ -78,6 +78,5 @@ public class MavenService {
 			Map<String, Object> dataModel) {
 		dataModel.put("boundedContext", boundedContext);
 		generate(fileService.domainPomFile(outputPath, projectIdentifier, boundedContext), "domain.ftlh", dataModel);
-		generate(fileService.bddPomFile(outputPath, projectIdentifier, boundedContext), "domain-bdd.ftlh", dataModel);
 	}
 }

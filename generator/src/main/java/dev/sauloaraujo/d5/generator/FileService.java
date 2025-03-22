@@ -18,8 +18,6 @@ class FileService {
 	static final String ANGULAR_MODULE = "presentation-angular";
 
 	static final String DOMAIN_PREFIX = "domain-";
-	static final String DOMAIN_SUFFIX = "";
-	static final String BDD_SUFFIX = "-bdd";
 
 	static final String POM_FILE = "pom.xml";
 
@@ -45,21 +43,8 @@ class FileService {
 		return moduleDirectory(outputPath, projectIdentifier, module);
 	}
 
-	File bddDirectory(String outputPath, String projectIdentifier, BoundedContext boundedContext) {
-		var module = bddModule(boundedContext);
-		return moduleDirectory(outputPath, projectIdentifier, module);
-	}
-
 	String domainModule(BoundedContext boundedContext) {
-		return domainModule(boundedContext, DOMAIN_SUFFIX);
-	}
-
-	String bddModule(BoundedContext boundedContext) {
-		return domainModule(boundedContext, BDD_SUFFIX);
-	}
-
-	String domainModule(BoundedContext boundedContext, String suffix) {
-		return DOMAIN_PREFIX + convert(boundedContext.getName()) + suffix;
+		return DOMAIN_PREFIX + convert(boundedContext.getName());
 	}
 
 	File projectPomFile(String outputPath, String projectIdentifier) {
@@ -74,11 +59,6 @@ class FileService {
 
 	File domainPomFile(String outputPath, String projectIdentifier, BoundedContext boundedContext) {
 		var directory = domainDirectory(outputPath, projectIdentifier, boundedContext);
-		return directoryPomFile(directory);
-	}
-
-	File bddPomFile(String outputPath, String projectIdentifier, BoundedContext boundedContext) {
-		var directory = bddDirectory(outputPath, projectIdentifier, boundedContext);
 		return directoryPomFile(directory);
 	}
 

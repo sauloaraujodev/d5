@@ -40,7 +40,6 @@
   		<module>domain-shared</module>  		
 <#list model.boundedContexts as context>
   		<module>domain-${upperCamelToLowerHyphen(context.name)}</module>
-  		<module>domain-${upperCamelToLowerHyphen(context.name)}-bdd</module>
 </#list>
 		<module>infrastructure-jpa</module>
 		<module>parent</module>
