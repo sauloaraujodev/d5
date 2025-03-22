@@ -1,5 +1,5 @@
 <#ftl output_format="plainText">
-package ${packagePrefix}.infrastructure.jpa;
+package ${packagePrefix}.infrastructure.persistence;
 
 import java.util.*;
 

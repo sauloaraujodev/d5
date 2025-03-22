@@ -1,7 +1,7 @@
 package dev.sauloaraujo.d5.generator;
 
+import static dev.sauloaraujo.d5.generator.FileService.INFRASTRUCTURE_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.JAVA_DIRECTORY;
-import static dev.sauloaraujo.d5.generator.FileService.JPA_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.MAIN_DIRECTORY;
 
 import java.util.HashMap;
@@ -39,9 +39,9 @@ public class JpaService {
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			BoundedContext boundedContext, Aggregate aggregate, ValueObject valueObject) {
-		var subPackage = "infrastructure.jpa";
+		var subPackage = "infrastructure.persistence";
 
-		var file = fileService.classFile(outputPath, projectIdentifier, JPA_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
+		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
 				packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();

@@ -26,16 +26,27 @@
 	</build>	
 
 	<dependencies>
+		<!-- compile -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
 			<version>24.3.13</version>
+			<scope>compile</scope>
 		</dependency>
 	
 		<dependency>
 			<groupId>${"$"}{project.groupId}</groupId>
 			<artifactId>${projectIdentifier}-application</artifactId>
 			<version>${"$"}{project.version}</version>
+			<scope>compile</scope>
 		</dependency>
-	</dependencies>		
+		
+		<!-- runtime -->
+		<dependency>
+			<groupId>${"$"}{project.groupId}</groupId>
+			<artifactId>${projectIdentifier}-infrastructure</artifactId>
+			<version>${"$"}{project.version}</version>
+			<scope>runtime</scope>
+		</dependency>		
+	</dependencies>
 </project>

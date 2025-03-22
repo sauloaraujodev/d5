@@ -41,7 +41,7 @@
 <#list model.boundedContexts as context>
   		<module>domain-${upperCamelToLowerHyphen(context.name)}</module>
 </#list>
-		<module>infrastructure-jpa</module>
+		<module>infrastructure</module>
 		<module>parent</module>
   		<module>presentation-angular</module>
   		<module>presentation-backend</module>

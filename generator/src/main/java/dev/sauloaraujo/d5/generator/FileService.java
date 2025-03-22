@@ -12,7 +12,7 @@ class FileService {
 	static final String PARENT_MODULE = "parent";
 	static final String SHARED_MODULE = "domain-shared";
 	static final String APPLICATION_MODULE = "application";
-	static final String JPA_MODULE = "infrastructure-jpa";
+	static final String INFRASTRUCTURE_MODULE = "infrastructure";
 	static final String VAADIN_MODULE = "presentation-vaadin";
 	static final String BACKEND_MODULE = "presentation-backend";
 	static final String ANGULAR_MODULE = "presentation-angular";

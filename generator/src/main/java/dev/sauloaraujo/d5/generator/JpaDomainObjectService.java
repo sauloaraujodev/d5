@@ -1,7 +1,7 @@
 package dev.sauloaraujo.d5.generator;
 
+import static dev.sauloaraujo.d5.generator.FileService.INFRASTRUCTURE_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.JAVA_DIRECTORY;
-import static dev.sauloaraujo.d5.generator.FileService.JPA_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.MAIN_DIRECTORY;
 import static dev.sauloaraujo.d5.generator.UpperCamelToLowerUnderscoreMethodModel.convert;
 
@@ -45,9 +45,9 @@ public class JpaDomainObjectService {
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			Set<ValueObject> sharedValueObjects, BoundedContext boundedContext, Aggregate aggregate,
 			ValueObject valueObject) {
-		var subPackage = "infrastructure.jpa." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
+		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
-		var file = fileService.classFile(outputPath, projectIdentifier, JPA_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
+		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
 				packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();
@@ -64,7 +64,7 @@ public class JpaDomainObjectService {
 			BoundedContext boundedContext, Aggregate aggregate, Entity entity) {
 		var module = fileService.domainModule(boundedContext);
 
-		var subPackage = "infrastructure.jpa." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
+		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
 		var file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
 				packagePrefix, subPackage, entity.getName());

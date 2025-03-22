@@ -3,8 +3,8 @@ package dev.sauloaraujo.d5.generator;
 import static dev.sauloaraujo.d5.generator.FileService.ANGULAR_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.APPLICATION_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.BACKEND_MODULE;
+import static dev.sauloaraujo.d5.generator.FileService.INFRASTRUCTURE_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.JAVA_DIRECTORY;
-import static dev.sauloaraujo.d5.generator.FileService.JPA_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.MAIN_DIRECTORY;
 import static dev.sauloaraujo.d5.generator.FileService.PARENT_MODULE;
 import static dev.sauloaraujo.d5.generator.FileService.SHARED_MODULE;
@@ -43,7 +43,7 @@ public class MavenService {
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, APPLICATION_MODULE), "application.ftlh",
 				dataModel);
-		generate(fileService.modulePomFile(outputPath, projectIdentifier, JPA_MODULE), "jpa.ftlh", dataModel);
+		generate(fileService.modulePomFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE), "infrastructure.ftlh", dataModel);
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, VAADIN_MODULE), "vaadin.ftlh", dataModel);
 		freeMarkerService

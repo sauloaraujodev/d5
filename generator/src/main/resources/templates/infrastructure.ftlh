@@ -14,7 +14,7 @@
 		<relativePath>../parent</relativePath>
 	</parent>
 
-	<artifactId>${projectIdentifier}-infrastructure-jpa</artifactId>
+	<artifactId>${projectIdentifier}-infrastructure</artifactId>
 	
 	<dependencies>	
 		<dependency>

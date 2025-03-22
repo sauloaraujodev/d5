@@ -17,20 +17,32 @@
 	<artifactId>${projectIdentifier}-presentation-backend</artifactId>
 
 	<dependencies>
+		<!-- compile -->
 		<dependency>
 		    <groupId>org.mapstruct</groupId>
 		    <artifactId>mapstruct</artifactId>
+		    <scope>compile</scope>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-web</artifactId>
+		    <scope>compile</scope>		    
 		</dependency>
 			
 		<dependency>
 			<groupId>${"$"}{project.groupId}</groupId>
 			<artifactId>${projectIdentifier}-application</artifactId>
 			<version>${"$"}{project.version}</version>
+		    <scope>compile</scope>			
 		</dependency>
+		
+		<!-- runtime -->
+		<dependency>
+			<groupId>${"$"}{project.groupId}</groupId>
+			<artifactId>${projectIdentifier}-infrastructure</artifactId>
+			<version>${"$"}{project.version}</version>
+			<scope>runtime</scope>
+		</dependency>		
 	</dependencies>
 </project>
