@@ -10,7 +10,7 @@
   	<parent>
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-parent</artifactId>
-	    <version>3.4.2</version>
+	    <version>3.4.4</version>
 	    <relativePath/>
 	</parent>
 
@@ -20,6 +20,10 @@
   
   	<packaging>pom</packaging>
   	
+    <properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>	
+    </properties>
+  	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -27,7 +31,20 @@
 					<groupId>com.google.cloud.tools</groupId>
 					<artifactId>jib-maven-plugin</artifactId>
 					<version>3.4.4</version>
-				</plugin>				
+					<configuration>
+						<to>
+							<image>${"$"}{artifactId}:${"$"}{version}</image>
+						</to>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>dockerBuild</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

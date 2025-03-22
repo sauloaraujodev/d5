@@ -15,24 +15,6 @@
   	
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>com.google.cloud.tools</groupId>
-				<artifactId>jib-maven-plugin</artifactId>
-				<configuration>
-					<to>
-						<image>${"$"}{project.artifactId}:${"$"}{version}</image>
-					</to>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>dockerBuild</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
   			<plugin>
 			    <groupId>com.github.ferstl</groupId>
 			    <artifactId>depgraph-maven-plugin</artifactId>

@@ -15,12 +15,57 @@
 	</parent>
 
 	<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(boundedContext.name)}</artifactId>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-bom</artifactId>
+				<version>7.21.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>      
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
+		<!-- compile -->
 		<dependency>
 			<groupId>${groupId}</groupId>
 			<artifactId>${projectIdentifier}-domain-shared</artifactId>
 			<version>${"$"}{project.version}</version>
+			<scope>compile</scope>
 		</dependency>
-  </dependencies>
+		
+		<!-- test -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<scope>test</scope>
+		</dependency>
+	
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit-platform-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+	   
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<scope>test</scope>
+		</dependency>    
+		
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+	    </dependency>
+	    
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>	    
+	</dependencies>
 </project>

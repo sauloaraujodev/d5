@@ -18,7 +18,7 @@ class Jpa${valueObject.name}<#if valueObject.extends??> extends Jpa${valueObject
 
 	</#if>
 </#list>
-	${valueObject.name}(<#if valueObject.extends?? && attributesOrReferences(valueObject.extends)?has_content><#list attributesOrReferences(valueObject.extends) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if attributesOrReferences(valueObject)?has_content>, </#if></#if><#list attributesOrReferences(valueObject) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
+	Jpa${valueObject.name}(<#if valueObject.extends?? && attributesOrReferences(valueObject.extends)?has_content><#list attributesOrReferences(valueObject.extends) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list><#if attributesOrReferences(valueObject)?has_content>, </#if></#if><#list attributesOrReferences(valueObject) as attribute>${attribute.type} ${attribute.name}<#sep>, </#list>) {
 <#if valueObject.extends??>
 		super(<#list attributesOrReferences(valueObject.extends) as attribute>${attribute.name}<#sep>, </#list>);
 </#if>
@@ -50,7 +50,7 @@ class Jpa${valueObject.name}<#if valueObject.extends??> extends Jpa${valueObject
 		}
 </#if>
 <#if attributesOrReferences(valueObject)?has_content>
-		var that = (${valueObject.name}) object;
+		var that = (Jpa${valueObject.name}) object;
 <#list attributesOrReferences(valueObject) as attribute>
 		if (!Objects.deepEquals(${attribute.name}, that.${attribute.name})) {
 			return false;

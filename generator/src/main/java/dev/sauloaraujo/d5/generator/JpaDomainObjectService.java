@@ -1,9 +1,12 @@
 package dev.sauloaraujo.d5.generator;
 
+import static dev.sauloaraujo.d5.generator.FileService.JAVA_DIRECTORY;
+import static dev.sauloaraujo.d5.generator.FileService.JPA_MODULE;
+import static dev.sauloaraujo.d5.generator.FileService.MAIN_DIRECTORY;
 import static dev.sauloaraujo.d5.generator.UpperCamelToLowerUnderscoreMethodModel.convert;
 
-import java.io.File;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
 import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
@@ -17,15 +20,19 @@ import org.springframework.stereotype.Service;
 public class JpaDomainObjectService {
 	private @Autowired FileService fileService;
 	private @Autowired FreeMarkerService freeMarkerService;
+	private @Autowired SharedKernelService sharedKernelService;
 
 	public void generate(String outputPath, String projectIdentifier, String groupId, String version,
 			String packagePrefix, ContextMappingModel model) {
+		var sharedValueObjects = sharedKernelService.sharedValueObjects(model);
+
 		for (var boundedContext : model.getBoundedContexts()) {
 			for (var aggregate : boundedContext.getAggregates()) {
 				for (var domainObject : aggregate.getDomainObjects()) {
 					if (domainObject instanceof ValueObject) {
 						var valueObject = (ValueObject) domainObject;
-						generate(outputPath, projectIdentifier, packagePrefix, boundedContext, aggregate, valueObject);
+						generate(outputPath, projectIdentifier, packagePrefix, sharedValueObjects, boundedContext,
+								aggregate, valueObject);
 					} else if (domainObject instanceof Entity) {
 						var entity = (Entity) domainObject;
 						generate(outputPath, projectIdentifier, packagePrefix, boundedContext, aggregate, entity);
@@ -36,14 +43,12 @@ public class JpaDomainObjectService {
 	}
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
-			BoundedContext boundedContext, Aggregate aggregate, ValueObject valueObject) {
-		var directory = fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
+			Set<ValueObject> sharedValueObjects, BoundedContext boundedContext, Aggregate aggregate,
+			ValueObject valueObject) {
+		var subPackage = "infrastructure.jpa." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
-		var packageName = packagePrefix + ".domain." + convert(boundedContext.getName()) + "."
-				+ convert(aggregate.getName());
-		var packagePath = packageName.replace('.', '/');
-
-		var file = new File(directory, "src/main/java/" + packagePath + "/" + valueObject.getName() + ".java");
+		var file = fileService.classFile(outputPath, projectIdentifier, JPA_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
+				packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
@@ -57,13 +62,12 @@ public class JpaDomainObjectService {
 
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			BoundedContext boundedContext, Aggregate aggregate, Entity entity) {
-		var domainDirectory = fileService.domainDirectory(outputPath, projectIdentifier, boundedContext);
+		var module = fileService.domainModule(boundedContext);
 
-		var packageName = packagePrefix + ".domain." + convert(boundedContext.getName()) + "."
-				+ convert(aggregate.getName());
-		var packagePath = packageName.replace('.', '/');
+		var subPackage = "infrastructure.jpa." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
 
-		var file = new File(domainDirectory, "src/main/java/" + packagePath + "/" + entity.getName() + ".java");
+		var file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+				packagePrefix, subPackage, entity.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
@@ -75,14 +79,14 @@ public class JpaDomainObjectService {
 
 		freeMarkerService.process(file, "JpaEntity.ftlh", dataModel);
 
-		if (entity.isAggregateRoot()) {
-			file = new File(domainDirectory,
-					"src/main/java/" + packagePath + "/" + entity.getName() + "Repository.java");
-			freeMarkerService.process(file, "Repository.ftlh", dataModel);
-
-			file = new File(domainDirectory,
-					"src/main/java/" + packagePath + "/" + entity.getName() + "DomainService.java");
-			freeMarkerService.process(file, "DomainService.ftlh", dataModel);
-		}
+//		if (entity.isAggregateRoot()) {
+//			file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+//					packagePrefix, subPackage, entity.getName() + "Repository");
+//			freeMarkerService.process(file, "Repository.ftlh", dataModel);
+//
+//			file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
+//					packagePrefix, subPackage, entity.getName() + "DomainService");
+//			freeMarkerService.process(file, "DomainService.ftlh", dataModel);
+//		}
 	}
 }
