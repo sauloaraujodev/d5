@@ -45,10 +45,11 @@ public class JpaDomainObjectService {
 	public void generate(String outputPath, String projectIdentifier, String packagePrefix,
 			Set<ValueObject> sharedValueObjects, BoundedContext boundedContext, Aggregate aggregate,
 			ValueObject valueObject) {
-		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
+		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "."
+				+ convert(aggregate.getName());
 
-		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
-				packagePrefix, subPackage, valueObject.getName());
+		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY,
+				JAVA_DIRECTORY, packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
@@ -64,7 +65,8 @@ public class JpaDomainObjectService {
 			BoundedContext boundedContext, Aggregate aggregate, Entity entity) {
 		var module = fileService.domainModule(boundedContext);
 
-		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "." + convert(aggregate.getName());
+		var subPackage = "infrastructure.persistence." + convert(boundedContext.getName()) + "."
+				+ convert(aggregate.getName());
 
 		var file = fileService.classFile(outputPath, projectIdentifier, module, MAIN_DIRECTORY, JAVA_DIRECTORY,
 				packagePrefix, subPackage, entity.getName());

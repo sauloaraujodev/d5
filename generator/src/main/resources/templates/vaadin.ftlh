@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
-			<version>24.3.13</version>
+			<version>24.7.0</version>
 			<scope>compile</scope>
 		</dependency>
 	

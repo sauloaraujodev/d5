@@ -43,7 +43,8 @@ public class MavenService {
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, APPLICATION_MODULE), "application.ftlh",
 				dataModel);
-		generate(fileService.modulePomFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE), "infrastructure.ftlh", dataModel);
+		generate(fileService.modulePomFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE), "infrastructure.ftlh",
+				dataModel);
 
 		generate(fileService.modulePomFile(outputPath, projectIdentifier, VAADIN_MODULE), "vaadin.ftlh", dataModel);
 		freeMarkerService

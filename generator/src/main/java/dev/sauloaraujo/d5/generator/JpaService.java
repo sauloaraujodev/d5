@@ -41,8 +41,8 @@ public class JpaService {
 			BoundedContext boundedContext, Aggregate aggregate, ValueObject valueObject) {
 		var subPackage = "infrastructure.persistence";
 
-		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY, JAVA_DIRECTORY,
-				packagePrefix, subPackage, valueObject.getName());
+		var file = fileService.classFile(outputPath, projectIdentifier, INFRASTRUCTURE_MODULE, MAIN_DIRECTORY,
+				JAVA_DIRECTORY, packagePrefix, subPackage, valueObject.getName());
 
 		var dataModel = new HashMap<String, Object>();
 		dataModel.put("attributesOrReferences", new AttributesOrReferencesMethodModel(packagePrefix));
