@@ -3,7 +3,7 @@ package ${packagePrefix}.domain.${upperCamelToLowerUnderscore(boundedContext.nam
 
 import java.util.*;
 
-<#list attributesOrReferences(entity) as attribute>
+<#list attributesOrReferences(entity)?filter(a -> a.import??) as attribute>
 <#if attribute.import??>
 import ${attribute.import};
 </#if>

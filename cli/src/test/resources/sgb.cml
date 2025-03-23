@@ -8,10 +8,8 @@ ContextMap {
 	contains Administracao
 	contains Acervo	
 	contains Analise	
-	
-	Acervo Shared-Kernel Administracao
 
-	Analise Shared-Kernel Administracao	
+	Acervo  Shared-Kernel Administracao
 	Analise Shared-Kernel Acervo
 }
 

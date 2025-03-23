@@ -16,20 +16,24 @@
 
 	<artifactId>${projectIdentifier}-infrastructure</artifactId>
 	
-	<dependencies>	
+	<dependencies>
+		<!-- compile -->
 		<dependency>
 		    <groupId>org.flywaydb</groupId>
 		    <artifactId>flyway-core</artifactId>
+		    <scope>compile</scope>
 		</dependency>
 
 		<dependency>
 		    <groupId>org.mapstruct</groupId>
 		    <artifactId>mapstruct</artifactId>
+		    <scope>compile</scope>
 		</dependency>
 
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-data-jpa</artifactId>
+		    <scope>compile</scope>
 		</dependency>
 <#list model.boundedContexts as context>
 
@@ -37,6 +41,7 @@
 			<groupId>${"$"}{project.groupId}</groupId>
 			<artifactId>${projectIdentifier}-domain-${upperCamelToLowerHyphen(context.name)}</artifactId>
 			<version>${"$"}{project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 </#list>
 
@@ -44,8 +49,10 @@
 			<groupId>${"$"}{project.groupId}</groupId>
 			<artifactId>${projectIdentifier}-application</artifactId>
 			<version>${"$"}{project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
+		<!-- test -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-test</artifactId>

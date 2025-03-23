@@ -20,6 +20,7 @@
 <#list model.boundedContexts as context>
 <#if !context?is_first>
 
+<!-- compile -->
 </#if>
 		<dependency>
 			<groupId>${"$"}{project.groupId}</groupId>
