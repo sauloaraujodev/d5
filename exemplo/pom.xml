@@ -15,10 +15,18 @@
 
 	<packaging>pom</packaging>
 
-	<properties>
-		<maven.deploy.skip>true</maven.deploy.skip>
-		<skipPublishing>true</skipPublishing>
-	</properties>
+	<repositories>
+		<repository>
+			<id>central-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<modules>
 		<module>dominio-compartilhado</module>

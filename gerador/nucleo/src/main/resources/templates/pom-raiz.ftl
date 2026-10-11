@@ -7,7 +7,7 @@
 <#if framework>
 		<groupId>dev.sauloaraujo</groupId>
 		<artifactId>d5-pai</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.0-SNAPSHOT</version>
 <#else>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -22,6 +22,21 @@
 
 	<packaging>pom</packaging>
 
+<#if framework>
+	<repositories>
+		<repository>
+			<id>central-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+</#if>
 <#if !framework>
 	<dependencyManagement>
 		<dependencies>

@@ -13,11 +13,6 @@
 
 	<packaging>pom</packaging>
 
-	<properties>
-		<maven.deploy.skip>true</maven.deploy.skip>
-		<skipPublishing>true</skipPublishing>
-	</properties>
-
 	<modules>
 		<module>cli</module>
 		<module>nucleo</module>

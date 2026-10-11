@@ -10,3 +10,29 @@ D5, trocadilho com as cinco letras D de **DDD**-**D**riven **D**evelopment, agil
 - [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"}.
 
 Siga o [tutorial](tutorial.md) para aprender a desenvolver com o framework de D5.
+
+## Como usar
+O framework é publicado no [Maven Central](https://central.sonatype.com/namespace/dev.sauloaraujo){target="_blank"}, com `groupId` `dev.sauloaraujo`, e requer Java 25. Enquanto a versão for `1.0.0-SNAPSHOT`, declare também o repositório de snapshots no `pom.xml` do projeto raiz:
+
+```xml
+<parent>
+    <groupId>dev.sauloaraujo</groupId>
+    <artifactId>d5-pai</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<repositories>
+    <repository>
+        <id>central-snapshots</id>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+```
+
+O [tutorial](tutorial.md) mostra o projeto completo.

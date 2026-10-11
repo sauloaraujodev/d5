@@ -3,6 +3,8 @@
 ## Módulos principais
 O framework possui módulos para as camadas de domínio, aplicação, infraestrutura e UI.
 
+Todos têm `groupId` `dev.sauloaraujo` e estão no [Maven Central](https://central.sonatype.com/namespace/dev.sauloaraujo){target="_blank"}. Na versão `1.0.0-SNAPSHOT`, é preciso declarar o [repositório de snapshots](../../index.md#como-usar).
+
 <div class="tabela-centralizada" markdown="1">
 
 | Módulo | Camada |

@@ -95,6 +95,8 @@ exemplo
 ### Arquivos pom.xml
 Crie um `pom.xml` para o projeto raiz e um para cada módulo, seguindo as [convenções](referencia/convencoes.md#maven). O raiz herda de `d5-pai` e declara os seis módulos.
 
+O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no repositório principal, porque a versão atual, `1.0.0-SNAPSHOT`, ainda não é uma versão final. Por isso, o `pom.xml` do projeto raiz declara esse repositório em `<repositories>`; os módulos o herdam.
+
 ```xml title="exemplo/pom.xml"
 --8<-- "exemplo/pom.xml"
 ```

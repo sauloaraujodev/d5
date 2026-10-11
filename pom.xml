@@ -59,9 +59,7 @@
 	</properties>
 
 	<modules>
-		<module>exemplo</module>
 		<module>framework</module>
-		<module>gerador</module>
 	</modules>
 
 	<build>
@@ -191,6 +189,22 @@
 	</dependencies>
 
 	<profiles>
+		<!-- Ativo por padrão. Desativado com -Dpublicar, para que exemplo e gerador não sejam publicados. -->
+		<profile>
+			<id>extras</id>
+
+			<activation>
+				<property>
+					<name>!publicar</name>
+				</property>
+			</activation>
+
+			<modules>
+				<module>exemplo</module>
+				<module>gerador</module>
+			</modules>
+		</profile>
+
 		<profile>
 			<id>release</id>
 
