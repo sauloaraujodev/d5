@@ -1,0 +1,47 @@
+site_name: D5
+site_description: D5 acelera o desenvolvimento de aplicações web com DDD, arquitetura limpa, CQRS, programação defensiva, Spring Boot e Spring Data JPA.
+site_author: Saulo Araujo
+site_url: https://d5.sauloaraujo.dev
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/zoom-diagrama.js
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight
+  - pymdownx.snippets:
+      base_path: ['.']
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - content.code.copy
+
+nav:
+  - Visão geral: index.md
+  - Tutorial: tutorial.md
+  - Referência:
+      - DDD: referencia/ddd.md
+      - Convenções: referencia/convencoes.md
+      - Framework:
+          - Visão geral: referencia/framework/index.md
+          - d5-framework-dominio: referencia/framework/dominio.md
+          - d5-framework-aplicacao: referencia/framework/aplicacao.md
+          - d5-framework-infraestrutura: referencia/framework/infraestrutura.md
+          - d5-framework-ui-backend: referencia/framework/ui-backend.md
+          - d5-framework-springdoc: referencia/framework/springdoc.md
+          - Comportamentos automáticos: referencia/framework/comportamentos.md
+      - Programação defensiva: referencia/programacao.md

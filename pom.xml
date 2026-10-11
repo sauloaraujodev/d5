@@ -1,0 +1,229 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.1.1</version>
+		<relativePath />
+	</parent>
+
+	<groupId>dev.sauloaraujo</groupId>
+	<artifactId>d5-pai</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<name>D5</name>
+	<description>Framework DDD-Driven Development para aplicações Spring Boot em
+		Java.</description>
+	<url>https://sauloaraujo.dev</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Saulo Araujo</name>
+			<email>contato@sauloaraujo.dev</email>
+			<url>https://sauloaraujo.dev</url>
+		</developer>
+	</developers>
+
+	<!-- TODO: substituir pela URL real assim que o repositório for criado -->
+	<scm>
+		<connection>
+			scm:git:https://github.com/sauloaraujo/TODO-repositorio-d5.git</connection>
+		<developerConnection>
+			scm:git:https://github.com/sauloaraujo/TODO-repositorio-d5.git</developerConnection>
+		<url>https://github.com/sauloaraujo/TODO-repositorio-d5</url>
+	</scm>
+
+	<properties>
+		<java.version>25</java.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<modules>
+		<module>exemplo</module>
+		<module>framework</module>
+		<module>gerador</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>am.ik.maven</groupId>
+				<artifactId>nullability-maven-plugin</artifactId>
+				<version>0.5.1</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<goals>
+							<goal>configure</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>3.1.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-aplicacao</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-aplicacao-teste</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-dominio</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-dominio-teste</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-bdd</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-infraestrutura</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-infraestrutura-teste</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-springdoc</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-ui-backend</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dev.sauloaraujo</groupId>
+				<artifactId>d5-framework-ui-backend-teste</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-bom</artifactId>
+				<version>7.34.8</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>6.1.3</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>5.23.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jspecify</groupId>
+			<artifactId>jspecify</artifactId>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.8</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.11.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

@@ -1,0 +1,9 @@
+services:
+  mkdocs-material:
+    container_name: mkdocs-material
+    image: squidfunk/mkdocs-material:9.7
+    command: serve --dev-addr=0.0.0.0:8000 -f documentacao/site/mkdocs.yml
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../..:/docs

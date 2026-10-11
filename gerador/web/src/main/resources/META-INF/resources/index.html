@@ -1,0 +1,131 @@
+<!doctype html>
+
+<html ng-app="d5">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="webjars/bootstrap/5.3.8/css/bootstrap.min.css" rel="stylesheet">
+	<script src="webjars/bootstrap/5.3.8/js/bootstrap.min.js"></script>
+
+	<link href="webjars/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+	<script src="webjars/angularjs/1.8.3/angular.min.js"></script>
+
+	<script>
+		const modulo = angular.module("d5", [])
+
+		modulo.controller("controlador", ($scope) => {
+			$scope.padraoMinusculas = /^[a-z]+$/
+
+			$scope.subdominios = [""]
+
+			$scope.incluirSubdominio = () => {
+				$scope.subdominios.unshift("")
+			}
+
+			$scope.excluirSubdominio = (indice) => {
+				$scope.subdominios.splice(indice, 1)
+			}
+		})
+	</script>
+
+	<title>D5 - DDD-Driven Development</title>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row mt-5">
+			<div class="col">
+
+				<pre class="mx-auto" style="width: fit-content">
+  _____  _____ 
+ |  __ \| ____|
+ | |  | | |__               DDD-Driven Development
+ | |  | |___ \                      0.0.1-SNAPSHOT
+ | |__| |___) |    Copyright (C) 2026 Saulo Araujo
+ |_____/|____/ </pre>
+
+			</div>
+		</div>
+
+		<form name="formulario" action="gerador" method="post" novalidate ng-controller="controlador">
+			<div class="row mt-5">
+				<div class="col-6">
+					<div>
+						<label class="form-label">groupId *</label>
+						<input class="form-control" type="text" name="groupId" required ng-model="groupId"
+							ng-pattern="/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/"
+							ng-class="{'is-invalid': formulario.$submitted && formulario.groupId.$invalid}">
+						<div class="invalid-feedback">
+							<span ng-if="formulario.groupId.$error.required">Obrigatório</span>
+							<span ng-if="!formulario.groupId.$error.required">Deve seguir a <a
+									href="https://maven.apache.org/guides/mini/guide-naming-conventions.html#project-group-identifier"
+									target="_blank">convenção Maven</a></span>
+						</div>
+					</div>
+
+					<div class="mt-3">
+						<label class="form-label">Nome do projeto *</label>
+						<input class="form-control" type="text" name="nome" required ng-model="nome"
+							ng-pattern="padraoMinusculas"
+							ng-class="{'is-invalid': formulario.$submitted && formulario.nome.$invalid}">
+						<div class="invalid-feedback">
+							<span ng-if="formulario.nome.$error.required">Obrigatório</span>
+							<span ng-if="!formulario.nome.$error.required">Deve conter apenas letras minúsculas</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-6">
+					<div ng-repeat="subdominio in subdominios track by $index">
+						<ng-form name="subdominioForm">
+							<div ng-class="{'mt-3': $index !== 0}">
+								<label class="form-label">Subdomínio *</label>
+								<div class="input-group">
+									<input class="form-control" type="text" name="subdominios" required
+										ng-model="subdominios[$index]" ng-pattern="padraoMinusculas"
+										ng-class="{'is-invalid': formulario.$submitted && subdominioForm.subdominios.$invalid}">
+									<button class="btn btn-primary" type="button" ng-if="$index === 0"
+										ng-disabled="subdominioForm.subdominios.$invalid"
+										ng-click="incluirSubdominio()">
+										<i class="bi bi-plus"></i>
+									</button>
+									<button class="btn btn-danger" type="button" ng-if="$index !== 0"
+										ng-click="excluirSubdominio($index)">
+										<i class="bi bi-dash"></i>
+									</button>
+									<div class="invalid-feedback">
+										<span ng-if="subdominioForm.subdominios.$error.required">Obrigatório</span>
+										<span ng-if="!subdominioForm.subdominios.$error.required">Deve conter apenas
+											letras minúsculas</span>
+									</div>
+								</div>
+							</div>
+						</ng-form>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col">
+					<div class="text-center">
+						<button class="btn btn-primary" type="submit"
+							ng-click="formulario.$setSubmitted(); formulario.$invalid && $event.preventDefault()">Gerar</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<div class="row my-5">
+			<div class="col text-center">
+				<a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">
+					<img src="agplv3-with-text-162x68.png">
+				</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
