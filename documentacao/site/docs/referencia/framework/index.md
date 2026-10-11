@@ -28,3 +28,14 @@ Cada camada tem também um módulo de teste correspondente, que traz as dependê
 | `d5-framework-ui-backend-teste` | UI |
 
 </div>
+
+Esses módulos não têm código próprio: são agregadores de dependências, publicados com `packaging` `pom`. Por isso, ao declará-los em um `pom.xml`, é necessário informar `<type>pom</type>`:
+
+```xml
+<dependency>
+    <groupId>dev.sauloaraujo</groupId>
+    <artifactId>d5-framework-dominio-teste</artifactId>
+    <type>pom</type>
+    <scope>test</scope>
+</dependency>
+```

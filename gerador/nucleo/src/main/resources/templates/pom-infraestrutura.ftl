@@ -46,6 +46,7 @@
 		<dependency>
 			<groupId>dev.sauloaraujo</groupId>
 			<artifactId>d5-framework-infraestrutura-teste</artifactId>
+			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
 <#else>

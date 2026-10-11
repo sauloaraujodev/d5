@@ -37,14 +37,20 @@
 		</developer>
 	</developers>
 
-	<!-- TODO: substituir pela URL real assim que o repositório for criado -->
 	<scm>
 		<connection>
-			scm:git:https://github.com/sauloaraujo/TODO-repositorio-d5.git</connection>
+			scm:git:https://github.com/sauloaraujodev/d5.git</connection>
 		<developerConnection>
-			scm:git:https://github.com/sauloaraujo/TODO-repositorio-d5.git</developerConnection>
-		<url>https://github.com/sauloaraujo/TODO-repositorio-d5</url>
+			scm:git:https://github.com/sauloaraujodev/d5.git</developerConnection>
+		<url>https://github.com/sauloaraujodev/d5</url>
 	</scm>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>central</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
 		<java.version>25</java.version>
@@ -98,6 +104,7 @@
 				<groupId>dev.sauloaraujo</groupId>
 				<artifactId>d5-framework-aplicacao-teste</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
@@ -110,12 +117,14 @@
 				<groupId>dev.sauloaraujo</groupId>
 				<artifactId>d5-framework-dominio-teste</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
 				<groupId>dev.sauloaraujo</groupId>
 				<artifactId>d5-framework-bdd</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
@@ -128,6 +137,7 @@
 				<groupId>dev.sauloaraujo</groupId>
 				<artifactId>d5-framework-infraestrutura-teste</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
@@ -146,6 +156,7 @@
 				<groupId>dev.sauloaraujo</groupId>
 				<artifactId>d5-framework-ui-backend-teste</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
@@ -192,7 +203,7 @@
 							<execution>
 								<id>attach-javadocs</id>
 								<goals>
-									<goal>jar-no-fork</goal>
+									<goal>jar</goal>
 								</goals>
 							</execution>
 						</executions>

@@ -13,6 +13,8 @@
 
 	<artifactId>d5-framework-bdd</artifactId>
 
+	<packaging>pom</packaging>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.cucumber</groupId>

@@ -13,6 +13,8 @@
 
 	<artifactId>d5-framework-infraestrutura-teste</artifactId>
 
+	<packaging>pom</packaging>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

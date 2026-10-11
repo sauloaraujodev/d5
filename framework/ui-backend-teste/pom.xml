@@ -13,6 +13,8 @@
 
 	<artifactId>d5-framework-ui-backend-teste</artifactId>
 
+	<packaging>pom</packaging>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

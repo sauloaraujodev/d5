@@ -66,6 +66,7 @@
 		<dependency>
 			<groupId>dev.sauloaraujo</groupId>
 			<artifactId>d5-framework-ui-backend-teste</artifactId>
+			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
 

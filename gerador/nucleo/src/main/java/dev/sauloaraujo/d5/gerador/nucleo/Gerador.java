@@ -77,8 +77,8 @@ public class Gerador {
 		criarDiretorioVazio(new File(modulo, "src/test/resources"));
 	}
 
-	private void gerarDominio(File raiz, String groupId, String nome, String subdominio,
-			String artifactIdCompartilhado, boolean framework) {
+	private void gerarDominio(File raiz, String groupId, String nome, String subdominio, String artifactIdCompartilhado,
+			boolean framework) {
 		var modulo = new File(raiz, "dominio-" + subdominio);
 
 		gerarPomDominio(modulo, groupId, nome, nome + "-dominio-" + subdominio, artifactIdCompartilhado, framework);
