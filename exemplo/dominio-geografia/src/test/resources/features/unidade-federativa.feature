@@ -37,6 +37,12 @@ Funcionalidade: Gerenciar unidades federativas
     Quando eu tento incluir a unidade federativa de código IBGE "33", sigla "RJ" e nome "São Paulo"
     Então a inclusão é rejeitada porque já existe uma unidade federativa com o nome "São Paulo"
 
+  Cenário: Não é possível incluir uma unidade federativa com nome já existente, ainda que com outras maiúsculas e minúsculas
+    Dado que sou um usuário administrador
+    E que existe uma unidade federativa com código IBGE "35", sigla "SP" e nome "São Paulo"
+    Quando eu tento incluir a unidade federativa de código IBGE "33", sigla "RJ" e nome "SÃO PAULO"
+    Então a inclusão é rejeitada porque já existe uma unidade federativa com o nome "SÃO PAULO"
+
   Cenário: Buscar uma unidade federativa existente
     Dado que existe uma unidade federativa com código IBGE "35", sigla "SP" e nome "São Paulo"
     E que sou um usuário sem autorização de administrador
@@ -96,3 +102,11 @@ Funcionalidade: Gerenciar unidades federativas
     Dado que sou um usuário administrador
     Quando eu tento excluir a unidade federativa de código IBGE "35"
     Então a exclusão é rejeitada porque não existe unidade federativa com o identificador "35"
+
+  Cenário: Não é possível excluir uma unidade federativa referenciada
+    Dado que sou um usuário administrador
+    E que existe uma unidade federativa com código IBGE "35", sigla "SP" e nome "São Paulo"
+    E que a unidade federativa de código IBGE "35" é referenciada
+    Quando eu tento excluir a unidade federativa de código IBGE "35"
+    Então a exclusão é rejeitada porque a unidade federativa "35" é referenciada
+    E a unidade federativa de código IBGE "35" passa a existir

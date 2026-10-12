@@ -10,6 +10,8 @@ import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativa
 import dev.sauloaraujo.d5.framework.dominio.IAgregado;
 
 public final class Municipio implements IAgregado<MunicipioCodigoIbge> {
+	public static final String EXTINTO_MODELO = "O município %s está extinto";
+
 	private final MunicipioCodigoIbge identificador;
 	private final String nome;
 	private final boolean extinto;
@@ -21,6 +23,8 @@ public final class Municipio implements IAgregado<MunicipioCodigoIbge> {
 	}
 
 	public Municipio extinguir() {
+		Validate.validState(!extinto, EXTINTO_MODELO, identificador);
+
 		return new Municipio(identificador, nome, Optional.of(true));
 	}
 

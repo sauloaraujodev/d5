@@ -38,16 +38,17 @@ class UnidadeFederativaAplicacaoRepositorioTest {
 	}
 
 	private static UnidadeFederativaConsulta consultar() {
-		return consultar(Optional.empty());
+		return consultar(UnidadeFederativaOrdenacao.NOME, Optional.empty(), Optional.empty());
 	}
 
-	private static UnidadeFederativaConsulta consultar(Optional<String> nome) {
-		return new UnidadeFederativaConsulta(Optional.of(UnidadeFederativaOrdenacao.NOME), Optional.empty(),
-				Optional.empty(), Optional.empty(), nome);
+	private static UnidadeFederativaConsulta consultar(UnidadeFederativaOrdenacao ordenacao, Optional<String> sigla,
+			Optional<String> nome) {
+		return new UnidadeFederativaConsulta(Optional.of(ordenacao), Optional.empty(), Optional.empty(),
+				Optional.empty(), sigla, nome);
 	}
 
 	@Test
-	void pesquisaRetornaProjecaoComIdentificadorENome() {
+	void pesquisaRetornaProjecaoComIdentificadorSiglaENome() {
 		repositorio.incluir(criar("35", "SP", "São Paulo"));
 		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
 
@@ -58,10 +59,12 @@ class UnidadeFederativaAplicacaoRepositorioTest {
 
 		var primeira = resultado.getProjecoes().get(0);
 		assertEquals(new UnidadeFederativaCodigoIbge("33"), primeira.getIdentificador());
+		assertEquals(new UnidadeFederativaSigla("RJ"), primeira.getSigla());
 		assertEquals("Rio de Janeiro", primeira.getNome());
 
 		var segunda = resultado.getProjecoes().get(1);
 		assertEquals(new UnidadeFederativaCodigoIbge("35"), segunda.getIdentificador());
+		assertEquals(new UnidadeFederativaSigla("SP"), segunda.getSigla());
 		assertEquals("São Paulo", segunda.getNome());
 	}
 
@@ -78,9 +81,36 @@ class UnidadeFederativaAplicacaoRepositorioTest {
 		repositorio.incluir(criar("35", "SP", "São Paulo"));
 		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
 
-		var resultado = repositorioAplicacao.pesquisar(consultar(Optional.of("paulo")));
+		var resultado = repositorioAplicacao
+				.pesquisar(consultar(UnidadeFederativaOrdenacao.NOME, Optional.empty(), Optional.of("paulo")));
 
 		assertEquals(1, resultado.getTotal());
 		assertEquals("São Paulo", resultado.getProjecoes().get(0).getNome());
+	}
+
+	@Test
+	void pesquisaFiltrandoPorTrechoDaSigla() {
+		repositorio.incluir(criar("35", "SP", "São Paulo"));
+		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
+
+		var resultado = repositorioAplicacao
+				.pesquisar(consultar(UnidadeFederativaOrdenacao.NOME, Optional.of("r"), Optional.empty()));
+
+		assertEquals(1, resultado.getTotal());
+		assertEquals("Rio de Janeiro", resultado.getProjecoes().get(0).getNome());
+	}
+
+	@Test
+	void pesquisaOrdenadaPorSigla() {
+		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
+		repositorio.incluir(criar("12", "AC", "Acre"));
+		repositorio.incluir(criar("27", "AL", "Alagoas"));
+
+		var resultado = repositorioAplicacao
+				.pesquisar(consultar(UnidadeFederativaOrdenacao.SIGLA, Optional.empty(), Optional.empty()));
+
+		assertEquals(new UnidadeFederativaSigla("AC"), resultado.getProjecoes().get(0).getSigla());
+		assertEquals(new UnidadeFederativaSigla("AL"), resultado.getProjecoes().get(1).getSigla());
+		assertEquals(new UnidadeFederativaSigla("RJ"), resultado.getProjecoes().get(2).getSigla());
 	}
 }

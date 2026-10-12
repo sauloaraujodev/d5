@@ -14,13 +14,13 @@ import jakarta.persistence.Table;
 @Table(name = "UFI_UNIDADE_FEDERATIVA")
 public class UnidadeFederativaJpa implements IAgregadoJpa<UnidadeFederativa> {
 	@Id
-	@Column(name = "UFI_ID", length = UnidadeFederativaCodigoIbge.TAMANHO, nullable = false)
+	@Column(name = "UFI_ID", length = UnidadeFederativaCodigoIbge.TAMANHO, nullable = false, updatable = false)
 	private String identificador;
 
-	@Column(name = "UFI_SG", length = UnidadeFederativaSigla.TAMANHO, nullable = false)
+	@Column(name = "UFI_SG", length = UnidadeFederativaSigla.TAMANHO, nullable = false, unique = true)
 	private String sigla;
 
-	@Column(name = "UFI_NM", length = 50, nullable = false)
+	@Column(name = "UFI_NM", length = 50, nullable = false, unique = true)
 	private String nome;
 
 	protected UnidadeFederativaJpa() {

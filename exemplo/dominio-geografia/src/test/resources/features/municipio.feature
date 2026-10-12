@@ -32,6 +32,12 @@ Funcionalidade: Gerenciar municípios
     Quando eu tento incluir o município de código IBGE "3548500", nome "São Paulo"
     Então a inclusão é rejeitada porque já existe um município com o nome "São Paulo" na unidade federativa
 
+  Cenário: Não é possível incluir um município com nome já existente na mesma unidade federativa, ainda que com outras maiúsculas e minúsculas
+    Dado que sou um administrador do cadastro de municípios
+    E que existe um município com código IBGE "3550308", nome "São Paulo"
+    Quando eu tento incluir o município de código IBGE "3548500", nome "SÃO PAULO"
+    Então a inclusão é rejeitada porque já existe um município com o nome "SÃO PAULO" na unidade federativa
+
   Cenário: Não é possível incluir um município em uma unidade federativa inexistente
     Dado que sou um administrador do cadastro de municípios
     Quando eu tento incluir o município de código IBGE "3304557", nome "Rio de Janeiro"
@@ -106,6 +112,14 @@ Funcionalidade: Gerenciar municípios
     Dado que sou um administrador do cadastro de municípios
     Quando eu tento excluir o município de código IBGE "3550308"
     Então a exclusão é rejeitada porque não existe município com o identificador "3550308"
+
+  Cenário: Não é possível excluir um município referenciado
+    Dado que sou um administrador do cadastro de municípios
+    E que existe um município com código IBGE "3550308", nome "São Paulo"
+    E que o município de código IBGE "3550308" é referenciado
+    Quando eu tento excluir o município de código IBGE "3550308"
+    Então a exclusão é rejeitada porque o município "3550308" é referenciado
+    E o município de código IBGE "3550308" passa a existir
 
   Cenário: Extinguir um município
     Dado que sou um administrador do cadastro de municípios

@@ -40,7 +40,7 @@ Também expõe `paraLike`, que converte um filtro textual opcional em um padrão
 --8<-- "framework/infraestrutura/src/main/java/dev/sauloaraujo/d5/framework/infraestrutura/AgregadoAplicacaoRepositorioAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaAplicacaoRepositorio`](../../tutorial.md#implementacao-do-repositorio-de-aplicacao) estende `AgregadoAplicacaoRepositorioAbstrato`, implementa `pesquisar(UnidadeFederativaConsulta, Pageable)` e `paraPropriedadeOrdenacao`, e usa `paraLike` para filtrar pelo nome.
+No tutorial, [`UnidadeFederativaAplicacaoRepositorio`](../../tutorial.md#implementacao-do-repositorio-de-aplicacao) estende `AgregadoAplicacaoRepositorioAbstrato`, implementa `pesquisar(UnidadeFederativaConsulta, Pageable)` e `paraPropriedadeOrdenacao`, e usa `paraLike` para filtrar pela sigla e pelo nome.
 
 ## Segurança
 

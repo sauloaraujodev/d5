@@ -11,4 +11,6 @@ import dev.sauloaraujo.d5.framework.dominio.spi.IAgregadoRepositorio;
 public interface IMunicipioRepositorio extends IAgregadoRepositorio<MunicipioCodigoIbge, Municipio> {
 	boolean existePorNome(String nome, UnidadeFederativaCodigoIbge unidadeFederativa,
 			Optional<MunicipioCodigoIbge> identificadorIgnorado);
+
+	boolean existeReferencia(MunicipioCodigoIbge identificador);
 }

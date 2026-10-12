@@ -63,4 +63,11 @@ public class UnidadeFederativaRepositorio extends
 		var identificadorIgnoradoJpa = identificadorIgnorado.map(UnidadeFederativaCodigoIbge::toString).orElse(null);
 		return repositorioJpa.existePorNome(nome, identificadorIgnoradoJpa);
 	}
+
+	@Override
+	public boolean existeReferencia(UnidadeFederativaCodigoIbge identificador) {
+		Objects.requireNonNull(identificador);
+
+		return repositorioJpa.existeReferencia(identificador.toString());
+	}
 }

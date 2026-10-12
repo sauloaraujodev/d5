@@ -1,0 +1,65 @@
+package com.example.exemplo.infraestrutura.crm.cliente;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import com.example.exemplo.dominio.crm.cliente.Cliente;
+import com.example.exemplo.dominio.crm.cliente.ClienteCpf;
+import com.example.exemplo.dominio.crm.cliente.ClienteIdentificador;
+import com.example.exemplo.dominio.crm.cliente.ClienteServico;
+import com.example.exemplo.dominio.crm.cliente.Endereco;
+import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
+import com.example.exemplo.dominio.crm.cliente.spi.IClienteRepositorio;
+import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
+
+import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
+
+public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdentificador, Cliente, Long, ClienteJpa>
+		implements IClienteRepositorio {
+	private final IClienteRepositorioJpa repositorioJpa;
+
+	public ClienteRepositorio(IClienteRepositorioJpa repositorioJpa) {
+		super(repositorioJpa, ClienteServico.IDENTIFICADOR_INEXISTENTE_MODELO);
+
+		this.repositorioJpa = Objects.requireNonNull(repositorioJpa);
+	}
+
+	@Override
+	protected ClienteJpa paraJpa(Cliente agregado) {
+		Objects.requireNonNull(agregado);
+
+		var identificador = agregado.getIdentificador().map(this::paraIdentificadorJpa).orElse(null);
+		var endereco = agregado.getEndereco();
+		return new ClienteJpa(identificador, agregado.getCpf().toString(), agregado.getNome(),
+				endereco.getLogradouro(), endereco.getNumero(), endereco.getComplemento().orElse(null),
+				endereco.getBairro(), endereco.getCep().toString(), endereco.getMunicipio().toString());
+	}
+
+	@Override
+	protected Cliente paraAgregado(ClienteJpa agregadoJpa) {
+		Objects.requireNonNull(agregadoJpa);
+
+		var identificador = new ClienteIdentificador(Objects.requireNonNull(agregadoJpa.getIdentificador()).toString());
+		var endereco = new Endereco(agregadoJpa.getLogradouro(), agregadoJpa.getNumero(),
+				Optional.ofNullable(agregadoJpa.getComplemento()), agregadoJpa.getBairro(),
+				new EnderecoCep(agregadoJpa.getCep()), new MunicipioCodigoIbge(agregadoJpa.getMunicipio()));
+		return new Cliente(Optional.of(identificador), new ClienteCpf(agregadoJpa.getCpf()), agregadoJpa.getNome(),
+				endereco);
+	}
+
+	@Override
+	protected Long paraIdentificadorJpa(ClienteIdentificador identificador) {
+		Objects.requireNonNull(identificador);
+
+		return Long.valueOf(identificador.toString());
+	}
+
+	@Override
+	public boolean existePorCpf(ClienteCpf cpf, Optional<ClienteIdentificador> identificadorIgnorado) {
+		Objects.requireNonNull(cpf);
+		Objects.requireNonNull(identificadorIgnorado);
+
+		var identificadorIgnoradoJpa = identificadorIgnorado.map(this::paraIdentificadorJpa).orElse(null);
+		return repositorioJpa.existePorCpf(cpf.toString(), identificadorIgnoradoJpa);
+	}
+}

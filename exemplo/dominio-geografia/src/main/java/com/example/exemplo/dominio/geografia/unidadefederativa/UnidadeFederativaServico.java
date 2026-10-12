@@ -3,6 +3,8 @@ package com.example.exemplo.dominio.geografia.unidadefederativa;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
+
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.geografia.unidadefederativa.spi.IUnidadeFederativaRepositorio;
 
@@ -16,6 +18,7 @@ public final class UnidadeFederativaServico extends
 	public static final String IDENTIFICADOR_EXISTENTE_MODELO = "Já existe uma unidade federativa com o identificador %s";
 	public static final String SIGLA_EXISTENTE_MODELO = "Já existe uma unidade federativa com a sigla %s";
 	public static final String NOME_EXISTENTE_MODELO = "Já existe uma unidade federativa com o nome %s";
+	public static final String REFERENCIADA_MODELO = "A unidade federativa %s é referenciada e não pode ser excluída";
 
 	private final IUnidadeFederativaRepositorio repositorio;
 
@@ -45,5 +48,12 @@ public final class UnidadeFederativaServico extends
 
 		validarInexistencia(nome -> repositorio.existePorNome(nome, identificador), agregado.getNome(),
 				NOME_EXISTENTE_MODELO);
+	}
+
+	@Override
+	protected void validarExclusao(UnidadeFederativaCodigoIbge identificador) {
+		Objects.requireNonNull(identificador);
+
+		Validate.validState(!repositorio.existeReferencia(identificador), REFERENCIADA_MODELO, identificador);
 	}
 }

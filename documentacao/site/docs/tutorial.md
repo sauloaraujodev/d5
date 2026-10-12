@@ -7,7 +7,7 @@ No exemplo deste tutorial, o [domínio](referencia/ddd.md#dominio) foi decompost
 - **Geografia**, que contém os conceitos de **unidade federativa** e **município**;
 - **CRM (Customer Relationship Management)**, que contém o conceito de **cliente**.
 
-Este tutorial implementa apenas a unidade federativa. Município e cliente ilustram a decomposição em subdomínios, mas ficam fora do escopo — por isso, o módulo `exemplo-dominio-crm` contém apenas a [suíte do Cucumber](#testes), sem cenários.
+Este tutorial implementa apenas a unidade federativa. Município e cliente ilustram a decomposição em subdomínios e estão implementados no código de exemplo, mas ficam fora do escopo do tutorial.
 
 ## Projeto Maven
 Seguindo as [convenções](referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
@@ -217,7 +217,7 @@ A pesquisa de unidades federativas, ao contrário das demais operações, não p
 ```
 
 ##### Projeção
-A projeção de unidade federativa contém apenas seu identificador e seu nome — o suficiente para, por exemplo, popular uma lista de seleção. Ela implementa [`IProjecao`](referencia/framework/aplicacao.md#iprojecao), parametrizada pelo agregado que representa.
+A projeção de unidade federativa contém seu identificador, sua sigla e seu nome — o suficiente para, por exemplo, popular uma lista de seleção. Assim como no agregado, o identificador e a sigla são representados por seus objetos de valor; o construtor que recebe `String`s existe para que a consulta JPQL possa instanciar a projeção diretamente. Ela implementa [`IProjecao`](referencia/framework/aplicacao.md#iprojecao), parametrizada pelo agregado que representa.
 
 ```java title="exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaProjecao.java"
 --8<-- "exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaProjecao.java"
@@ -231,7 +231,7 @@ As propriedades pelas quais a projeção pode ser ordenada são declaradas em um
 ```
 
 ##### Consulta
-Os parâmetros da pesquisa são representados por uma classe que estende [`Consulta`](referencia/framework/aplicacao.md#consulta-classe), acrescentando o atributo `nome`, usado para filtrar as unidades federativas por um trecho do nome.
+Os parâmetros da pesquisa são representados por uma classe que estende [`Consulta`](referencia/framework/aplicacao.md#consulta-classe), acrescentando os atributos `sigla` e `nome`, usados para filtrar as unidades federativas por um trecho da sigla e do nome.
 
 ```java title="exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaConsulta.java"
 --8<-- "exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaConsulta.java"
@@ -258,7 +258,7 @@ A pesquisa é encapsulada em um serviço de aplicação que estende [`AgregadoAp
 #### Infraestrutura
 
 ##### Repositório
-Serviços acessam unidades federativas persistidas através de um [repositório](referencia/ddd.md#repositorio). Seguindo as [convenções](referencia/convencoes.md#pacotes), a interface do repositório fica no pacote `com.example.exemplo.dominio.geografia.unidadefederativa.spi` e estende [`IAgregadoRepositorio`](referencia/framework/dominio.md#iagregadorepositorio). Adicionalmente, expõe `existePorSigla` e `existePorNome`, que o serviço usa para garantir que a sigla e o nome de uma unidade federativa sejam únicos. Ambos recebem o identificador da própria unidade federativa a ignorar na verificação, para que alterá-la não a faça conflitar consigo mesma. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
+Serviços acessam unidades federativas persistidas através de um [repositório](referencia/ddd.md#repositorio). Seguindo as [convenções](referencia/convencoes.md#pacotes), a interface do repositório fica no pacote `com.example.exemplo.dominio.geografia.unidadefederativa.spi` e estende [`IAgregadoRepositorio`](referencia/framework/dominio.md#iagregadorepositorio). Adicionalmente, expõe `existePorSigla` e `existePorNome`, que o serviço usa para garantir que a sigla e o nome de uma unidade federativa sejam únicos. Ambos recebem o identificador da própria unidade federativa a ignorar na verificação, para que alterá-la não a faça conflitar consigo mesma. Expõe também `existeReferencia`, que informa se algum outro agregado referencia a unidade federativa — quais agregados são esses é um detalhe da implementação do repositório, de modo que o serviço não precisa conhecê-los. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/spi/package-info.java"
 --8<-- "exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/spi/package-info.java"
@@ -280,7 +280,7 @@ As regras de autorização sobre um agregado usam papéis compartilhados por tod
 ```
 
 ##### Serviço
-Operações sobre unidades federativas são encapsuladas em um [serviço](referencia/ddd.md#servico) que estende [`AgregadoServicoAbstrato`](referencia/framework/dominio.md#agregadoservicoabstrato). Ele implementa `criarAutorizacoes` consultando o [`ISegurancaServico`](referencia/framework/dominio.md#isegurancaservico) recebido no construtor para verificar se o usuário possui a [autorização](#autorizacao) `ADMINISTRADOR`, devolvendo um [`AgregadoAutorizacoes`](referencia/framework/dominio.md#agregadoautorizacoes) que libera a busca a qualquer usuário e as demais operações somente a administradores. Também sobrescreve `validarInclusaoAlteracao` para usar `existePorSigla` e `existePorNome`, ignorando o identificador da própria unidade federativa, e impedir que uma inclusão ou alteração deixe duas unidades federativas com a mesma sigla ou o mesmo nome.
+Operações sobre unidades federativas são encapsuladas em um [serviço](referencia/ddd.md#servico) que estende [`AgregadoServicoAbstrato`](referencia/framework/dominio.md#agregadoservicoabstrato). Ele implementa `criarAutorizacoes` consultando o [`ISegurancaServico`](referencia/framework/dominio.md#isegurancaservico) recebido no construtor para verificar se o usuário possui a [autorização](#autorizacao) `ADMINISTRADOR`, devolvendo um [`AgregadoAutorizacoes`](referencia/framework/dominio.md#agregadoautorizacoes) que libera a busca a qualquer usuário e as demais operações somente a administradores. Também sobrescreve `validarInclusaoAlteracao` para usar `existePorSigla` e `existePorNome`, ignorando o identificador da própria unidade federativa, e impedir que uma inclusão ou alteração deixe duas unidades federativas com a mesma sigla ou o mesmo nome. Por fim, sobrescreve `validarExclusao` para usar `existeReferencia` e, [validando o estado](referencia/programacao.md#validacao-de-estado) da aplicação, impedir a exclusão de uma unidade federativa referenciada.
 
 Note que o serviço não leva nenhuma anotação do Spring: ele, os repositórios e o serviço de aplicação são [registrados como beans automaticamente](referencia/framework/comportamentos.md#registro-de-beans).
 
@@ -295,13 +295,13 @@ O comportamento do serviço é especificado com cenários em Gherkin e automatiz
 --8<-- "exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
 ```
 
-Escreva os cenários cobrindo inclusão, busca, alteração e exclusão de uma unidade federativa, incluindo as regras de autorização e de unicidade de sigla e nome:
+Escreva os cenários cobrindo inclusão, busca, alteração e exclusão de uma unidade federativa, incluindo as regras de autorização, de unicidade de sigla e nome e de exclusão de uma unidade federativa referenciada:
 
 ```gherkin title="exemplo/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
 --8<-- "exemplo/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
 ```
 
-Implemente as step definitions que ligam os cenários ao serviço. Como `UnidadeFederativaServico` depende das abstrações `ISegurancaServico` e `IUnidadeFederativaRepositorio`, use o [Mockito](https://site.mockito.org) para dublá-las: a segurança simula a autorização do usuário, e o repositório simula a persistência através de um mapa em memória, preservando as mesmas regras de unicidade que uma implementação real deve respeitar.
+Implemente as step definitions que ligam os cenários ao serviço. Como `UnidadeFederativaServico` depende das abstrações `ISegurancaServico` e `IUnidadeFederativaRepositorio`, use o [Mockito](https://site.mockito.org) para dublá-las: a segurança simula a autorização do usuário, e o repositório simula a persistência através de um mapa em memória, preservando as mesmas regras de unicidade que uma implementação real deve respeitar — inclusive a comparação de nomes que ignora maiúsculas e minúsculas. As unidades federativas referenciadas são simuladas por um conjunto de identificadores.
 
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
 --8<-- "exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
@@ -314,28 +314,28 @@ A persistência de unidade federativa é implementada no módulo `exemplo-infrae
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/package-info.java"
 ```
 
-O primeiro passo é a entidade JPA, que mapeia o agregado para a tabela `UFI_UNIDADE_FEDERATIVA`. Ela implementa [`IAgregadoJpa`](referencia/framework/infraestrutura.md#iagregadojpa), parametrizada pelo agregado que representa, e declara as colunas com o tamanho dos objetos de valor correspondentes.
+O primeiro passo é a entidade JPA, que mapeia o agregado para a tabela `UFI_UNIDADE_FEDERATIVA`. Ela implementa [`IAgregadoJpa`](referencia/framework/infraestrutura.md#iagregadojpa), parametrizada pelo agregado que representa, e declara as colunas com o tamanho dos objetos de valor correspondentes. A coluna do identificador não pode ser alterada, e as de sigla e nome são únicas, garantindo no banco de dados a mesma unicidade validada pelo serviço.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaJpa.java"
 ```
 
 ##### Repositório Spring Data
-Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. Ela também declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pelo nome apenas quando o parâmetro não é nulo. O filtro é case insensitive porque compara o nome em minúsculas com o padrão produzido por `paraLike`, já em minúsculas, declarando `\` como caractere de escape.
+Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. `existePorNome` compara os nomes em minúsculas, de modo que "São Paulo" e "SÃO PAULO" sejam considerados o mesmo nome. A interface também declara `existeReferencia`, cuja consulta verifica se algum município — a entidade `MunicipioJpa`, também presente no código de exemplo — referencia a unidade federativa; caso outros agregados passem a referenciá-la, basta acrescentar suas verificações a essa consulta. Por fim, declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pela sigla e pelo nome apenas quando o parâmetro correspondente não é nulo. Os filtros são case insensitive porque comparam a sigla e o nome em minúsculas com o padrão produzido por `paraLike`, já em minúsculas, declarando `\` como caractere de escape.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
 ```
 
 ##### Implementação do repositório
-Por fim, implemente [`IUnidadeFederativaRepositorio`](#repositorio) estendendo [`AgregadoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadorepositorioabstrato), que já implementa `incluir`, `buscarPorIdentificador`, `alterar`, `excluir` e `existePorIdentificador` a partir dos métodos `paraJpa`, `paraAgregado` e `paraIdentificadorJpa` — os únicos que restam implementar. `existePorSigla` e `existePorNome` delegam para a interface Spring Data, convertendo o identificador a ignorar para o tipo usado pela entidade JPA.
+Por fim, implemente [`IUnidadeFederativaRepositorio`](#repositorio) estendendo [`AgregadoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadorepositorioabstrato), que já implementa `incluir`, `buscarPorIdentificador`, `alterar`, `excluir` e `existePorIdentificador` a partir dos métodos `paraJpa`, `paraAgregado` e `paraIdentificadorJpa` — os únicos que restam implementar. `existePorSigla`, `existePorNome` e `existeReferencia` delegam para a interface Spring Data, convertendo os identificadores para o tipo usado pela entidade JPA.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorio.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorio.java"
 ```
 
 ##### Implementação do repositório de aplicação
-Implemente também [`IUnidadeFederativaAplicacaoRepositorio`](#repositorio-de-aplicacao) estendendo [`AgregadoAplicacaoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato). Ela já implementa `pesquisar(UnidadeFederativaConsulta)`, convertendo a consulta em paginação e ordenação do Spring Data — através de `paraPropriedadeOrdenacao`, que mapeia cada valor de [`UnidadeFederativaOrdenacao`](#ordenacao) para a propriedade correspondente — e delegando a `pesquisar(UnidadeFederativaConsulta, Pageable)`, que resta implementar: ele converte o `nome` da consulta em um padrão `like` com [`paraLike`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato) — em minúsculas, escapado e envolvido por `%`, ou `null` na ausência de filtro — e delega à interface Spring Data.
+Implemente também [`IUnidadeFederativaAplicacaoRepositorio`](#repositorio-de-aplicacao) estendendo [`AgregadoAplicacaoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato). Ela já implementa `pesquisar(UnidadeFederativaConsulta)`, convertendo a consulta em paginação e ordenação do Spring Data — através de `paraPropriedadeOrdenacao`, que mapeia cada valor de [`UnidadeFederativaOrdenacao`](#ordenacao) para a propriedade correspondente — e delegando a `pesquisar(UnidadeFederativaConsulta, Pageable)`, que resta implementar: ele converte a `sigla` e o `nome` da consulta em padrões `like` com [`paraLike`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato) — em minúsculas, escapado e envolvido por `%`, ou `null` na ausência de filtro — e delega à interface Spring Data.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorio.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorio.java"
@@ -348,13 +348,13 @@ Diferente do serviço, cujo comportamento é especificado com cenários em Gherk
 --8<-- "exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/InfraestruturaTesteAplicacao.java"
 ```
 
-Escreva os testes cobrindo as operações do repositório e as duas variações de `existePorSigla` e `existePorNome`: considerando todas as unidades federativas e ignorando o identificador de uma delas.
+Escreva os testes cobrindo as operações do repositório; as duas variações de `existePorSigla` e `existePorNome` — considerando todas as unidades federativas e ignorando o identificador de uma delas —; a comparação de nomes que ignora maiúsculas e minúsculas; e `existeReferencia`, persistindo um município diretamente através de `IMunicipioRepositorioJpa`.
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorioTest.java"
 --8<-- "exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorioTest.java"
 ```
 
-Escreva também os testes do repositório de aplicação, cobrindo a pesquisa sem filtro, sem resultados e filtrando por um trecho do nome.
+Escreva também os testes do repositório de aplicação, cobrindo a pesquisa sem filtro, sem resultados, filtrando por um trecho do nome e da sigla e ordenando pela sigla.
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorioTest.java"
 --8<-- "exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorioTest.java"
@@ -434,7 +434,7 @@ O código IBGE e a sigla trafegam como strings simples graças à [serializaçã
 ![Resposta 200 da inclusão](assets/tutorial/03-incluir-resposta.png)
 
 ###### Pesquisar
-`GET /backend/geografia/unidade-federativa/pesquisa` recebe os campos de [`UnidadeFederativaConsulta`](#consulta) — `nome` (filtro parcial, opcional), `ordenacao`, `descendente`, `indicePagina` e `tamanhoPagina` — como parâmetros de consulta individuais, e o Swagger UI, graças à [expansão da consulta](referencia/framework/comportamentos.md#expansao-da-consulta-no-swagger-ui) feita pelo `d5-framework-springdoc`, exibe cada um como um campo separado do formulário. Deixe em branco os campos que não quiser informar — eles assumem os padrões declarados em [`Consulta`](referencia/framework/aplicacao.md#consulta-classe); deixe todos em branco para listar a primeira página, sem filtro. Valores inválidos, como `tamanhoPagina` igual a `0`, resultam em 422, com a mensagem da validação; veja [`ExcecaoManipulador`](referencia/framework/ui-backend.md#excecaomanipulador).
+`GET /backend/geografia/unidade-federativa/pesquisa` recebe os campos de [`UnidadeFederativaConsulta`](#consulta) — `sigla` e `nome` (filtros parciais, opcionais), `ordenacao`, `descendente`, `indicePagina` e `tamanhoPagina` — como parâmetros de consulta individuais, e o Swagger UI, graças à [expansão da consulta](referencia/framework/comportamentos.md#expansao-da-consulta-no-swagger-ui) feita pelo `d5-framework-springdoc`, exibe cada um como um campo separado do formulário. Deixe em branco os campos que não quiser informar — eles assumem os padrões declarados em [`Consulta`](referencia/framework/aplicacao.md#consulta-classe); deixe todos em branco para listar a primeira página, sem filtro. Valores inválidos, como `tamanhoPagina` igual a `0`, resultam em 422, com a mensagem da validação; veja [`ExcecaoManipulador`](referencia/framework/ui-backend.md#excecaomanipulador).
 
 ![Parâmetro nome preenchido com Paulo na operação de pesquisa](assets/tutorial/04-pesquisa-parametros.png)
 

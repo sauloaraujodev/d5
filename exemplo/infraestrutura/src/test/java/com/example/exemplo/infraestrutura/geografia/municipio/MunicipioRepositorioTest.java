@@ -15,6 +15,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import com.example.exemplo.dominio.geografia.municipio.Municipio;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
+import com.example.exemplo.infraestrutura.crm.cliente.ClienteJpa;
+import com.example.exemplo.infraestrutura.crm.cliente.IClienteRepositorioJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 
@@ -25,6 +27,9 @@ class MunicipioRepositorioTest {
 
 	@Autowired
 	private IMunicipioRepositorioJpa repositorioJpa;
+
+	@Autowired
+	private IClienteRepositorioJpa clienteRepositorioJpa;
 
 	private MunicipioRepositorio repositorio;
 
@@ -108,5 +113,23 @@ class MunicipioRepositorioTest {
 		var identificador = Optional.of(new MunicipioCodigoIbge("3548500"));
 
 		assertTrue(repositorio.existePorNome("São Paulo", SAO_PAULO, identificador));
+	}
+
+	@Test
+	void existePorNomeIgnorandoMaiusculasEMinusculas() {
+		repositorio.incluir(criar("3550308", "São Paulo"));
+
+		assertTrue(repositorio.existePorNome("SÃO PAULO", SAO_PAULO, Optional.empty()));
+	}
+
+	@Test
+	void existeReferenciaPorCliente() {
+		repositorio.incluir(criar("3550308", "São Paulo"));
+		repositorio.incluir(criar("3548500", "Santos"));
+		clienteRepositorioJpa.save(new ClienteJpa(null, "11111111111", "Maria", "Avenida Paulista", "1000", null,
+				"Bela Vista", "01310100", "3550308"));
+
+		assertTrue(repositorio.existeReferencia(new MunicipioCodigoIbge("3550308")));
+		assertFalse(repositorio.existeReferencia(new MunicipioCodigoIbge("3548500")));
 	}
 }

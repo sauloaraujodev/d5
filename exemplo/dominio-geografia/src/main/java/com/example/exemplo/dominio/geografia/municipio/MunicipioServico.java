@@ -7,6 +7,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.geografia.municipio.spi.IMunicipioRepositorio;
+import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaServico;
 import com.example.exemplo.dominio.geografia.unidadefederativa.spi.IUnidadeFederativaRepositorio;
 
 import dev.sauloaraujo.d5.framework.dominio.impl.AgregadoServicoAbstrato;
@@ -17,9 +18,8 @@ public final class MunicipioServico
 	public static final String IDENTIFICADOR_INEXISTENTE_MODELO = "Não existe município com o identificador %s";
 	public static final String IDENTIFICADOR_EXISTENTE_MODELO = "Já existe um município com o identificador %s";
 	public static final String NOME_EXISTENTE_MODELO = "Já existe um município com o nome %s na unidade federativa";
-	public static final String UNIDADE_FEDERATIVA_INEXISTENTE_MODELO = "Não existe unidade federativa com o identificador %s";
 	public static final String EXTINCAO_INDEVIDA = "O município só pode ser extinto pela ação de extinção";
-	public static final String EXTINTO_MODELO = "O município %s está extinto";
+	public static final String REFERENCIADO_MODELO = "O município %s é referenciado e não pode ser excluído";
 
 	private final IMunicipioRepositorio repositorio;
 	private final IUnidadeFederativaRepositorio unidadeFederativaRepositorio;
@@ -47,7 +47,7 @@ public final class MunicipioServico
 		Validate.isTrue(!agregado.isExtinto(), EXTINCAO_INDEVIDA);
 
 		validarExistencia(unidadeFederativaRepositorio::existePorIdentificador, agregado.getUnidadeFederativa(),
-				UNIDADE_FEDERATIVA_INEXISTENTE_MODELO);
+				UnidadeFederativaServico.IDENTIFICADOR_INEXISTENTE_MODELO);
 
 		validarInexistencia(
 				nome -> repositorio.existePorNome(nome, agregado.getUnidadeFederativa(), agregado.getIdentificador()),
@@ -59,7 +59,15 @@ public final class MunicipioServico
 		Objects.requireNonNull(agregado);
 
 		var identificador = agregado.getIdentificador().orElseThrow();
-		validarNaoExtinto(repositorio.buscarPorIdentificador(identificador));
+		var municipio = repositorio.buscarPorIdentificador(identificador);
+		Validate.validState(!municipio.isExtinto(), Municipio.EXTINTO_MODELO, identificador);
+	}
+
+	@Override
+	protected void validarExclusao(MunicipioCodigoIbge identificador) {
+		Objects.requireNonNull(identificador);
+
+		Validate.validState(!repositorio.existeReferencia(identificador), REFERENCIADO_MODELO, identificador);
 	}
 
 	public void extinguir(MunicipioCodigoIbge identificador) {
@@ -69,13 +77,6 @@ public final class MunicipioServico
 		validarExistencia(identificador);
 
 		var municipio = repositorio.buscarPorIdentificador(identificador);
-		validarNaoExtinto(municipio);
 		repositorio.alterar(municipio.extinguir());
-	}
-
-	private void validarNaoExtinto(Municipio municipio) {
-		if (municipio.isExtinto()) {
-			throw new IllegalStateException(String.format(EXTINTO_MODELO, municipio.getIdentificador().orElseThrow()));
-		}
 	}
 }

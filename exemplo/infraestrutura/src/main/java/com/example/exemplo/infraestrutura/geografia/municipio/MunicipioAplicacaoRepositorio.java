@@ -38,6 +38,7 @@ public class MunicipioAplicacaoRepositorio
 		return switch (ordenacao) {
 		case IDENTIFICADOR -> "identificador";
 		case NOME -> "nome";
+		case UNIDADE_FEDERATIVA_NOME -> "u.nome";
 		};
 	}
 }

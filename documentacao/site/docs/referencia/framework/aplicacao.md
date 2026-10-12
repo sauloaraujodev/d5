@@ -48,7 +48,7 @@ No backend, a consulta é instanciada pelo Spring MVC a partir dos parâmetros d
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/Consulta.java"
 ```
 
-No tutorial, [`UnidadeFederativaConsulta`](../../tutorial.md#consulta) estende `Consulta<UnidadeFederativaOrdenacao>`, acrescentando o atributo `nome` para filtrar a pesquisa.
+No tutorial, [`UnidadeFederativaConsulta`](../../tutorial.md#consulta) estende `Consulta<UnidadeFederativaOrdenacao>`, acrescentando os atributos `sigla` e `nome` para filtrar a pesquisa.
 
 ## Resultado da consulta
 

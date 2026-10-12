@@ -56,4 +56,11 @@ public class MunicipioRepositorio
 		var identificadorIgnoradoJpa = identificadorIgnorado.map(MunicipioCodigoIbge::toString).orElse(null);
 		return repositorioJpa.existePorNome(nome, unidadeFederativa.toString(), identificadorIgnoradoJpa);
 	}
+
+	@Override
+	public boolean existeReferencia(MunicipioCodigoIbge identificador) {
+		Objects.requireNonNull(identificador);
+
+		return repositorioJpa.existeReferencia(identificador.toString());
+	}
 }

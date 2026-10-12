@@ -20,6 +20,7 @@ import java.util.Set;
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.geografia.municipio.spi.IMunicipioRepositorio;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
+import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaServico;
 import com.example.exemplo.dominio.geografia.unidadefederativa.spi.IUnidadeFederativaRepositorio;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoExistenteExcecao;
@@ -33,6 +34,7 @@ import io.cucumber.java.pt.Quando;
 public final class MunicipioStepDefinitions {
 	private final Map<String, Municipio> municipios = new HashMap<>();
 	private final Set<String> unidadesFederativas = new HashSet<>();
+	private final Set<String> referenciados = new HashSet<>();
 	private final ISegurancaServico segurancaServico = mock(ISegurancaServico.class);
 	private final IMunicipioRepositorio repositorio = mock(IMunicipioRepositorio.class);
 	private final IUnidadeFederativaRepositorio unidadeFederativaRepositorio = mock(
@@ -66,10 +68,13 @@ public final class MunicipioStepDefinitions {
 			UnidadeFederativaCodigoIbge unidadeFederativa = chamada.getArgument(1);
 			Optional<MunicipioCodigoIbge> identificadorIgnorado = chamada.getArgument(2);
 			return municipios.values().stream()
-					.anyMatch(candidato -> candidato.getNome().equals(nome)
+					.anyMatch(candidato -> candidato.getNome().equalsIgnoreCase(nome)
 							&& candidato.getUnidadeFederativa().equals(unidadeFederativa)
 							&& !foiIgnorado(candidato, identificadorIgnorado));
 		});
+
+		when(repositorio.existeReferencia(any()))
+				.thenAnswer(chamada -> referenciados.contains(chave(chamada.getArgument(0))));
 
 		when(repositorio.incluir(any())).thenAnswer(chamada -> {
 			Municipio municipio = chamada.getArgument(0);
@@ -106,6 +111,7 @@ public final class MunicipioStepDefinitions {
 	public void que_nao_existe_nenhum_municipio_cadastrado() {
 		municipios.clear();
 		unidadesFederativas.clear();
+		referenciados.clear();
 	}
 
 	@Dado("que existe a unidade federativa de código IBGE {string}")
@@ -133,6 +139,11 @@ public final class MunicipioStepDefinitions {
 	public void que_existe_um_municipio_extinto(String codigoIbge, String nome) {
 		var municipio = criar(codigoIbge, nome).extinguir();
 		municipios.put(chave(municipio.getIdentificador().orElseThrow()), municipio);
+	}
+
+	@Dado("que o município de código IBGE {string} é referenciado")
+	public void que_o_municipio_e_referenciado(String codigoIbge) {
+		referenciados.add(codigoIbge);
 	}
 
 	@Quando("eu incluo o município de código IBGE {string}, nome {string}")
@@ -272,7 +283,7 @@ public final class MunicipioStepDefinitions {
 	@Entao("a inclusão é rejeitada porque não existe unidade federativa com o identificador {string}")
 	public void a_inclusao_e_rejeitada_por_unidade_federativa_inexistente(String codigoIbge) {
 		assertInstanceOf(AgregadoInexistenteExcecao.class, excecaoCapturada);
-		assertEquals(String.format(MunicipioServico.UNIDADE_FEDERATIVA_INEXISTENTE_MODELO, codigoIbge),
+		assertEquals(String.format(UnidadeFederativaServico.IDENTIFICADOR_INEXISTENTE_MODELO, codigoIbge),
 				excecaoCapturada.getMessage());
 	}
 
@@ -343,6 +354,12 @@ public final class MunicipioStepDefinitions {
 		assertMensagemDeInexistencia(codigoIbge);
 	}
 
+	@Entao("a exclusão é rejeitada porque o município {string} é referenciado")
+	public void a_exclusao_e_rejeitada_por_referencia(String codigoIbge) {
+		assertInstanceOf(IllegalStateException.class, excecaoCapturada);
+		assertEquals(String.format(MunicipioServico.REFERENCIADO_MODELO, codigoIbge), excecaoCapturada.getMessage());
+	}
+
 	@Entao("o município é extinguido com sucesso")
 	public void o_municipio_e_extinguido_com_sucesso() {
 		assertNull(excecaoCapturada);
@@ -388,6 +405,6 @@ public final class MunicipioStepDefinitions {
 
 	private void assertMensagemDeExtincao(Object argumento) {
 		assertInstanceOf(IllegalStateException.class, excecaoCapturada);
-		assertEquals(String.format(MunicipioServico.EXTINTO_MODELO, argumento), excecaoCapturada.getMessage());
+		assertEquals(String.format(Municipio.EXTINTO_MODELO, argumento), excecaoCapturada.getMessage());
 	}
 }

@@ -9,18 +9,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "MUN_MUNICIPIO")
+@Table(name = "MUN_MUNICIPIO", uniqueConstraints = @UniqueConstraint(columnNames = { "MUN_UFI_ID", "MUN_NM" }))
 public class MunicipioJpa implements IAgregadoJpa<Municipio> {
 	@Id
-	@Column(name = "MUN_ID", length = MunicipioCodigoIbge.TAMANHO, nullable = false)
+	@Column(name = "MUN_ID", length = MunicipioCodigoIbge.TAMANHO, nullable = false, updatable = false)
 	private String identificador;
 
 	@Column(name = "MUN_NM", length = 100, nullable = false)
 	private String nome;
 
-	@Column(name = "MUN_UFI_ID", length = UnidadeFederativaCodigoIbge.TAMANHO, nullable = false)
+	@Column(name = "MUN_UFI_ID", length = UnidadeFederativaCodigoIbge.TAMANHO, nullable = false, updatable = false)
 	private String unidadeFederativa;
 
 	@Column(name = "MUN_EX", nullable = false)

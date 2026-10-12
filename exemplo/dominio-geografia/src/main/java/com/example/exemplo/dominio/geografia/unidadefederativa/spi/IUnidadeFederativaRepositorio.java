@@ -13,4 +13,6 @@ public interface IUnidadeFederativaRepositorio
 	boolean existePorSigla(UnidadeFederativaSigla sigla, Optional<UnidadeFederativaCodigoIbge> identificadorIgnorado);
 
 	boolean existePorNome(String nome, Optional<UnidadeFederativaCodigoIbge> identificadorIgnorado);
+
+	boolean existeReferencia(UnidadeFederativaCodigoIbge identificador);
 }

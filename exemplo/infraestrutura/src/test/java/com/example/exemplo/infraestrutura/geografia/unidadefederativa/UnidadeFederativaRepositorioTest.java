@@ -15,6 +15,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativa;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaSigla;
+import com.example.exemplo.infraestrutura.geografia.municipio.IMunicipioRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.municipio.MunicipioJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 
@@ -22,6 +24,9 @@ import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 class UnidadeFederativaRepositorioTest {
 	@Autowired
 	private IUnidadeFederativaRepositorioJpa repositorioJpa;
+
+	@Autowired
+	private IMunicipioRepositorioJpa municipioRepositorioJpa;
 
 	private UnidadeFederativaRepositorio repositorio;
 
@@ -130,5 +135,22 @@ class UnidadeFederativaRepositorioTest {
 		var identificador = Optional.of(new UnidadeFederativaCodigoIbge("33"));
 
 		assertTrue(repositorio.existePorNome("São Paulo", identificador));
+	}
+
+	@Test
+	void existePorNomeIgnorandoMaiusculasEMinusculas() {
+		repositorio.incluir(criar("35", "SP", "São Paulo"));
+
+		assertTrue(repositorio.existePorNome("SÃO PAULO", Optional.empty()));
+	}
+
+	@Test
+	void existeReferenciaPorMunicipio() {
+		repositorio.incluir(criar("35", "SP", "São Paulo"));
+		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
+		municipioRepositorioJpa.save(new MunicipioJpa("3550308", "São Paulo", "35", false));
+
+		assertTrue(repositorio.existeReferencia(new UnidadeFederativaCodigoIbge("35")));
+		assertFalse(repositorio.existeReferencia(new UnidadeFederativaCodigoIbge("33")));
 	}
 }

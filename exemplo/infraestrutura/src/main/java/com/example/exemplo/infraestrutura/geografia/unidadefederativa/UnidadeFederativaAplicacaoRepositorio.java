@@ -26,8 +26,9 @@ public class UnidadeFederativaAplicacaoRepositorio extends
 		Objects.requireNonNull(consulta);
 		Objects.requireNonNull(pageable);
 
+		var sigla = paraLike(consulta.getSigla());
 		var nome = paraLike(consulta.getNome());
-		return repositorioJpa.pesquisar(nome, pageable);
+		return repositorioJpa.pesquisar(sigla, nome, pageable);
 	}
 
 	@Override
@@ -36,6 +37,7 @@ public class UnidadeFederativaAplicacaoRepositorio extends
 
 		return switch (ordenacao) {
 		case IDENTIFICADOR -> "identificador";
+		case SIGLA -> "sigla";
 		case NOME -> "nome";
 		};
 	}

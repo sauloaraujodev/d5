@@ -19,6 +19,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>exemplo-dominio-geografia</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>dev.sauloaraujo</groupId>
 			<artifactId>d5-framework-dominio-teste</artifactId>
 			<type>pom</type>

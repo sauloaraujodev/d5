@@ -12,8 +12,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.geografia.unidadefederativa.spi.IUnidadeFederativaRepositorio;
@@ -28,6 +30,7 @@ import io.cucumber.java.pt.Quando;
 
 public final class UnidadeFederativaStepDefinitions {
 	private final Map<String, UnidadeFederativa> unidadesFederativas = new HashMap<>();
+	private final Set<String> referenciadas = new HashSet<>();
 	private final ISegurancaServico segurancaServico = mock(ISegurancaServico.class);
 	private final IUnidadeFederativaRepositorio repositorio = mock(IUnidadeFederativaRepositorio.class);
 	private final UnidadeFederativaServico servico = new UnidadeFederativaServico(segurancaServico, repositorio);
@@ -61,8 +64,11 @@ public final class UnidadeFederativaStepDefinitions {
 			String nome = chamada.getArgument(0);
 			Optional<UnidadeFederativaCodigoIbge> identificadorIgnorado = chamada.getArgument(1);
 			return unidadesFederativas.values().stream().anyMatch(
-					candidata -> candidata.getNome().equals(nome) && !foiIgnorada(candidata, identificadorIgnorado));
+					candidata -> candidata.getNome().equalsIgnoreCase(nome) && !foiIgnorada(candidata, identificadorIgnorado));
 		});
+
+		when(repositorio.existeReferencia(any()))
+				.thenAnswer(chamada -> referenciadas.contains(chave(chamada.getArgument(0))));
 
 		when(repositorio.incluir(any())).thenAnswer(chamada -> {
 			UnidadeFederativa unidadeFederativa = chamada.getArgument(0);
@@ -100,6 +106,7 @@ public final class UnidadeFederativaStepDefinitions {
 	@Dado("que não existe nenhuma unidade federativa cadastrada")
 	public void que_nao_existe_nenhuma_unidade_federativa_cadastrada() {
 		unidadesFederativas.clear();
+		referenciadas.clear();
 	}
 
 	@Dado("que sou um usuário administrador")
@@ -116,6 +123,11 @@ public final class UnidadeFederativaStepDefinitions {
 	public void que_existe_uma_unidade_federativa(String codigoIbge, String sigla, String nome) {
 		var unidadeFederativa = criar(codigoIbge, sigla, nome);
 		unidadesFederativas.put(chave(unidadeFederativa.getIdentificador().orElseThrow()), unidadeFederativa);
+	}
+
+	@Dado("que a unidade federativa de código IBGE {string} é referenciada")
+	public void que_a_unidade_federativa_e_referenciada(String codigoIbge) {
+		referenciadas.add(codigoIbge);
 	}
 
 	@Quando("eu incluo a unidade federativa de código IBGE {string}, sigla {string} e nome {string}")
@@ -278,6 +290,13 @@ public final class UnidadeFederativaStepDefinitions {
 	@Entao("a exclusão é rejeitada porque não existe unidade federativa com o identificador {string}")
 	public void a_exclusao_e_rejeitada_por_inexistencia(String codigoIbge) {
 		assertMensagemDeInexistencia(codigoIbge);
+	}
+
+	@Entao("a exclusão é rejeitada porque a unidade federativa {string} é referenciada")
+	public void a_exclusao_e_rejeitada_por_referencia(String codigoIbge) {
+		assertInstanceOf(IllegalStateException.class, excecaoCapturada);
+		assertEquals(String.format(UnidadeFederativaServico.REFERENCIADA_MODELO, codigoIbge),
+				excecaoCapturada.getMessage());
 	}
 
 	private void assertMensagemDeExistencia(String modelo, Object argumento) {
