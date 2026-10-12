@@ -34,7 +34,7 @@ class MunicipioRepositorioTest {
 	}
 
 	private static Municipio criar(String codigoIbge, String nome) {
-		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome);
+		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome, Optional.empty());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class MunicipioRepositorioTest {
 	void alteraPreservandoExtincao() {
 		repositorio.incluir(criar("3550308", "São Paulo").extinguir());
 
-		repositorio.alterar(Municipio.extinto(new MunicipioCodigoIbge("3550308"), "São Paulo Alterado"));
+		repositorio.alterar(new Municipio(new MunicipioCodigoIbge("3550308"), "São Paulo Alterado", Optional.of(true)));
 
 		var municipio = repositorio.buscarPorIdentificador(new MunicipioCodigoIbge("3550308"));
 		assertEquals("São Paulo Alterado", municipio.getNome());

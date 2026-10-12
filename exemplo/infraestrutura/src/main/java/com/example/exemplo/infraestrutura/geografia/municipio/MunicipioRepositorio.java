@@ -36,8 +36,7 @@ public class MunicipioRepositorio
 		Objects.requireNonNull(agregadoJpa);
 
 		var identificador = new MunicipioCodigoIbge(agregadoJpa.getIdentificador());
-		return agregadoJpa.isExtinto() ? Municipio.extinto(identificador, agregadoJpa.getNome())
-				: new Municipio(identificador, agregadoJpa.getNome());
+		return new Municipio(identificador, agregadoJpa.getNome(), Optional.of(agregadoJpa.isExtinto()));
 	}
 
 	@Override

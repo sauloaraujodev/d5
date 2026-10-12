@@ -14,22 +14,14 @@ public final class Municipio implements IAgregado<MunicipioCodigoIbge> {
 	private final String nome;
 	private final boolean extinto;
 
-	public Municipio(MunicipioCodigoIbge identificador, String nome) {
-		this(identificador, nome, false);
-	}
-
-	private Municipio(MunicipioCodigoIbge identificador, String nome, boolean extinto) {
+	public Municipio(MunicipioCodigoIbge identificador, String nome, Optional<Boolean> extinto) {
 		this.identificador = Objects.requireNonNull(identificador);
 		this.nome = Validate.notBlank(nome, "Nome do município em branco");
-		this.extinto = extinto;
-	}
-
-	public static Municipio extinto(MunicipioCodigoIbge identificador, String nome) {
-		return new Municipio(identificador, nome, true);
+		this.extinto = Objects.requireNonNull(extinto).orElse(false);
 	}
 
 	public Municipio extinguir() {
-		return extinto(identificador, nome);
+		return new Municipio(identificador, nome, Optional.of(true));
 	}
 
 	@Override

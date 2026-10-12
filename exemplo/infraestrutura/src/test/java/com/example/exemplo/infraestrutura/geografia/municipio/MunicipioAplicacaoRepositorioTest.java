@@ -35,7 +35,7 @@ class MunicipioAplicacaoRepositorioTest {
 	}
 
 	private static Municipio criar(String codigoIbge, String nome) {
-		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome);
+		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome, Optional.empty());
 	}
 
 	private static MunicipioConsulta consultar(Optional<String> nome, Optional<String> unidadeFederativa) {

@@ -99,7 +99,7 @@ public final class MunicipioStepDefinitions {
 	}
 
 	private static Municipio criar(String codigoIbge, String nome) {
-		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome);
+		return new Municipio(new MunicipioCodigoIbge(codigoIbge), nome, Optional.empty());
 	}
 
 	@Dado("que não existe nenhum município cadastrado")
@@ -145,9 +145,18 @@ public final class MunicipioStepDefinitions {
 		incluir(codigoIbge, nome);
 	}
 
+	@Quando("eu tento incluir o município extinto de código IBGE {string} e nome {string}")
+	public void eu_tento_incluir_o_municipio_extinto(String codigoIbge, String nome) {
+		incluir(criar(codigoIbge, nome).extinguir());
+	}
+
 	private void incluir(String codigoIbge, String nome) {
+		incluir(criar(codigoIbge, nome));
+	}
+
+	private void incluir(Municipio municipio) {
 		try {
-			resultadoInclusao = servico.incluir(criar(codigoIbge, nome));
+			resultadoInclusao = servico.incluir(municipio);
 		} catch (RuntimeException excecao) {
 			excecaoCapturada = excecao;
 		}
@@ -181,9 +190,18 @@ public final class MunicipioStepDefinitions {
 		alterar(codigoIbge, nome);
 	}
 
+	@Quando("eu tento alterar o município de código IBGE {string} para extinto com nome {string}")
+	public void eu_tento_alterar_o_municipio_para_extinto(String codigoIbge, String nome) {
+		alterar(criar(codigoIbge, nome).extinguir());
+	}
+
 	private void alterar(String codigoIbge, String nome) {
+		alterar(criar(codigoIbge, nome));
+	}
+
+	private void alterar(Municipio municipio) {
 		try {
-			servico.alterar(criar(codigoIbge, nome));
+			servico.alterar(municipio);
 		} catch (RuntimeException excecao) {
 			excecaoCapturada = excecao;
 		}
@@ -290,6 +308,16 @@ public final class MunicipioStepDefinitions {
 		assertMensagemDeInexistencia(codigoIbge);
 	}
 
+	@Entao("a inclusão é rejeitada porque o município só pode ser extinto pela ação de extinção")
+	public void a_inclusao_e_rejeitada_por_extincao_indevida() {
+		assertMensagemDeExtincaoIndevida();
+	}
+
+	@Entao("a alteração é rejeitada porque o município só pode ser extinto pela ação de extinção")
+	public void a_alteracao_e_rejeitada_por_extincao_indevida() {
+		assertMensagemDeExtincaoIndevida();
+	}
+
 	@Entao("a alteração é rejeitada porque o município {string} está extinto")
 	public void a_alteracao_e_rejeitada_por_extincao(String codigoIbge) {
 		assertMensagemDeExtincao(codigoIbge);
@@ -351,6 +379,11 @@ public final class MunicipioStepDefinitions {
 		assertInstanceOf(AgregadoInexistenteExcecao.class, excecaoCapturada);
 		assertEquals(String.format(MunicipioServico.IDENTIFICADOR_INEXISTENTE_MODELO, argumento),
 				excecaoCapturada.getMessage());
+	}
+
+	private void assertMensagemDeExtincaoIndevida() {
+		assertInstanceOf(IllegalArgumentException.class, excecaoCapturada);
+		assertEquals(MunicipioServico.EXTINCAO_INDEVIDA, excecaoCapturada.getMessage());
 	}
 
 	private void assertMensagemDeExtincao(Object argumento) {

@@ -3,6 +3,8 @@ package com.example.exemplo.dominio.geografia.municipio;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
+
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.geografia.municipio.spi.IMunicipioRepositorio;
 import com.example.exemplo.dominio.geografia.unidadefederativa.spi.IUnidadeFederativaRepositorio;
@@ -16,6 +18,7 @@ public final class MunicipioServico
 	public static final String IDENTIFICADOR_EXISTENTE_MODELO = "Já existe um município com o identificador %s";
 	public static final String NOME_EXISTENTE_MODELO = "Já existe um município com o nome %s na unidade federativa";
 	public static final String UNIDADE_FEDERATIVA_INEXISTENTE_MODELO = "Não existe unidade federativa com o identificador %s";
+	public static final String EXTINCAO_INDEVIDA = "O município só pode ser extinto pela ação de extinção";
 	public static final String EXTINTO_MODELO = "O município %s está extinto";
 
 	private final IMunicipioRepositorio repositorio;
@@ -40,6 +43,8 @@ public final class MunicipioServico
 	@Override
 	protected void validarInclusaoAlteracao(Municipio agregado) {
 		Objects.requireNonNull(agregado);
+
+		Validate.isTrue(!agregado.isExtinto(), EXTINCAO_INDEVIDA);
 
 		validarExistencia(unidadeFederativaRepositorio::existePorIdentificador, agregado.getUnidadeFederativa(),
 				UNIDADE_FEDERATIVA_INEXISTENTE_MODELO);

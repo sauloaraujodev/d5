@@ -37,6 +37,11 @@ Funcionalidade: Gerenciar municípios
     Quando eu tento incluir o município de código IBGE "3304557", nome "Rio de Janeiro"
     Então a inclusão é rejeitada porque não existe unidade federativa com o identificador "33"
 
+  Cenário: Não é possível incluir um município já extinto
+    Dado que sou um administrador do cadastro de municípios
+    Quando eu tento incluir o município extinto de código IBGE "3550308" e nome "São Paulo"
+    Então a inclusão é rejeitada porque o município só pode ser extinto pela ação de extinção
+
   Cenário: Buscar um município existente
     Dado que existe um município com código IBGE "3550308", nome "São Paulo"
     E que sou um usuário sem autorização para administrar municípios
@@ -77,6 +82,12 @@ Funcionalidade: Gerenciar municípios
     E que existe um município extinto com código IBGE "3550308", nome "São Paulo"
     Quando eu tento alterar o município de código IBGE "3550308" para nome "Cidade de São Paulo"
     Então a alteração é rejeitada porque o município "3550308" está extinto
+
+  Cenário: Não é possível extinguir um município por meio da alteração
+    Dado que sou um administrador do cadastro de municípios
+    E que existe um município com código IBGE "3550308", nome "São Paulo"
+    Quando eu tento alterar o município de código IBGE "3550308" para extinto com nome "São Paulo"
+    Então a alteração é rejeitada porque o município só pode ser extinto pela ação de extinção
 
   Cenário: Excluir um município
     Dado que sou um administrador do cadastro de municípios
