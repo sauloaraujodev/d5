@@ -1,0 +1,21 @@
+---
+name: desenvolver-dominio-d5
+description: Desenvolver camada de domínio com D5
+---
+Aplique [desenvolver-dominio](../04-desenvolver-dominio/SKILL.md).
+
+Não decompile o D5. Seu código fonte está em [.agents/d5/framework](../../d5/framework). O código do exemplo está em [.agents/d5/exemplo](../../d5/exemplo).
+
+Objetos de valor que possuem um único atributo de tipo String herdam de [ObjetoValorRegexAbstrato](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/ObjetoValorRegexAbstrato.java) (ver [UnidadeFederativaSigla](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaSigla.java)), quando os valores válidos para o atributo podem ser descritos por uma expressão regular. Caso contrário, devem herdar de [ObjetoValorStringAbstrato](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/ObjetoValorStringAbstrato.java) (ver [ClienteIdentificador](../../d5/exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/ClienteIdentificador.java)).
+
+Objetos de valor com mais de um atributo devem implementar [IObjetoValor](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IObjetoValor.java) diretamente (ver [Endereco](../../d5/exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/Endereco.java)).
+
+Objetos de valor que identificam entidades implementam [IIdentificador](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IIdentificador.java) (ver [ClienteIdentificador](../../d5/exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/ClienteIdentificador.java)).
+
+Entidades raiz implementam [IAgregado](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IAgregado.java). Ver [UnidadeFederativa](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativa.java) e [Cliente](../../d5/exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/Cliente.java) para exemplos de entidades com identificador natural e artificial, respectivamente. No primeiro caso, o construtor da entidade recebe o identificador como parâmetro. No segundo caso, recebe o identificador envolto em um Optional.
+
+Serviços herdam de [AgregadoServicoAbstrato](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/AgregadoServicoAbstrato.java) e implementam o método criarAutorizacoes. [UnidadeFederativaServico](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaServico.java) exemplifica um serviço apenas com ações herdadas (incluir, buscar, alterar e excluir). [MunicipioServico](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/MunicipioServico.java) exemplifica um serviço com uma ação adicional (extinguir), caso em que é necessário criar uma subclasse de [AgregadoAutorizacoes](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/AgregadoAutorizacoes.java) como [MunicipioAutorizacoes](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/MunicipioAutorizacoes.java).
+
+No modelo do projeto de software, por exigência do Context Mapper, os repositórios devem ser nomeados com o sufixo Repository. No código, interfaces de repositórios são nomeadas com prefixo I e sufixo Repositorio (por exemplo, I**A**Repositorio, onde **A** é um agregado).
+
+Interfaces de repositório devem estender [IAgregadoRepositorio](../../d5/framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/spi/IAgregadoRepositorio.java) e declarar métodos de consulta adicionais aos herdados e necessários à implementação de regras de negócio em serviços (ver [IMunicipioRepositorio](../../d5/exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/spi/IMunicipioRepositorio.java)).

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import freemarker.template.Configuration;
@@ -24,6 +27,23 @@ import freemarker.template.TemplateExceptionHandler;
 public class Gerador {
 	private static final List<String> DIRETORIOS_PADRAO = List.of("src/main/java", "src/main/resources",
 			"src/test/java", "src/test/resources");
+
+	private static final String DIRETORIO_SKILLS = "agents/skills/";
+
+	private static final List<String> SKILLS = List.of("01-especificar-funcionalidade/SKILL.md",
+			"01-especificar-funcionalidade/references/REFERENCE.md", "02-especificar-testes/SKILL.md",
+			"03-projetar-software/SKILL.md", "03-projetar-software/references/REFERENCE.md",
+			"03.01-projetar-contextos-delimitados/SKILL.md", "03.02-projetar-objetos-valor/SKILL.md",
+			"03.03-projetar-entidades/SKILL.md", "03.04-projetar-agregados/SKILL.md",
+			"03.05-projetar-associacoes/SKILL.md", "03.06-projetar-servicos/SKILL.md",
+			"03.07-projetar-repositorios/SKILL.md", "03.08-validar-modelo/SKILL.md",
+			"03.08-validar-modelo/scripts/pom.xml", "04-desenvolver-dominio/SKILL.md", "05-desenvolver-testes/SKILL.md",
+			"06-projetar-banco/SKILL.md", "07-desenvolver-infraestrutura-dominio/SKILL.md",
+			"08-desenvolver-backend/SKILL.md", "09-desenvolver-frontend/SKILL.md",
+			"programar-defensivamente/SKILL.md");
+
+	private static final List<String> SKILLS_FRAMEWORK = List.of("04-desenvolver-dominio-d5/SKILL.md",
+			"07-desenvolver-infraestrutura-dominio-d5/SKILL.md", "08-desenvolver-backend-d5/SKILL.md");
 
 	private final Configuration freemarker;
 
@@ -58,9 +78,51 @@ public class Gerador {
 		gerarInfraestrutura(raiz, groupId, nome, framework);
 		gerarUiBackend(raiz, groupId, nome, framework);
 
-		var modulos = Objects.requireNonNull(raiz.listFiles(File::isDirectory));
+		gerarAgentes(raiz, groupId, nome, subdominiosOrdenados, framework);
+
+		var modulos = Objects.requireNonNull(raiz.listFiles(f -> f.isDirectory() && !f.getName().startsWith(".")));
 		for (var modulo : modulos) {
 			criarDiretoriosPadrao(modulo);
+		}
+	}
+
+	private void gerarAgentes(File raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
+		var projeto = Map.of("name", nome, "groupId", groupId, "version", "1.0.0-SNAPSHOT", "framework", framework,
+				"subdomains", subdominios, "mavenRootProject", Map.of("artifactId", nome + "-pai"));
+		var modelo = Map.<String, Object>of("d5Project", projeto);
+
+		if (framework) {
+			copiarRecursos("framework", new File(raiz, ".agents/d5/framework"));
+			copiarRecursos("exemplo", new File(raiz, ".agents/d5/exemplo"));
+		}
+
+		processar("AGENTS.md.ftlh", modelo, new File(raiz, "AGENTS.md"));
+
+		var skills = new ArrayList<>(SKILLS);
+		if (framework) {
+			skills.addAll(SKILLS_FRAMEWORK);
+		}
+		for (var skill : skills) {
+			processar(DIRETORIO_SKILLS + skill + ".ftlh", modelo, new File(raiz, ".agents/skills/" + skill));
+		}
+	}
+
+	private void copiarRecursos(String origem, File destino) {
+		var prefixo = "d5/" + origem + "/";
+		try {
+			for (var recurso : new PathMatchingResourcePatternResolver().getResources("classpath*:" + prefixo + "**")) {
+				if (!recurso.isReadable()) {
+					continue;
+				}
+				var caminho = recurso.getURL().toString();
+				var arquivo = new File(destino, caminho.substring(caminho.lastIndexOf("/" + prefixo) + prefixo.length() + 1));
+				Files.createDirectories(arquivo.getParentFile().toPath());
+				try (var entrada = recurso.getInputStream()) {
+					Files.copy(entrada, arquivo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException("Falha ao copiar " + origem, e);
 		}
 	}
 

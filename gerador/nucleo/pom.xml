@@ -11,6 +11,34 @@
 
 	<artifactId>d5-gerador-nucleo</artifactId>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>../../framework</directory>
+				<targetPath>d5/framework</targetPath>
+				<excludes>
+					<exclude>**/target/**</exclude>
+					<exclude>**/.settings/**</exclude>
+					<exclude>**/.classpath</exclude>
+					<exclude>**/.project</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>../../exemplo</directory>
+				<targetPath>d5/exemplo</targetPath>
+				<excludes>
+					<exclude>**/target/**</exclude>
+					<exclude>**/.settings/**</exclude>
+					<exclude>**/.classpath</exclude>
+					<exclude>**/.project</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
