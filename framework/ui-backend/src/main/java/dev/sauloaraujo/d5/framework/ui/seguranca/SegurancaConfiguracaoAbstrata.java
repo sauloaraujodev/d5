@@ -41,6 +41,7 @@ public abstract class SegurancaConfiguracaoAbstrata {
 					autorizacao.requestMatchers(BACKEND).denyAll();
 				})
 				.httpBasic(basico -> basico.authenticationEntryPoint(entradaSemDesafio))
+				.exceptionHandling(excecoes -> excecoes.accessDeniedHandler(new ManipuladorAcessoNegado()))
 				.logout(logout -> logout
 						.logoutUrl(SAIR)
 						.logoutSuccessHandler((requisicao, resposta, autenticacao) -> resposta

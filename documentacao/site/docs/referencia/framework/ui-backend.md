@@ -110,7 +110,7 @@ Nos casos a seguir, a resposta usa uma mensagem em português em vez da mensagem
 
 `AccessDeniedException` e `AuthenticationException` têm tratamento explícito porque, sem ele, uma dessas exceções lançada de dentro de um controlador — por exemplo, por uma verificação de segurança em nível de método — seria capturada pelo handler genérico de `Exception` e viraria [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}, em vez de 403 ou 401.
 
-Exceções lançadas fora dos controladores, na cadeia de filtros do Spring Security — como a negação de um endpoint pelas regras de [`SegurancaConfiguracaoAbstrata`](#segurancaconfiguracaoabstrata), a ausência de autenticação ou a ausência do token de CSRF — não passam por `ExcecaoManipulador` e, portanto, não seguem necessariamente o formato `{"mensagem": "..."}`.
+Exceções lançadas fora dos controladores, na cadeia de filtros do Spring Security — como a negação de um endpoint pelas regras de [`SegurancaConfiguracaoAbstrata`](#segurancaconfiguracaoabstrata), a ausência de autenticação ou a ausência do token de CSRF — não passam por `ExcecaoManipulador`. Elas também respondem no formato `{"mensagem": "..."}`, mas através de [`EntradaAutenticacaoSemDesafio`](#entradaautenticacaosemdesafio), com 401, e de [`ManipuladorAcessoNegado`](#manipuladoracessonegado), com 403.
 
 ```java title="ExcecaoManipulador.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/ExcecaoManipulador.java"
@@ -133,7 +133,8 @@ Além disso, `filtroSeguranca`:
 - autentica via HTTP Basic, com [`EntradaAutenticacaoSemDesafio`](#entradaautenticacaosemdesafio) no lugar do desafio padrão;
 - adota a política de sessão `SessionCreationPolicy.IF_REQUIRED`;
 - configura o logout em `SAIR` — a constante protegida `"/" + Backend.PREFIXO + "sair"` —, que responde [204 No Content](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/204){target="_blank"};
-- protege contra CSRF com o cookie `XSRF-TOKEN`, não `HttpOnly`, lido pelo cliente e devolvido no cabeçalho `X-XSRF-TOKEN`, através de [`ManipuladorRequisicaoCsrfSpa`](#manipuladorrequisicaocsrfspa) e [`FiltroCookieCsrf`](#filtrocookiecsrf). A verificação do token ocorre antes da autenticação: uma requisição de escrita sem token válido é rejeitada e, na prática, responde 401 com a mensagem de usuário não autenticado, mesmo que traga credenciais válidas.
+- protege contra CSRF com o cookie `XSRF-TOKEN`, não `HttpOnly`, lido pelo cliente e devolvido no cabeçalho `X-XSRF-TOKEN`, através de [`ManipuladorRequisicaoCsrfSpa`](#manipuladorrequisicaocsrfspa) e [`FiltroCookieCsrf`](#filtrocookiecsrf). Uma requisição de escrita sem token válido é rejeitada com 403 e a mensagem `Token CSRF ausente ou inválido.`, antes mesmo da verificação das credenciais;
+- responde às negações de acesso na cadeia de filtros — por CSRF ou pelas regras de autorização — através de [`ManipuladorAcessoNegado`](#manipuladoracessonegado).
 
 Também expõe, como bean, o `PasswordEncoder` devolvido por `codificadorSenha`, usado para codificar e verificar as senhas dos usuários da aplicação. É um `DelegatingPasswordEncoder`: codifica com bcrypt e prefixa a senha codificada com o identificador do algoritmo — `{bcrypt}...` —, prefixo que toda senha armazenada deve trazer para ser verificada.
 
@@ -148,6 +149,18 @@ Por padrão, a autenticação HTTP Basic do Spring Security responde a uma requi
 
 ```java title="EntradaAutenticacaoSemDesafio.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/EntradaAutenticacaoSemDesafio.java"
+```
+
+### `ManipuladorAcessoNegado`
+Por padrão, o Spring Security responde a uma negação de acesso na cadeia de filtros com `sendError(403)`, que encaminha a requisição ao endpoint de erro, `/error`. Como as regras de [`SegurancaConfiguracaoAbstrata`](#segurancaconfiguracaoabstrata) não liberam `/error`, esse encaminhamento também seria negado:
+
+- uma falha de CSRF, verificada antes da autenticação, chegaria a `/error` com o usuário ainda anônimo e resultaria em 401 com a mensagem de usuário não autenticado, mesmo com credenciais válidas;
+- a negação de um endpoint por `autorizar` resultaria em 403, mas com corpo vazio.
+
+Esta implementação de `AccessDeniedHandler` escreve a resposta diretamente, sem encaminhá-la a `/error`: 403 com um corpo JSON cuja mensagem é `Token CSRF ausente ou inválido.`, para falhas de CSRF, ou `Ação não autorizada.`, para as demais negações. Assim, o cliente distingue a falta do token — que se resolve obtendo um novo cookie — da falta de credenciais, que responde 401.
+
+```java title="ManipuladorAcessoNegado.java"
+--8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/ManipuladorAcessoNegado.java"
 ```
 
 ### `FiltroCookieCsrf`

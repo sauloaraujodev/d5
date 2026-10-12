@@ -411,7 +411,7 @@ Como todo endpoint sob `/backend/**` exige um usuário autenticado, e a aplicaç
 
 ![Diálogo de autenticação HTTP Basic do Swagger UI](assets/tutorial/02-autorizar.png)
 
-A partir daí, toda requisição disparada pelo Swagger UI leva o cabeçalho `Authorization` com essas credenciais. O primeiro `Execute`, ainda que sem sucesso, também recebe do servidor o cookie `XSRF-TOKEN`, exigido pelas operações de escrita — como o Swagger UI só lê esse cookie ao carregar a página (veja [CSRF no Swagger UI](referencia/framework/comportamentos.md#csrf-no-swagger-ui)), recarregue a página e autentique-se novamente antes de tentar incluir, alterar ou excluir. Sem o cookie, as operações de escrita respondem 401, ainda que as credenciais sejam válidas.
+A partir daí, toda requisição disparada pelo Swagger UI leva o cabeçalho `Authorization` com essas credenciais. O primeiro `Execute`, ainda que sem sucesso, também recebe do servidor o cookie `XSRF-TOKEN`, exigido pelas operações de escrita — como o Swagger UI só lê esse cookie ao carregar a página (veja [CSRF no Swagger UI](referencia/framework/comportamentos.md#csrf-no-swagger-ui)), recarregue a página e autentique-se novamente antes de tentar incluir, alterar ou excluir. Sem o cookie, as operações de escrita respondem 403 com a mensagem `Token CSRF ausente ou inválido.`.
 
 Com a sessão autenticada, expanda cada operação e use **Try it out**:
 
