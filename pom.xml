@@ -19,7 +19,7 @@
 	<name>D5</name>
 	<description>Framework DDD-Driven Development para aplicações Spring Boot em
 		Java.</description>
-	<url>https://sauloaraujo.dev</url>
+	<url>https://d5.sauloaraujo.dev</url>
 
 	<licenses>
 		<license>
@@ -189,13 +189,13 @@
 	</dependencies>
 
 	<profiles>
-		<!-- Ativo por padrão. Desativado com -Dpublicar, para que exemplo e gerador não sejam publicados. -->
+		<!-- Ativo por padrão. Desativado com -Dpublicacao, para que exemplo e gerador não sejam publicados. -->
 		<profile>
-			<id>extras</id>
+			<id>completo</id>
 
 			<activation>
 				<property>
-					<name>!publicar</name>
+					<name>!publicacao</name>
 				</property>
 			</activation>
 
@@ -206,7 +206,14 @@
 		</profile>
 
 		<profile>
-			<id>release</id>
+			<id>publicacao</id>
+
+			<!-- Ativado com -Dpublicacao, a mesma propriedade que desativa o perfil completo; -Ppublicacao não basta. -->
+			<activation>
+				<property>
+					<name>publicacao</name>
+				</property>
+			</activation>
 
 			<build>
 				<plugins>

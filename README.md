@@ -45,10 +45,10 @@ Os módulos `d5-framework-*-teste` e `d5-framework-bdd` têm `packaging` `pom`; 
 - `documentacao`: fonte do site.
 
 ## Publicação
-Somente o `framework` é publicado. Os módulos `exemplo` e `gerador` ficam fora do build com `-Dpublicar`:
+Somente o `framework` é publicado. A propriedade `publicacao` ativa o perfil de publicação e tira os módulos `exemplo` e `gerador` do build — use `-Dpublicacao`, e não `-Ppublicacao`, que ativa o perfil sem definir a propriedade:
 
 ```bash
-mvn -Prelease -Dpublicar clean deploy -DskipTests
+mvn -Dpublicacao clean deploy -DskipTests
 ```
 
 ## Licença
