@@ -1,11 +1,11 @@
 package dev.sauloaraujo.d5.gerador.nucleo;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +55,10 @@ public class Gerador {
 	}
 
 	public void gerar(File diretorio, String groupId, String nome, Set<String> subdominios, boolean framework) {
+		gerar(diretorio.toPath(), groupId, nome, subdominios, framework);
+	}
+
+	public void gerar(Path diretorio, String groupId, String nome, Set<String> subdominios, boolean framework) {
 		Objects.requireNonNull(diretorio);
 		Objects.requireNonNull(groupId);
 		Objects.requireNonNull(nome);
@@ -63,7 +67,7 @@ public class Gerador {
 			throw new IllegalArgumentException("É necessário informar ao menos um subdomínio");
 		}
 
-		var raiz = new File(diretorio, nome);
+		var raiz = diretorio.resolve(nome);
 		var subdominiosOrdenados = new TreeSet<>(subdominios);
 		var artifactIdCompartilhado = nome + "-dominio-compartilhado";
 
@@ -80,82 +84,85 @@ public class Gerador {
 
 		gerarAgentes(raiz, groupId, nome, subdominiosOrdenados, framework);
 
-		var modulos = Objects.requireNonNull(raiz.listFiles(f -> f.isDirectory() && !f.getName().startsWith(".")));
-		for (var modulo : modulos) {
-			criarDiretoriosPadrao(modulo);
+		try (var modulos = Files.list(raiz)) {
+			for (var modulo : (Iterable<Path>) modulos::iterator) {
+				if (Files.isDirectory(modulo) && !modulo.getFileName().toString().startsWith(".")) {
+					criarDiretoriosPadrao(modulo);
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException("Falha ao gerar " + raiz, e);
 		}
 	}
 
-	private void gerarAgentes(File raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
+	private void gerarAgentes(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
 		var projeto = Map.of("name", nome, "groupId", groupId, "version", "1.0.0-SNAPSHOT", "framework", framework,
 				"subdomains", subdominios, "mavenRootProject", Map.of("artifactId", nome + "-pai"));
 		var modelo = Map.<String, Object>of("d5Project", projeto);
 
 		if (framework) {
-			copiarRecursos("framework", new File(raiz, ".agents/d5/framework"));
-			copiarRecursos("exemplo", new File(raiz, ".agents/d5/exemplo"));
+			copiarD5(raiz.resolve(".agents/d5"));
 		}
 
-		processar("AGENTS.md.ftlh", modelo, new File(raiz, "AGENTS.md"));
+		processar("AGENTS.md.ftlh", modelo, raiz.resolve("AGENTS.md"));
 
 		var skills = new ArrayList<>(SKILLS);
 		if (framework) {
 			skills.addAll(SKILLS_FRAMEWORK);
 		}
 		for (var skill : skills) {
-			processar(DIRETORIO_SKILLS + skill + ".ftlh", modelo, new File(raiz, ".agents/skills/" + skill));
+			processar(DIRETORIO_SKILLS + skill + ".ftlh", modelo, raiz.resolve(".agents/skills/" + skill));
 		}
 	}
 
-	private void copiarRecursos(String origem, File destino) {
-		var prefixo = "d5/" + origem + "/";
+	private void copiarD5(Path destino) {
 		try {
-			for (var recurso : new PathMatchingResourcePatternResolver().getResources("classpath*:" + prefixo + "**")) {
+			for (var recurso : new PathMatchingResourcePatternResolver().getResources("classpath*:d5/**")) {
 				if (!recurso.isReadable()) {
 					continue;
 				}
 				var caminho = recurso.getURL().toString();
-				var arquivo = new File(destino, caminho.substring(caminho.lastIndexOf("/" + prefixo) + prefixo.length() + 1));
-				Files.createDirectories(arquivo.getParentFile().toPath());
+				var arquivo = destino.resolve(caminho.substring(caminho.lastIndexOf("/d5/") + 4));
+				Files.createDirectories(arquivo.getParent());
 				try (var entrada = recurso.getInputStream()) {
-					Files.copy(entrada, arquivo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(entrada, arquivo, StandardCopyOption.REPLACE_EXISTING);
 				}
 			}
 		} catch (IOException e) {
-			throw new IllegalStateException("Falha ao copiar " + origem, e);
+			throw new IllegalStateException("Falha ao copiar o D5", e);
 		}
 	}
 
-	private void gerarPomRaiz(File raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
+	private void gerarPomRaiz(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
 		processar("pom-raiz.ftl",
 				Map.of("groupId", groupId, "nome", nome, "subdominios", subdominios, "framework", framework),
-				new File(raiz, "pom.xml"));
+				raiz.resolve("pom.xml"));
 	}
 
-	private void gerarDominioCompartilhado(File raiz, String groupId, String nome, String artifactId,
+	private void gerarDominioCompartilhado(Path raiz, String groupId, String nome, String artifactId,
 			boolean framework) {
-		var modulo = new File(raiz, "dominio-compartilhado");
+		var modulo = raiz.resolve("dominio-compartilhado");
 
 		gerarPomDominio(modulo, groupId, nome, artifactId, null, framework);
 
 		var pacote = groupId + "." + nome + ".dominio";
-		var mainJava = new File(modulo, "src/main/java/" + pacote.replace('.', '/'));
-		processar("package-info.java.ftl", Map.of("pacote", pacote), new File(mainJava, "package-info.java"));
-		processar("Autorizacao.java.ftl", Map.of("pacote", pacote), new File(mainJava, "Autorizacao.java"));
+		var mainJava = modulo.resolve("src/main/java/" + pacote.replace('.', '/'));
+		processar("package-info.java.ftl", Map.of("pacote", pacote), mainJava.resolve("package-info.java"));
+		processar("Autorizacao.java.ftl", Map.of("pacote", pacote), mainJava.resolve("Autorizacao.java"));
 	}
 
-	private void gerarDominio(File raiz, String groupId, String nome, String subdominio, String artifactIdCompartilhado,
+	private void gerarDominio(Path raiz, String groupId, String nome, String subdominio, String artifactIdCompartilhado,
 			boolean framework) {
-		var modulo = new File(raiz, "dominio-" + subdominio);
+		var modulo = raiz.resolve("dominio-" + subdominio);
 
 		gerarPomDominio(modulo, groupId, nome, nome + "-dominio-" + subdominio, artifactIdCompartilhado, framework);
 
 		var pacote = groupId + "." + nome + ".dominio." + subdominio;
-		var testeJava = new File(modulo, "src/test/java/" + pacote.replace('.', '/'));
-		processar("CucumberTests.java.ftl", Map.of("pacote", pacote), new File(testeJava, "CucumberTests.java"));
+		var testeJava = modulo.resolve("src/test/java/" + pacote.replace('.', '/'));
+		processar("CucumberTests.java.ftl", Map.of("pacote", pacote), testeJava.resolve("CucumberTests.java"));
 	}
 
-	private void gerarPomDominio(File modulo, String groupId, String nome, String artifactId,
+	private void gerarPomDominio(Path modulo, String groupId, String nome, String artifactId,
 			@Nullable String dominioCompartilhado, boolean framework) {
 		var modelo = new HashMap<String, Object>();
 		modelo.put("groupId", groupId);
@@ -163,58 +170,58 @@ public class Gerador {
 		modelo.put("artifactId", artifactId);
 		modelo.put("dominioCompartilhado", dominioCompartilhado);
 		modelo.put("framework", framework);
-		processar("pom-dominio.ftl", modelo, new File(modulo, "pom.xml"));
+		processar("pom-dominio.ftl", modelo, modulo.resolve("pom.xml"));
 	}
 
-	private void gerarAplicacao(File raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
+	private void gerarAplicacao(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
 		processar("pom-aplicacao.ftl",
 				Map.of("groupId", groupId, "nome", nome, "subdominios", subdominios, "framework", framework),
-				new File(raiz, "aplicacao/pom.xml"));
+				raiz.resolve("aplicacao/pom.xml"));
 	}
 
-	private void gerarInfraestrutura(File raiz, String groupId, String nome, boolean framework) {
-		var modulo = new File(raiz, "infraestrutura");
+	private void gerarInfraestrutura(Path raiz, String groupId, String nome, boolean framework) {
+		var modulo = raiz.resolve("infraestrutura");
 
 		processar("pom-infraestrutura.ftl", Map.of("groupId", groupId, "nome", nome, "framework", framework),
-				new File(modulo, "pom.xml"));
+				modulo.resolve("pom.xml"));
 
 		var pacote = groupId + "." + nome + ".infraestrutura";
-		var testeJava = new File(modulo, "src/test/java/" + pacote.replace('.', '/'));
+		var testeJava = modulo.resolve("src/test/java/" + pacote.replace('.', '/'));
 		processar("InfraestruturaTesteAplicacao.java.ftl", Map.of("pacote", pacote),
-				new File(testeJava, "InfraestruturaTesteAplicacao.java"));
+				testeJava.resolve("InfraestruturaTesteAplicacao.java"));
 	}
 
-	private void gerarUiBackend(File raiz, String groupId, String nome, boolean framework) {
-		var modulo = new File(raiz, "ui-backend");
+	private void gerarUiBackend(Path raiz, String groupId, String nome, boolean framework) {
+		var modulo = raiz.resolve("ui-backend");
 
 		processar("pom-ui-backend.ftl", Map.of("groupId", groupId, "nome", nome, "framework", framework),
-				new File(modulo, "pom.xml"));
+				modulo.resolve("pom.xml"));
 
 		var pacote = groupId + "." + nome;
-		var raizJava = new File(modulo, "src/main/java/" + pacote.replace('.', '/'));
+		var raizJava = modulo.resolve("src/main/java/" + pacote.replace('.', '/'));
 
-		processar("package-info.java.ftl", Map.of("pacote", pacote), new File(raizJava, "package-info.java"));
-		processar("Aplicacao.java.ftl", Map.of("pacote", pacote), new File(raizJava, "BackendAplicacao.java"));
+		processar("package-info.java.ftl", Map.of("pacote", pacote), raizJava.resolve("package-info.java"));
+		processar("Aplicacao.java.ftl", Map.of("pacote", pacote), raizJava.resolve("BackendAplicacao.java"));
 
 		if (framework) {
 			var pacoteSeguranca = pacote + ".ui.backend.seguranca";
-			var seguranca = new File(raizJava, "ui/backend/seguranca");
+			var seguranca = raizJava.resolve("ui/backend/seguranca");
 
 			processar("package-info.java.ftl", Map.of("pacote", pacoteSeguranca),
-					new File(seguranca, "package-info.java"));
+					seguranca.resolve("package-info.java"));
 			processar("SegurancaConfiguracao.java.ftl", Map.of("pacote", pacote),
-					new File(seguranca, "SegurancaConfiguracao.java"));
+					seguranca.resolve("SegurancaConfiguracao.java"));
 			processar("AutenticacaoControlador.java.ftl", Map.of("pacote", pacote),
-					new File(seguranca, "AutenticacaoControlador.java"));
+					seguranca.resolve("AutenticacaoControlador.java"));
 		}
 	}
 
-	private void processar(String template, Map<String, Object> modelo, File destino) {
+	private void processar(String template, Map<String, Object> modelo, Path destino) {
 		try {
-			Files.createDirectories(destino.getParentFile().toPath());
+			Files.createDirectories(destino.getParent());
 
 			var modeloTemplate = freemarker.getTemplate(template);
-			try (var escritor = new OutputStreamWriter(new FileOutputStream(destino), StandardCharsets.UTF_8)) {
+			try (var escritor = new OutputStreamWriter(Files.newOutputStream(destino), StandardCharsets.UTF_8)) {
 				modeloTemplate.process(modelo, escritor);
 			}
 		} catch (IOException | TemplateException e) {
@@ -222,9 +229,9 @@ public class Gerador {
 		}
 	}
 
-	private void criarDiretoriosPadrao(File modulo) {
+	private void criarDiretoriosPadrao(Path modulo) {
 		for (var caminho : DIRETORIOS_PADRAO) {
-			var diretorio = new File(modulo, caminho).toPath();
+			var diretorio = modulo.resolve(caminho);
 			try {
 				Files.createDirectories(diretorio);
 				try (var conteudo = Files.list(diretorio)) {
