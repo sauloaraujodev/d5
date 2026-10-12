@@ -19,22 +19,20 @@
 			<resource>
 				<directory>../../framework</directory>
 				<targetPath>d5/framework</targetPath>
-				<excludes>
-					<exclude>**/target/**</exclude>
-					<exclude>**/.settings/**</exclude>
-					<exclude>**/.classpath</exclude>
-					<exclude>**/.project</exclude>
-				</excludes>
+				<includes>
+					<include>pom.xml</include>
+					<include>*/pom.xml</include>
+					<include>*/src/**</include>
+				</includes>
 			</resource>
 			<resource>
 				<directory>../../exemplo</directory>
 				<targetPath>d5/exemplo</targetPath>
-				<excludes>
-					<exclude>**/target/**</exclude>
-					<exclude>**/.settings/**</exclude>
-					<exclude>**/.classpath</exclude>
-					<exclude>**/.project</exclude>
-				</excludes>
+				<includes>
+					<include>pom.xml</include>
+					<include>*/pom.xml</include>
+					<include>*/src/**</include>
+				</includes>
 			</resource>
 		</resources>
 	</build>
