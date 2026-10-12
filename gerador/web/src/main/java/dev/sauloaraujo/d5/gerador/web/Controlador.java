@@ -33,7 +33,8 @@ public class Controlador {
 	public ResponseEntity<Resource> generate(Formulario formulario) throws IOException {
 		var nome = formulario.getNome();
 
-		// Gera diretamente dentro do zip, evitando a escrita de centenas de arquivos temporários
+		// Gera diretamente dentro do zip, evitando a escrita de centenas de arquivos
+		// temporários
 		var arquivo = Files.createTempFile("d5", ".zip");
 		try {
 			Files.delete(arquivo);
@@ -43,8 +44,8 @@ public class Controlador {
 			}
 			var corpo = new ByteArrayResource(Files.readAllBytes(arquivo));
 			var disposicao = "attachment; filename=" + nome + ".zip";
-			return ok().header(HttpHeaders.CONTENT_DISPOSITION, disposicao).contentType(new MediaType("application", "zip"))
-					.body(corpo);
+			return ok().header(HttpHeaders.CONTENT_DISPOSITION, disposicao)
+					.contentType(new MediaType("application", "zip")).body(corpo);
 		} finally {
 			Files.deleteIfExists(arquivo);
 		}

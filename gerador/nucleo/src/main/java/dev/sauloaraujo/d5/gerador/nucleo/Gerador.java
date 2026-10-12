@@ -39,8 +39,7 @@ public class Gerador {
 			"03.07-projetar-repositorios/SKILL.md", "03.08-validar-modelo/SKILL.md",
 			"03.08-validar-modelo/scripts/pom.xml", "04-desenvolver-dominio/SKILL.md", "05-desenvolver-testes/SKILL.md",
 			"06-projetar-banco/SKILL.md", "07-desenvolver-infraestrutura-dominio/SKILL.md",
-			"08-desenvolver-backend/SKILL.md", "09-desenvolver-frontend/SKILL.md",
-			"programar-defensivamente/SKILL.md");
+			"08-desenvolver-backend/SKILL.md", "09-desenvolver-frontend/SKILL.md", "programar-defensivamente/SKILL.md");
 
 	private static final List<String> SKILLS_FRAMEWORK = List.of("04-desenvolver-dominio-d5/SKILL.md",
 			"07-desenvolver-infraestrutura-dominio-d5/SKILL.md", "08-desenvolver-backend-d5/SKILL.md");
