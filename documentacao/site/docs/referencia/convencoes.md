@@ -27,6 +27,19 @@ Nesta seção, `${groupId}` é o `groupId` do projeto raiz e de seus módulos. J
 | Controlador REST de um agregado `${agregado}` | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}.ui.backend.${subdominio}.${agregado}` |
 | Configuração de segurança e controlador de autenticação | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}.ui.backend.seguranca` |
 | Classe com o `main` da aplicação Spring Boot | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}` |
+| Suíte do Cucumber de um subdomínio | `${aplicacao}-dominio-${subdominio}`, em `src/test/java` | `${groupId}.${aplicacao}.dominio.${subdominio}` |
+| Step definitions de um agregado `${agregado}` | `${aplicacao}-dominio-${subdominio}`, em `src/test/java` | `${groupId}.${aplicacao}.dominio.${subdominio}.${agregado}` |
+| Testes do repositório e do repositório de aplicação de um agregado `${agregado}` | `${aplicacao}-infraestrutura`, em `src/test/java` | `${groupId}.${aplicacao}.infraestrutura.${subdominio}.${agregado}` |
+| Configuração Spring Boot dos testes de infraestrutura | `${aplicacao}-infraestrutura`, em `src/test/java` | `${groupId}.${aplicacao}.infraestrutura` |
+
+## Caminhos
+Nesta seção, `${agregado-hifenizado}` é o nome de um agregado em minúsculas, com as palavras separadas por hífen — por exemplo, `unidade-federativa`.
+
+| Elemento | Caminho |
+| --- | --- |
+| Controlador REST de um agregado | `@RequestMapping(Backend.PREFIXO + "${subdominio}/${agregado-hifenizado}")` |
+| Controlador de autenticação | `@RequestMapping(Backend.PREFIXO + "autenticacao")` |
+| Cenários Gherkin de um agregado | `${aplicacao}/dominio-${subdominio}/src/test/resources/features/${agregado-hifenizado}.feature` |
 
 ## Nomenclatura
 Nesta seção, `${Agregado}` é o nome de um agregado e `${Atributo}` é o nome de um atributo, ambos em `PascalCase`.
@@ -47,3 +60,11 @@ Nesta seção, `${Agregado}` é o nome de um agregado e `${Atributo}` é o nome 
 | Entidade JPA | `${Agregado}Jpa` |
 | Repositório Spring Data JPA | `I${Agregado}RepositorioJpa` |
 | Controlador | `${Agregado}Controlador` |
+| Papéis de autorização (`enum`) | `Autorizacao` |
+| Configuração de segurança | `SegurancaConfiguracao` |
+| Controlador de autenticação | `AutenticacaoControlador` |
+| Classe com o `main` da aplicação Spring Boot | `BackendAplicacao` |
+| Suíte do Cucumber | `CucumberTests` |
+| Step definitions | `${Agregado}StepDefinitions` |
+| Testes do repositório e do repositório de aplicação | `${Agregado}RepositorioTest` e `${Agregado}AplicacaoRepositorioTest` |
+| Configuração Spring Boot dos testes de infraestrutura | `InfraestruturaTesteAplicacao` |

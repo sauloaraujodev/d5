@@ -13,7 +13,7 @@ Possui interfaces e classes para:
 ## Objeto de valor
 
 ### `IObjetoValor`
-Realiza o conceito de [objeto de valor](../ddd.md#objeto-de-valor). `IObjetoValor` formaliza isso exigindo que as implementações redefinam `equals` e `hashCode`, de modo que duas instâncias com os mesmos atributos sejam iguais.
+Realiza o conceito de [objeto de valor](../ddd.md#objeto-de-valor). `IObjetoValor` redeclara `equals` e `hashCode` para documentar o contrato de que as implementações devem redefini-los, de modo que duas instâncias com os mesmos atributos sejam iguais. O compilador não impõe esse contrato, pois toda classe já herda `equals` e `hashCode` de `Object`; por isso, prefira herdar de [`ObjetoValorStringAbstrato`](#objetovalorstringabstrato), que já os implementa, sempre que o objeto de valor for representado por uma única `String`.
 
 ```java title="IObjetoValor.java"
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IObjetoValor.java"
@@ -31,7 +31,7 @@ Classe base para objetos de valor representados por uma única `String` — um c
 Duas instâncias são iguais quando têm a mesma classe concreta (`getClass()`) e o mesmo valor. Portanto, objetos de valor de tipos diferentes com o mesmo valor nunca são iguais. `toString` devolve o valor sem alteração — usado pelo backend para serializar e converter essas instâncias como uma `String` pura; veja [Serialização de objetos de valor](comportamentos.md#serializacao-de-objetos-de-valor).
 
 ### `ObjetoValorRegexAbstrato`
-Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito por uma expressão regular. Além do valor, o construtor recebe o `formato` (a expressão regular) e a `mensagem` de erro (um modelo com um `%s` para o valor inválido), e valida com `Validate.matchesPattern`. A validação de `null`, herdada de `ObjetoValorStringAbstrato`, ocorre antes da validação do formato.
+Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito por uma expressão regular. Além do valor, o construtor recebe o `formato` (a expressão regular) e a `mensagem` de erro (um modelo com um `%s` para o valor inválido), e valida com `Validate.matchesPattern`, que exige que o valor **inteiro** corresponda à expressão regular — não basta conter um trecho que corresponda. A validação de `null`, herdada de `ObjetoValorStringAbstrato`, ocorre antes da validação do formato.
 
 ```java title="ObjetoValorRegexAbstrato.java"
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/ObjetoValorRegexAbstrato.java"
@@ -42,7 +42,7 @@ No tutorial, [`UnidadeFederativaSigla`](../../tutorial.md#sigla) e [`UnidadeFede
 ## Entidade
 
 ### `IIdentificador`
-Identificador de uma [entidade](../ddd.md#entidade). É um [`IObjetoValor`](#iobjetovalor) — portanto, comparado por valor — que adicionalmente exige `toString`, a representação textual usada, por exemplo, em URLs e mensagens de erro.
+Identificador de uma [entidade](../ddd.md#entidade). É um [`IObjetoValor`](#iobjetovalor) — portanto, comparado por valor — que adicionalmente redeclara `toString` para documentar que ele deve devolver a representação textual do identificador, usada, por exemplo, em URLs e mensagens de erro. Assim como em `IObjetoValor`, o compilador não impõe esse contrato; `ObjetoValorStringAbstrato` já o cumpre, devolvendo o próprio valor.
 
 ```java title="IIdentificador.java"
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IIdentificador.java"
@@ -120,9 +120,9 @@ Realiza o conceito de [serviço](../ddd.md#servico). `IAgregadoServico` é param
 Implementações são registradas automaticamente como beans — veja [Registro de beans](comportamentos.md#registro-de-beans).
 
 ### `AgregadoServicoAbstrato`
-Implementação base de [`IAgregadoServico`](#iagregadoservico). Recebe no construtor o [`ISegurancaServico`](#isegurancaservico), exposto às subclasses por `getSegurancaServico`, o [`IAgregadoRepositorio`](#iagregadorepositorio) do agregado e as mensagens de erro para identificador existente e inexistente. Antes de cada operação, `validarAutorizacao` verifica a [autorização](#iagregadoautorizacoes) correspondente através do método abstrato `criarAutorizacoes`, que a subclasse implementa, e lança [`NaoAutorizadoExcecao`](#naoautorizadoexcecao) quando ela não libera a operação.
+Implementação base de [`IAgregadoServico`](#iagregadoservico). Recebe no construtor o [`ISegurancaServico`](#isegurancaservico), exposto às subclasses por `getSegurancaServico`, o [`IAgregadoRepositorio`](#iagregadorepositorio) do agregado e os modelos das mensagens de erro para identificador existente e inexistente — modelos no formato de `String.format`, com um `%s` substituído pelo identificador. Antes de cada operação, o método protegido `validarAutorizacao` — que recebe o identificador opcional do agregado e um predicado que seleciona, entre as [autorizações](#iagregadoautorizacoes), a da operação — chama o método abstrato `criarAutorizacoes`, que a subclasse implementa, e lança [`NaoAutorizadoExcecao`](#naoautorizadoexcecao) quando o predicado não libera a operação. `incluir` passa um identificador vazio; `buscar`, `alterar` e `excluir`, o identificador do agregado.
 
-`incluir` e `alterar` chamam `validarInclusaoAlteracao`, ponto de extensão comum às duas operações que a subclasse pode sobrescrever para impor regras adicionais, como unicidade; `validarInclusao` e `validarAlteracao` são os pontos de extensão específicos de cada uma. `incluir`, ao receber um agregado com identificador, e `alterar` chamam `validarInexistencia` e `validarExistencia`, respectivamente, que lançam [`AgregadoExistenteExcecao`](#agregadoexistenteexcecao) e [`AgregadoInexistenteExcecao`](#agregadoinexistenteexcecao) a partir de `existePorIdentificador` do repositório; cada uma tem uma sobrecarga protegida — recebendo um predicado, um argumento e a mensagem de erro — que a subclasse pode reutilizar para impor outras regras de unicidade ou existência. `excluir` chama `validarExclusao`, ponto de extensão análogo para a exclusão.
+`incluir` e `alterar` chamam `validarInclusaoAlteracao`, ponto de extensão comum às duas operações que a subclasse pode sobrescrever para impor regras adicionais, como unicidade; `validarInclusao` e `validarAlteracao` são os pontos de extensão específicos de cada uma. `incluir`, ao receber um agregado com identificador, e `alterar` chamam `validarInexistencia` e `validarExistencia`, respectivamente, que lançam [`AgregadoExistenteExcecao`](#agregadoexistenteexcecao) e [`AgregadoInexistenteExcecao`](#agregadoinexistenteexcecao) a partir de `existePorIdentificador` do repositório; cada uma tem uma sobrecarga protegida — recebendo um predicado, um argumento e o modelo da mensagem de erro, formatado com o argumento — que a subclasse pode reutilizar para impor outras regras de unicidade ou existência. `alterar` exige que o agregado tenha identificador; sem ele, lança `NoSuchElementException`. `excluir` chama `validarExclusao`, ponto de extensão análogo para a exclusão.
 
 ```java title="AgregadoServicoAbstrato.java"
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/AgregadoServicoAbstrato.java"

@@ -6,7 +6,8 @@ Possui as classes que expõem um [agregado](../ddd.md#agregado) como uma API RES
 - [recurso de pesquisa](#recurso-de-pesquisa);
 - [tratamento de erros](#tratamento-de-erros);
 - [segurança](#seguranca);
-- [conversão](#conversao).
+- [conversão](#conversao);
+- [transações](#transacoes).
 
 ## `Backend`
 Declara `PREFIXO`, o prefixo `backend/` usado no `@RequestMapping` de todo controlador do backend.
@@ -50,7 +51,27 @@ Implementação de `IPesquisaRecurso` que recebe a consulta e o resultado direta
 ## Controlador
 
 ### `AgregadoControladorAbstrato`
-Expõe as operações de um [serviço](dominio.md#iagregadoservico) e de um [serviço de aplicação](aplicacao.md#iagregadoaplicacaoservico) como endpoints REST: `inclusao` e `incluir`, `alteracao` e `alterar`, `exclusao` e `excluir`, e `pesquisa`. Cada operação de escrita é precedida por uma correspondente que devolve o [recurso do agregado](#iagregadorecurso) — agregado e autorizações, obtidas por `autorizacoes` a partir de `criarAutorizacoes` do serviço — usado pelo cliente para montar o formulário; `pesquisa` devolve o [recurso de pesquisa](#ipesquisarecurso) a partir da consulta recebida como parâmetros da requisição. `alteracao`, `exclusao` e `pesquisa` têm, cada uma, uma sobrecarga protegida — recebendo o agregado e as autorizações, ou a consulta e o resultado, já obtidos — que a subclasse pode sobrescrever para customizar o recurso devolvido.
+Expõe as operações de um [serviço](dominio.md#iagregadoservico) e de um [serviço de aplicação](aplicacao.md#iagregadoaplicacaoservico) como endpoints REST. É parametrizada pelo identificador `I`, pelo agregado `A`, pelas autorizações `U`, pela projeção `P` e pela consulta `C`, e recebe no construtor o serviço e o serviço de aplicação.
+
+A classe não declara `@RestController` nem o caminho base dos endpoints: a subclasse deve ser anotada com `@RestController` e com `@RequestMapping(Backend.PREFIXO + "...")`. Os caminhos abaixo são relativos a esse caminho base:
+
+<div class="tabela-centralizada" markdown="1">
+
+| Método | Requisição | Corpo da requisição | Resposta |
+| --- | --- | --- | --- |
+| `inclusao` | `GET inclusao` | — | objeto vazio, `{}` |
+| `incluir` | `POST incluir` | agregado | 200, sem corpo |
+| `alteracao` | `GET {identificador}/alteracao` | — | [recurso do agregado](#iagregadorecurso) |
+| `alterar` | `POST {identificador}/alterar` | agregado | 200, sem corpo |
+| `exclusao` | `GET {identificador}/exclusao` | — | [recurso do agregado](#iagregadorecurso) |
+| `excluir` | `POST {identificador}/excluir` | — | 200, sem corpo |
+| `pesquisa` | `GET pesquisa` | — | [recurso de pesquisa](#ipesquisarecurso) |
+
+</div>
+
+`alteracao` e `exclusao` buscam o agregado através de `buscar` do serviço — sujeito, portanto, à autorização de busca — e obtêm as autorizações através do método protegido `autorizacoes`, que delega a `criarAutorizacoes` do serviço; o cliente usa esse recurso para montar o formulário de alteração ou de confirmação da exclusão. `inclusao` não consulta o serviço nem verifica autorizações. `alterar` valida que o identificador do caminho é igual ao do agregado recebido no corpo, lançando `IllegalArgumentException` — e, portanto, respondendo 422 — caso contrário. `pesquisa` recebe a [consulta](aplicacao.md#consulta-classe) como `@ModelAttribute`, isto é, a partir de parâmetros de requisição individuais.
+
+`alteracao`, `exclusao` e `pesquisa` têm, cada uma, uma sobrecarga protegida — recebendo o agregado e as autorizações, ou a consulta e o resultado, já obtidos — que a subclasse pode sobrescrever para customizar o recurso devolvido. Por padrão, a sobrecarga de `exclusao` delega à de `alteracao`.
 
 ```java title="AgregadoControladorAbstrato.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/AgregadoControladorAbstrato.java"
@@ -63,7 +84,7 @@ No tutorial, [`UnidadeFederativaControlador`](../../tutorial.md#controlador) est
 ## Tratamento de erros
 
 ### `ExcecaoManipulador`
-Converte qualquer exceção lançada durante o processamento de uma requisição em uma resposta JSON — `{"mensagem": "..."}` — com o status HTTP correspondente, sem que controladores, serviços ou repositórios precisem tratar nada:
+Converte as exceções lançadas pelos controladores — e, através deles, pelos serviços e repositórios — em uma resposta JSON — `{"mensagem": "..."}` — com o status HTTP correspondente, sem que controladores, serviços ou repositórios precisem tratar nada:
 
 | Exceção | Status |
 | --- | --- |
@@ -73,9 +94,23 @@ Converte qualquer exceção lançada durante o processamento de uma requisição
 | `IllegalStateException` — inclui [`AgregadoExistenteExcecao`](dominio.md#agregadoexistenteexcecao) | [409 Conflict](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/409){target="_blank"} |
 | `NoSuchElementException` — inclui [`AgregadoInexistenteExcecao`](dominio.md#agregadoinexistenteexcecao) | [404 Not Found](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/404){target="_blank"} |
 | `HttpMessageNotReadableException` (corpo da requisição ilegível) | a causa é percorrida em busca de uma das exceções acima; sem correspondência, [400 Bad Request](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/400){target="_blank"} |
+| `TypeMismatchException` (parâmetro de caminho ou de consulta não convertido) | [422 Unprocessable Content](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/422){target="_blank"} — veja abaixo a mensagem; exceto `ConversionNotSupportedException` (nenhum conversor para o tipo do parâmetro), que é um erro de programação: [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}, registrada em log |
+| `BindException` — inclui `MethodArgumentNotValidException` (parâmetros de um `@ModelAttribute` não associados) | para um parâmetro não convertido, o mesmo tratamento de `TypeMismatchException`; para outros erros de associação, a causa é percorrida em busca de uma das exceções acima; sem correspondência, [400 Bad Request](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/400){target="_blank"} |
+| `BeanInstantiationException` (construtor de um `@ModelAttribute` lançou uma exceção) | a causa é percorrida em busca de uma das exceções acima; sem correspondência, [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}, registrada em log |
+| exceção do Spring MVC que implementa `ErrorResponse` com status 4xx — por exemplo, `NoResourceFoundException` (caminho sem controlador), `HttpRequestMethodNotSupportedException` (verbo não suportado) e `HttpMediaTypeNotSupportedException` (`Content-Type` não suportado) | o status declarado pela exceção — no exemplo, [404 Not Found](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/404){target="_blank"}, [405 Method Not Allowed](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/405){target="_blank"} e [415 Unsupported Media Type](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/415){target="_blank"}, respectivamente |
 | qualquer outra `Exception` | [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}, registrada em log |
 
-`AccessDeniedException` e `AuthenticationException` — lançadas pelo próprio Spring Security, por exemplo quando `autorizar` nega um endpoint — precisam de tratamento explícito apesar de já produzirem 403/401 por conta do framework: lançadas de dentro de um controlador, seriam interceptadas antes pelo mecanismo padrão de tratamento de exceções do Spring MVC, chegando a `ExcecaoManipulador` só pelo handler genérico de `Exception` — e virando [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}.
+Ao percorrer a cadeia de causas, prevalece a primeira exceção mapeada encontrada, e a mensagem da resposta é a dela. Assim, a mensagem de validação lançada pelo construtor de uma [consulta](aplicacao.md#consulta-classe) ou de um objeto de valor recebido no corpo chega intacta ao cliente.
+
+Nos casos a seguir, a resposta usa uma mensagem em português em vez da mensagem gerada pela JDK ou pelo Spring, que viria em inglês e com detalhes de implementação:
+
+- quando um parâmetro de caminho ou de consulta não é convertido, a resposta preserva a mensagem do domínio apenas se o parâmetro é um [objeto de valor](dominio.md#objetovalorstringabstrato) — isto é, uma subclasse de `ObjetoValorStringAbstrato`, cujo construtor lançou a exceção. Para os demais tipos — `enum`, números, booleanos, datas —, a mensagem é fixa e identifica o parâmetro e o valor recebido: `Valor inválido para o parâmetro ordenacao: FOO`;
+- as exceções que implementam `ErrorResponse` respondem com uma mensagem fixa associada ao status — por exemplo, `Recurso não encontrado.` para 404, `Método HTTP não suportado.` para 405 e `Formato do corpo da requisição não suportado.` para 415;
+- uma exceção mapeada sem mensagem — como a lançada por `Objects.requireNonNull` sem argumento de mensagem — responde com a mesma mensagem fixa associada ao seu status — por exemplo, `Dados inválidos.` para 422.
+
+`AccessDeniedException` e `AuthenticationException` têm tratamento explícito porque, sem ele, uma dessas exceções lançada de dentro de um controlador — por exemplo, por uma verificação de segurança em nível de método — seria capturada pelo handler genérico de `Exception` e viraria [500 Internal Server Error](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/500){target="_blank"}, em vez de 403 ou 401.
+
+Exceções lançadas fora dos controladores, na cadeia de filtros do Spring Security — como a negação de um endpoint pelas regras de [`SegurancaConfiguracaoAbstrata`](#segurancaconfiguracaoabstrata), a ausência de autenticação ou a ausência do token de CSRF — não passam por `ExcecaoManipulador` e, portanto, não seguem necessariamente o formato `{"mensagem": "..."}`.
 
 ```java title="ExcecaoManipulador.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/ExcecaoManipulador.java"
@@ -84,7 +119,23 @@ Converte qualquer exceção lançada durante o processamento de uma requisição
 ## Segurança
 
 ### `SegurancaConfiguracaoAbstrata`
-Configura o Spring Security para o backend: exige autenticação para todo endpoint sob [`Backend.PREFIXO`](#backend) — a constante protegida `BACKEND`, no formato exigido por `authorizeHttpRequests` — exceto os do próprio Swagger UI, sempre liberados — delegando ao método abstrato `autorizar` regras adicionais por endpoint, como as que restringem escrita a administradores; expõe a constante protegida `SAIR` como `POST .../sair` para logout; autentica via HTTP Basic, com [`EntradaAutenticacaoSemDesafio`](#entradaautenticacaosemdesafio) no lugar do desafio padrão; e protege contra CSRF com um cookie não `HttpOnly`, lido pelo cliente e devolvido no cabeçalho `X-XSRF-TOKEN`, através de [`ManipuladorRequisicaoCsrfSpa`](#manipuladorrequisicaocsrfspa) e [`FiltroCookieCsrf`](#filtrocookiecsrf). Também expõe, como bean, o `PasswordEncoder` devolvido por `codificadorSenha`, usado para codificar e verificar as senhas dos usuários da aplicação.
+Configura o Spring Security para o backend através do bean `filtroSeguranca`, um `SecurityFilterChain`. A subclasse deve ser anotada com `@Configuration` e implementar o método abstrato `autorizar`, que recebe o registro de regras de `authorizeHttpRequests`. As regras são avaliadas na ordem em que são declaradas, e prevalece a primeira que corresponde à requisição:
+
+1. os recursos do Swagger UI e da documentação OpenAPI, sob `/swagger-ui/` e `/v3/api-docs`, são liberados a todos;
+2. as regras declaradas por `autorizar`;
+3. `POST` em `SAIR` exige autenticação;
+4. qualquer outra requisição sob `BACKEND` — a constante protegida `"/" + Backend.PREFIXO + "**"`, no formato exigido por `authorizeHttpRequests` — é **negada**.
+
+Portanto, um endpoint sob [`Backend.PREFIXO`](#backend) só é acessível se `autorizar` o liberar explicitamente. Os caminhos do Swagger UI são fixos e correspondem aos padrões do springdoc-openapi; se `springdoc.swagger-ui.path` ou `springdoc.api-docs.path` forem alterados, o Swagger UI deixa de ser liberado.
+
+Além disso, `filtroSeguranca`:
+
+- autentica via HTTP Basic, com [`EntradaAutenticacaoSemDesafio`](#entradaautenticacaosemdesafio) no lugar do desafio padrão;
+- adota a política de sessão `SessionCreationPolicy.IF_REQUIRED`;
+- configura o logout em `SAIR` — a constante protegida `"/" + Backend.PREFIXO + "sair"` —, que responde [204 No Content](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/204){target="_blank"};
+- protege contra CSRF com o cookie `XSRF-TOKEN`, não `HttpOnly`, lido pelo cliente e devolvido no cabeçalho `X-XSRF-TOKEN`, através de [`ManipuladorRequisicaoCsrfSpa`](#manipuladorrequisicaocsrfspa) e [`FiltroCookieCsrf`](#filtrocookiecsrf). A verificação do token ocorre antes da autenticação: uma requisição de escrita sem token válido é rejeitada e, na prática, responde 401 com a mensagem de usuário não autenticado, mesmo que traga credenciais válidas.
+
+Também expõe, como bean, o `PasswordEncoder` devolvido por `codificadorSenha`, usado para codificar e verificar as senhas dos usuários da aplicação. É um `DelegatingPasswordEncoder`: codifica com bcrypt e prefixa a senha codificada com o identificador do algoritmo — `{bcrypt}...` —, prefixo que toda senha armazenada deve trazer para ser verificada.
 
 ```java title="SegurancaConfiguracaoAbstrata.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/SegurancaConfiguracaoAbstrata.java"
@@ -113,10 +164,10 @@ Implementação de `CsrfTokenRequestAttributeHandler` que segue a [recomendaçã
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/ManipuladorRequisicaoCsrfSpa.java"
 ```
 
-No tutorial, a seção [CSRF no Swagger UI](comportamentos.md#csrf-no-swagger-ui) descreve o efeito desses dois filtros na prática.
+A seção [CSRF no Swagger UI](comportamentos.md#csrf-no-swagger-ui) descreve o efeito de `FiltroCookieCsrf` e `ManipuladorRequisicaoCsrfSpa` na prática.
 
 ### `AutenticacaoControladorAbstrato`
-Expõe, em `Backend.PREFIXO + "autenticacao"`, o [`ISegurancaServico`](dominio.md#isegurancaservico) recebido no construtor como um recurso somente leitura — permitindo ao cliente descobrir, por exemplo, o nome do usuário autenticado.
+Expõe, através de `GET` no caminho base da subclasse, o recurso devolvido pelo método protegido `recurso` — permitindo ao cliente descobrir, por exemplo, o nome do usuário autenticado. Por padrão, `recurso` devolve um [`AutenticacaoRecurso`](#autenticacaorecurso) com o usuário obtido do [`ISegurancaServico`](dominio.md#isegurancaservico) recebido no construtor, disponível às subclasses pelo atributo protegido `segurancaServico`; a subclasse pode sobrescrevê-lo para devolver outras informações. Assim como em [`AgregadoControladorAbstrato`](#agregadocontroladorabstrato), a subclasse deve ser anotada com `@RestController` e `@RequestMapping`. Sem usuário autenticado, a resposta é 401.
 
 ```java title="AutenticacaoControladorAbstrato.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/AutenticacaoControladorAbstrato.java"
@@ -134,4 +185,9 @@ Recurso devolvido por `AutenticacaoControladorAbstrato`, com o nome do usuário 
 ## Conversão
 
 ### `ConversaoConfiguracao` e `JacksonConfiguracao`
-Fazem todo [objeto de valor](dominio.md#objetovalorstringabstrato) representado por uma única `String` trafegar como essa `String`, em parâmetros de caminho, de consulta e no corpo JSON — sem que o exemplo escreva nenhum código de conversão. Veja [Serialização de objetos de valor](comportamentos.md#serializacao-de-objetos-de-valor).
+Fazem todo [objeto de valor](dominio.md#objetovalorstringabstrato) que estende `ObjetoValorStringAbstrato` trafegar como a `String` que representa — sem que a aplicação escreva nenhum código de conversão. `JacksonConfiguracao` o serializa como essa `String` no corpo JSON, através de `ObjetoValorStringMixin`; `ConversaoConfiguracao` registra `ObjetoValorStringConversorFactory`, que o converte a partir de parâmetros de caminho e de consulta. Veja [Serialização de objetos de valor](comportamentos.md#serializacao-de-objetos-de-valor).
+
+## Transações
+
+### `TransacaoConfiguracao` e `PostMappingTransactionAttributeSource`
+Envolvem em uma transação todo método de controlador mapeado para `POST`, sem `@Transactional` nem `@EnableTransactionManagement`. Veja [Gerenciamento de transações](comportamentos.md#gerenciamento-de-transacoes).

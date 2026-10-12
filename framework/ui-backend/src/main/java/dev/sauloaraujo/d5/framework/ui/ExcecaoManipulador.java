@@ -2,19 +2,30 @@ package dev.sauloaraujo.d5.framework.ui;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanInstantiationException;
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import dev.sauloaraujo.d5.framework.dominio.impl.ObjetoValorStringAbstrato;
 import dev.sauloaraujo.d5.framework.dominio.spi.NaoAutenticadoExcecao;
 import dev.sauloaraujo.d5.framework.dominio.spi.NaoAutorizadoExcecao;
 
@@ -65,37 +76,112 @@ public class ExcecaoManipulador {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	ResponseEntity<Object> tratarCorpoInvalido(HttpMessageNotReadableException excecao) {
-		for (var causa = excecao.getCause(); causa != null; causa = causa.getCause()) {
-			if (causa instanceof IllegalStateException illegalStateException) {
-				return tratarConflito(illegalStateException);
+		return tratarCausa(excecao.getCause())
+				.orElseGet(() -> corpo(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido."));
+	}
+
+	@ExceptionHandler(TypeMismatchException.class)
+	ResponseEntity<Object> tratarParametroInvalido(TypeMismatchException excecao) {
+		if (excecao instanceof ConversionNotSupportedException) {
+			return tratarExcecaoNaoMapeada(excecao);
+		}
+		return tratarConversao(excecao, excecao.getPropertyName(), excecao.getValue());
+	}
+
+	@ExceptionHandler(BindException.class)
+	ResponseEntity<Object> tratarParametrosInvalidos(BindException excecao) {
+		for (var erro : excecao.getAllErrors()) {
+			if (erro instanceof FieldError erroCampo && erroCampo.contains(TypeMismatchException.class)) {
+				return tratarConversao(erroCampo.unwrap(TypeMismatchException.class), erroCampo.getField(),
+						erroCampo.getRejectedValue());
 			}
 
-			if (causa instanceof NoSuchElementException noSuchElementException) {
-				return tratarInexistente(noSuchElementException);
-			}
-
-			if (causa instanceof IllegalArgumentException illegalArgumentException) {
-				return tratarArgumentoInvalido(illegalArgumentException);
-			}
-
-			if (causa instanceof NullPointerException nullPointerException) {
-				return tratarValorAusente(nullPointerException);
+			if (erro.contains(Throwable.class)) {
+				var resposta = tratarCausa(erro.unwrap(Throwable.class));
+				if (resposta.isPresent()) {
+					return resposta.get();
+				}
 			}
 		}
 
-		return ResponseEntity.badRequest().body(Map.of("mensagem", "Corpo da requisição inválido."));
+		return corpo(HttpStatus.BAD_REQUEST, "Parâmetros da requisição inválidos.");
+	}
+
+	@ExceptionHandler(BeanInstantiationException.class)
+	ResponseEntity<Object> tratarInstanciacaoInvalida(BeanInstantiationException excecao) {
+		return tratarCausa(excecao.getCause()).orElseGet(() -> tratarExcecaoNaoMapeada(excecao));
 	}
 
 	@ExceptionHandler(Exception.class)
 	ResponseEntity<Object> tratarExcecaoNaoMapeada(Exception excecao) {
+		if (excecao instanceof ErrorResponse respostaErro && !respostaErro.getStatusCode().is5xxServerError()) {
+			return corpo(respostaErro.getStatusCode(), mensagemPadrao(respostaErro.getStatusCode()));
+		}
+
 		LOG.error("Erro não tratado", excecao);
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(Map.of("mensagem", "Erro interno do servidor."));
+		return corpo(HttpStatus.INTERNAL_SERVER_ERROR, mensagemPadrao(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+
+	private ResponseEntity<Object> tratarConversao(TypeMismatchException excecao, @Nullable String nomeParametro,
+			@Nullable Object valor) {
+		for (Throwable causa = excecao; causa != null; causa = causa.getCause()) {
+			if (causa instanceof ConversionFailedException conversao
+					&& ObjetoValorStringAbstrato.class.isAssignableFrom(conversao.getTargetType().getType())) {
+				var resposta = tratarCausa(conversao.getCause());
+				if (resposta.isPresent()) {
+					return resposta.get();
+				}
+			}
+		}
+
+		var parametro = nomeParametro != null ? "o parâmetro " + nomeParametro : "um parâmetro";
+		var mensagem = "Valor inválido para " + parametro + (valor != null ? ": " + valor : "");
+		return corpo(HttpStatus.UNPROCESSABLE_CONTENT, mensagem);
+	}
+
+	private Optional<ResponseEntity<Object>> tratarCausa(@Nullable Throwable excecao) {
+		for (var causa = excecao; causa != null; causa = causa.getCause()) {
+			if (causa instanceof IllegalStateException illegalStateException) {
+				return Optional.of(tratarConflito(illegalStateException));
+			}
+
+			if (causa instanceof NoSuchElementException noSuchElementException) {
+				return Optional.of(tratarInexistente(noSuchElementException));
+			}
+
+			if (causa instanceof IllegalArgumentException illegalArgumentException) {
+				return Optional.of(tratarArgumentoInvalido(illegalArgumentException));
+			}
+
+			if (causa instanceof NullPointerException nullPointerException) {
+				return Optional.of(tratarValorAusente(nullPointerException));
+			}
+		}
+
+		return Optional.empty();
 	}
 
 	private ResponseEntity<Object> corpo(HttpStatus status, Exception excecao) {
-		var mensagem = excecao.getMessage();
+		return corpo(status, excecao.getMessage());
+	}
+
+	private ResponseEntity<Object> corpo(HttpStatusCode status, @Nullable String mensagem) {
 		return ResponseEntity.status(status)
-				.body(Map.of("mensagem", mensagem != null ? mensagem : status.getReasonPhrase()));
+				.body(Map.of("mensagem", mensagem != null ? mensagem : mensagemPadrao(status)));
+	}
+
+	private static String mensagemPadrao(HttpStatusCode status) {
+		return switch (status.value()) {
+		case 400 -> "Requisição inválida.";
+		case 401 -> "Usuário não autenticado.";
+		case 403 -> "Ação não autorizada.";
+		case 404 -> "Recurso não encontrado.";
+		case 405 -> "Método HTTP não suportado.";
+		case 406 -> "Formato de resposta não suportado.";
+		case 409 -> "Conflito com o estado atual do recurso.";
+		case 415 -> "Formato do corpo da requisição não suportado.";
+		case 422 -> "Dados inválidos.";
+		default -> status.is4xxClientError() ? "Requisição inválida." : "Erro interno do servidor.";
+		};
 	}
 }

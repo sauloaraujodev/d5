@@ -22,12 +22,12 @@ Cada camada tem também um módulo de teste correspondente, que traz as dependê
 
 <div class="tabela-centralizada" markdown="1">
 
-| Módulo | Camada |
-| --- | --- |
-| `d5-framework-dominio-teste` | Domínio |
-| `d5-framework-aplicacao-teste` | Aplicação |
-| `d5-framework-infraestrutura-teste` | Infraestrutura |
-| `d5-framework-ui-backend-teste` | UI |
+| Módulo | Camada | Dependências |
+| --- | --- | --- |
+| `d5-framework-dominio-teste` | Domínio | Cucumber, JUnit (incluindo JUnit Platform Suite) e Mockito |
+| `d5-framework-aplicacao-teste` | Aplicação | Cucumber, JUnit (incluindo JUnit Platform Suite) e Mockito |
+| `d5-framework-infraestrutura-teste` | Infraestrutura | `spring-boot-starter-test`, `spring-boot-starter-data-jpa-test` e H2 |
+| `d5-framework-ui-backend-teste` | UI | `spring-boot-starter-test` e `spring-security-test` |
 
 </div>
 

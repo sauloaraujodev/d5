@@ -62,7 +62,8 @@ public abstract class AgregadoControladorAbstrato<I extends IIdentificador, A ex
 	public void alterar(@PathVariable I identificador, @RequestBody A agregado) {
 		Objects.requireNonNull(identificador);
 		Objects.requireNonNull(agregado);
-		Validate.isTrue(Objects.equals(Optional.of(identificador), agregado.getIdentificador()));
+		Validate.isTrue(Objects.equals(Optional.of(identificador), agregado.getIdentificador()),
+				"O identificador do caminho difere do identificador do agregado");
 		servico.alterar(agregado);
 	}
 

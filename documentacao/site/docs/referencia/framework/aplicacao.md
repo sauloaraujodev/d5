@@ -39,8 +39,10 @@ Representa os parâmetros de uma consulta sobre uma [projeção](#iprojecao): a 
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/IConsulta.java"
 ```
 
-### `Consulta`
-Implementação base de `IConsulta`. Valida no construtor que o índice da página, quando informado, não é negativo, e que o tamanho da página, quando informado, está entre 1 e `TAMANHO_PAGINA_MAXIMO`; na ausência de descendente, índice e tamanho de página, assume, respectivamente, `false`, `0` e `TAMANHO_PAGINA_PADRAO`.
+### `Consulta` {#consulta-classe}
+Implementação base de `IConsulta`. O construtor recebe a ordenação, o indicador de ordem descendente, o índice e o tamanho da página, todos `Optional`. Valida que o índice da página, quando informado, não é negativo, e que o tamanho da página, quando informado, está entre 1 e `TAMANHO_PAGINA_MAXIMO` (1000), lançando `IllegalArgumentException` caso contrário; na ausência de ordenação, descendente, índice e tamanho de página, assume, respectivamente, nenhuma ordenação, `false`, `0` e `TAMANHO_PAGINA_PADRAO` (10).
+
+No backend, a consulta é instanciada pelo Spring MVC a partir dos parâmetros da requisição, através do construtor da subclasse: o nome de cada parâmetro do construtor é o nome do parâmetro de requisição correspondente. Isso depende de a classe ser compilada com `-parameters`, o que o `spring-boot-starter-parent`, herdado através de `d5-pai`, já configura. Veja [`AgregadoControladorAbstrato`](ui-backend.md#agregadocontroladorabstrato).
 
 ```java title="Consulta.java"
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/Consulta.java"
@@ -58,7 +60,7 @@ Representa o resultado de uma consulta: a página de [projeções](#iprojecao) `
 ```
 
 ### `ConsultaResultado`
-Implementação de `IConsultaResultado` que recebe as projeções e o total diretamente pelo construtor, validando que o total não é negativo.
+Implementação de `IConsultaResultado` que recebe as projeções e o total diretamente pelo construtor, validando que o total não é negativo. Guarda uma cópia imutável da lista de projeções (`List.copyOf`), que não admite elementos `null`.
 
 ```java title="ConsultaResultado.java"
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/ConsultaResultado.java"
@@ -76,7 +78,7 @@ Expõe a operação de pesquisa sobre um [agregado](../ddd.md#agregado): `pesqui
 Implementações são registradas automaticamente como beans — veja [Registro de beans](comportamentos.md#registro-de-beans).
 
 ### `AgregadoAplicacaoServicoAbstrato`
-Implementação base de `IAgregadoAplicacaoServico`. Recebe no construtor o [repositório de aplicação](#iagregadoaplicacaorepositorio) do agregado e o [`IAgregadoServico`](dominio.md#iagregadoservico) correspondente, usado apenas para validar, em `pesquisar`, se o usuário está autorizado a buscar o agregado — a consulta em si é delegada ao repositório de aplicação.
+Implementação base de `IAgregadoAplicacaoServico`. É parametrizada pelo identificador `I`, pelo agregado `A` e pelas autorizações `U` do [serviço](dominio.md#iagregadoservico) correspondente, e pela projeção `P` e pela consulta `C` da pesquisa. Recebe no construtor o [repositório de aplicação](#iagregadoaplicacaorepositorio) do agregado e o [`IAgregadoServico`](dominio.md#iagregadoservico) correspondente, usado apenas para validar, em `pesquisar`, se o usuário está autorizado a buscar o agregado — através de `getBuscar` das autorizações devolvidas por `criarAutorizacoes` com um identificador vazio — e lançar [`NaoAutorizadoExcecao`](dominio.md#naoautorizadoexcecao) caso contrário. A consulta em si é delegada ao repositório de aplicação.
 
 ```java title="AgregadoAplicacaoServicoAbstrato.java"
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/AgregadoAplicacaoServicoAbstrato.java"

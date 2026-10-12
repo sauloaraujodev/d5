@@ -7,6 +7,8 @@ No exemplo deste tutorial, o [domínio](referencia/ddd.md#dominio) foi decompost
 - **Geografia**, que contém os conceitos de **unidade federativa** e **município**;
 - **CRM (Customer Relationship Management)**, que contém o conceito de **cliente**.
 
+Este tutorial implementa apenas a unidade federativa. Município e cliente ilustram a decomposição em subdomínios, mas ficam fora do escopo — por isso, o módulo `exemplo-dominio-crm` permanece vazio.
+
 ## Projeto Maven
 Seguindo as [convenções](referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
 
@@ -228,7 +230,7 @@ As propriedades pelas quais a projeção pode ser ordenada são declaradas em um
 ```
 
 ##### Consulta
-Os parâmetros da pesquisa são representados por uma classe que estende [`Consulta`](referencia/framework/aplicacao.md#consulta), acrescentando o atributo `nome`, usado para filtrar as unidades federativas por um trecho do nome.
+Os parâmetros da pesquisa são representados por uma classe que estende [`Consulta`](referencia/framework/aplicacao.md#consulta-classe), acrescentando o atributo `nome`, usado para filtrar as unidades federativas por um trecho do nome.
 
 ```java title="exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaConsulta.java"
 --8<-- "exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/UnidadeFederativaConsulta.java"
@@ -279,6 +281,8 @@ As regras de autorização sobre um agregado usam papéis compartilhados por tod
 ##### Serviço
 Operações sobre unidades federativas são encapsuladas em um [serviço](referencia/ddd.md#servico) que estende [`AgregadoServicoAbstrato`](referencia/framework/dominio.md#agregadoservicoabstrato). Ele implementa `criarAutorizacoes` consultando o [`ISegurancaServico`](referencia/framework/dominio.md#isegurancaservico) recebido no construtor para verificar se o usuário possui a [autorização](#autorizacao) `ADMINISTRADOR`, devolvendo um [`AgregadoAutorizacoes`](referencia/framework/dominio.md#agregadoautorizacoes) que libera a busca a qualquer usuário e as demais operações somente a administradores. Também sobrescreve `validarInclusaoAlteracao` para usar `existePorSigla` e `existePorNome`, ignorando o identificador da própria unidade federativa, e impedir que uma inclusão ou alteração deixe duas unidades federativas com a mesma sigla ou o mesmo nome.
 
+Note que o serviço não leva nenhuma anotação do Spring: ele, os repositórios e o serviço de aplicação são [registrados como beans automaticamente](referencia/framework/comportamentos.md#registro-de-beans).
+
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaServico.java"
 --8<-- "exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaServico.java"
 ```
@@ -316,7 +320,7 @@ O primeiro passo é a entidade JPA, que mapeia o agregado para a tabela `UFI_UNI
 ```
 
 ##### Repositório Spring Data
-Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. Ela também declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pelo nome — via `like`, case insensitive — apenas quando o parâmetro não é nulo.
+Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. Ela também declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pelo nome apenas quando o parâmetro não é nulo. O filtro é case insensitive porque compara o nome em minúsculas com o padrão produzido por `paraLike`, já em minúsculas, declarando `\` como caractere de escape.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
@@ -330,7 +334,7 @@ Por fim, implemente [`IUnidadeFederativaRepositorio`](#repositorio) estendendo [
 ```
 
 ##### Implementação do repositório de aplicação
-Implemente também [`IUnidadeFederativaAplicacaoRepositorio`](#repositorio-de-aplicacao) estendendo [`AgregadoAplicacaoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato). Ela já implementa `pesquisar(UnidadeFederativaConsulta)`, convertendo a consulta em paginação e ordenação do Spring Data — através de `paraPropriedadeOrdenacao`, que mapeia cada valor de [`UnidadeFederativaOrdenacao`](#ordenacao) para a propriedade correspondente — e delegando a `pesquisar(UnidadeFederativaConsulta, Pageable)`, que resta implementar: ele converte o `nome` da consulta em um padrão `like` com `paraLike` e delega à interface Spring Data.
+Implemente também [`IUnidadeFederativaAplicacaoRepositorio`](#repositorio-de-aplicacao) estendendo [`AgregadoAplicacaoRepositorioAbstrato`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato). Ela já implementa `pesquisar(UnidadeFederativaConsulta)`, convertendo a consulta em paginação e ordenação do Spring Data — através de `paraPropriedadeOrdenacao`, que mapeia cada valor de [`UnidadeFederativaOrdenacao`](#ordenacao) para a propriedade correspondente — e delegando a `pesquisar(UnidadeFederativaConsulta, Pageable)`, que resta implementar: ele converte o `nome` da consulta em um padrão `like` com [`paraLike`](referencia/framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato) — em minúsculas, escapado e envolvido por `%`, ou `null` na ausência de filtro — e delega à interface Spring Data.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorio.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorio.java"
@@ -363,14 +367,14 @@ Unidade federativa é exposta como uma API REST no módulo `exemplo-ui-backend`,
 ```
 
 ##### Controlador
-O controlador estende [`AgregadoControladorAbstrato`](referencia/framework/ui-backend.md#agregadocontroladorabstrato), parametrizado pelo identificador, agregado, autorizações, projeção e consulta de unidade federativa, e recebe pelo construtor o [`UnidadeFederativaServico`](#servico) e o [`UnidadeFederativaAplicacaoServico`](#servico-de-aplicacao). O `@RequestMapping` combina o prefixo [`Backend.PREFIXO`](referencia/framework/ui-backend.md#backend) com o caminho `geografia/unidade-federativa`.
+O controlador estende [`AgregadoControladorAbstrato`](referencia/framework/ui-backend.md#agregadocontroladorabstrato), parametrizado pelo identificador, agregado, autorizações, projeção e consulta de unidade federativa, e recebe pelo construtor o [`UnidadeFederativaServico`](#servico) e o [`UnidadeFederativaAplicacaoServico`](#servico-de-aplicacao). O `@RequestMapping` combina o prefixo [`Backend.PREFIXO`](referencia/framework/ui-backend.md#backend) com o caminho `geografia/unidade-federativa`. O parâmetro `identificador` dos endpoints é recebido diretamente como `UnidadeFederativaCodigoIbge` graças à [serialização de objetos de valor](referencia/framework/comportamentos.md#serializacao-de-objetos-de-valor), e as operações de escrita são executadas em uma transação graças ao [gerenciamento de transações](referencia/framework/comportamentos.md#gerenciamento-de-transacoes).
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/geografia/unidadefederativa/UnidadeFederativaControlador.java"
 --8<-- "exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/geografia/unidadefederativa/UnidadeFederativaControlador.java"
 ```
 
 ##### Segurança
-Restrinja o backend a usuários autenticados criando uma configuração de segurança, no pacote `com.example.exemplo.ui.backend.seguranca`, que estende [`SegurancaConfiguracaoAbstrata`](referencia/framework/ui-backend.md#segurancaconfiguracaoabstrata): ela já protege `/backend/**` com autenticação HTTP Basic e CSRF baseado em cookie, restando apenas declarar, em `autorizar`, que todo endpoint exige autenticação, e expor os usuários disponíveis através de um `UserDetailsService`. Este exemplo declara dois usuários em memória: `a`/`a`, com a [autorização](#autorizacao) `ADMINISTRADOR`, e `u`/`u`, com `USUARIO`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
+Restrinja o backend a usuários autenticados criando uma configuração de segurança, no pacote `com.example.exemplo.ui.backend.seguranca`, que estende [`SegurancaConfiguracaoAbstrata`](referencia/framework/ui-backend.md#segurancaconfiguracaoabstrata): ela já protege `/backend/**` com autenticação HTTP Basic e CSRF baseado em cookie, restando declarar, em `autorizar`, quais endpoints liberar — sem nenhuma regra, todo endpoint sob `/backend/**` seria negado; aqui, todos passam a exigir apenas autenticação — e expor os usuários disponíveis através de um `UserDetailsService`. Este exemplo declara dois usuários em memória: `a`/`a`, com a [autorização](#autorizacao) `ADMINISTRADOR`, e `u`/`u`, com `USUARIO`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/package-info.java"
 --8<-- "exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/package-info.java"
@@ -388,7 +392,7 @@ Para o cliente descobrir o usuário autenticado, crie um controlador que estende
 ```
 
 ##### Aplicação Spring Boot
-Por fim, crie a classe com o `main` que sobe a aplicação, anotada com `@SpringBootApplication`, no pacote raiz `com.example.exemplo`. É ela quem faz o component scan encontrar os controladores, serviços e implementações de repositório de todos os subdomínios. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
+Por fim, crie a classe com o `main` que sobe a aplicação, anotada com `@SpringBootApplication`, no pacote raiz `com.example.exemplo`. É a partir do pacote dela que o component scan encontra os controladores e a configuração de segurança, e que o [registro de beans](referencia/framework/comportamentos.md#registro-de-beans) encontra os serviços e as implementações de repositório de todos os subdomínios. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](referencia/programacao.md#evite-null):
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/package-info.java"
 --8<-- "exemplo/ui-backend/src/main/java/com/example/exemplo/package-info.java"
@@ -407,7 +411,7 @@ Como todo endpoint sob `/backend/**` exige um usuário autenticado, e a aplicaç
 
 ![Diálogo de autenticação HTTP Basic do Swagger UI](assets/tutorial/02-autorizar.png)
 
-A partir daí, toda requisição disparada pelo Swagger UI leva o cabeçalho `Authorization` com essas credenciais. O primeiro `Execute`, ainda que sem sucesso, também recebe do servidor o cookie `XSRF-TOKEN`, exigido pelas operações de escrita — como o Swagger UI só lê esse cookie ao carregar a página (`springdoc.swagger-ui.csrf.enabled=true`), recarregue a página e autentique-se novamente antes de tentar incluir, alterar ou excluir.
+A partir daí, toda requisição disparada pelo Swagger UI leva o cabeçalho `Authorization` com essas credenciais. O primeiro `Execute`, ainda que sem sucesso, também recebe do servidor o cookie `XSRF-TOKEN`, exigido pelas operações de escrita — como o Swagger UI só lê esse cookie ao carregar a página (veja [CSRF no Swagger UI](referencia/framework/comportamentos.md#csrf-no-swagger-ui)), recarregue a página e autentique-se novamente antes de tentar incluir, alterar ou excluir. Sem o cookie, as operações de escrita respondem 401, ainda que as credenciais sejam válidas.
 
 Com a sessão autenticada, expanda cada operação e use **Try it out**:
 
@@ -422,12 +426,14 @@ Com a sessão autenticada, expanda cada operação e use **Try it out**:
 }
 ```
 
+O código IBGE e a sigla trafegam como strings simples graças à [serialização de objetos de valor](referencia/framework/comportamentos.md#serializacao-de-objetos-de-valor).
+
 ![Corpo da requisição de inclusão preenchido com a unidade federativa de São Paulo](assets/tutorial/03-incluir-corpo.png)
 
 ![Resposta 200 da inclusão](assets/tutorial/03-incluir-resposta.png)
 
 ###### Pesquisar
-`GET /backend/geografia/unidade-federativa/pesquisa` recebe os campos de [`Consulta`](referencia/framework/aplicacao.md#consulta) — `nome` (filtro parcial, opcional), `ordenacao`, `descendente`, `indicePagina` e `tamanhoPagina` — como parâmetros de consulta individuais, e o Swagger UI, graças ao `d5-framework-springdoc`, exibe cada um como um campo separado do formulário. Deixe em branco os campos que não quiser informar — eles assumem os padrões declarados em `Consulta`; deixe todos em branco para listar a primeira página, sem filtro.
+`GET /backend/geografia/unidade-federativa/pesquisa` recebe os campos de [`UnidadeFederativaConsulta`](#consulta) — `nome` (filtro parcial, opcional), `ordenacao`, `descendente`, `indicePagina` e `tamanhoPagina` — como parâmetros de consulta individuais, e o Swagger UI, graças à [expansão da consulta](referencia/framework/comportamentos.md#expansao-da-consulta-no-swagger-ui) feita pelo `d5-framework-springdoc`, exibe cada um como um campo separado do formulário. Deixe em branco os campos que não quiser informar — eles assumem os padrões declarados em [`Consulta`](referencia/framework/aplicacao.md#consulta-classe); deixe todos em branco para listar a primeira página, sem filtro. Valores inválidos, como `tamanhoPagina` igual a `0`, resultam em 422, com a mensagem da validação; veja [`ExcecaoManipulador`](referencia/framework/ui-backend.md#excecaomanipulador).
 
 ![Parâmetro nome preenchido com Paulo na operação de pesquisa](assets/tutorial/04-pesquisa-parametros.png)
 
@@ -467,4 +473,4 @@ Com a sessão autenticada, expanda cada operação e use **Try it out**:
 
 ![Resposta 200 da exclusão definitiva](assets/tutorial/08-excluir-resposta.png)
 
-Como o usuário `u` não é administrador, repetir as operações de escrita autenticado como `u` deve falhar de acordo com as autorizações definidas em [`UnidadeFederativaServico`](#servico) — apenas a pesquisa é permitida a qualquer usuário autenticado.
+Como o usuário `u` não é administrador, repetir as operações de escrita autenticado como `u` deve falhar de acordo com as autorizações definidas em [`UnidadeFederativaServico`](#servico) — a pesquisa e os formulários de alteração e de exclusão, que dependem apenas da autorização de busca, são permitidos a qualquer usuário autenticado, mas as operações de escrita respondem 403.

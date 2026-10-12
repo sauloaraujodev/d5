@@ -35,4 +35,10 @@ O framework é publicado no [Maven Central](https://central.sonatype.com/namespa
 </repositories>
 ```
 
+O `d5-pai`:
+
+- herda de `spring-boot-starter-parent` 4.1.1 — portanto, a aplicação usa Spring Boot 4.1;
+- gerencia as versões dos módulos do framework, que são declarados sem `<version>`;
+- declara a dependência de [JSpecify](https://jspecify.dev){target="_blank"} em todos os módulos e configura a verificação de nulidade em tempo de compilação; veja [Evite `null`](referencia/programacao.md#evite-null).
+
 O [tutorial](tutorial.md) mostra o projeto completo.

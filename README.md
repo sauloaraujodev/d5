@@ -30,6 +30,12 @@ Enquanto a versão for `1.0.0-SNAPSHOT`, declare também o repositório de snaps
 </repositories>
 ```
 
+O `d5-pai`:
+
+- herda de `spring-boot-starter-parent` 4.1.1 — portanto, a aplicação usa Spring Boot 4.1;
+- gerencia as versões dos módulos do framework, que são declarados sem `<version>`;
+- declara a dependência de [JSpecify](https://jspecify.dev) em todos os módulos e configura, com o `nullability-maven-plugin`, a verificação de nulidade do Error Prone e do NullAway em tempo de compilação: o build falha se uma classe do código principal estiver em um pacote sem `@NullMarked`.
+
 Os módulos `d5-framework-*-teste` e `d5-framework-bdd` têm `packaging` `pom`; ao depender deles, informe `<type>pom</type>`.
 
 ## Estrutura

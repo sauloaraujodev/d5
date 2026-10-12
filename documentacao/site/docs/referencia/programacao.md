@@ -4,6 +4,8 @@ No contexto de uma linguagem orientada a objetos, [programação defensiva](http
 ## Evite `null`
 Todo pacote não vazio deve ser anotado com [`@NullMarked`](https://jspecify.dev/docs/user-guide/#nullmarked){target="_blank"}.
 
+Em projetos que herdam de `d5-pai`, essa regra é verificada na compilação do código principal — o de teste não é verificado: o `nullability-maven-plugin` configura o [Error Prone](https://errorprone.info){target="_blank"} e o [NullAway](https://github.com/uber/NullAway){target="_blank"}, que fazem o build falhar quando uma classe está em um pacote não anotado com `@NullMarked` ou quando o código pode atribuir ou devolver `null` onde ele não é admitido.
+
 Atributos, parâmetros ou tipos de retorno não obrigatórios devem ser do tipo [`Optional`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html){target="_blank"}.
 
 ## Atributos `final`
