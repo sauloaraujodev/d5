@@ -5,7 +5,8 @@ O framework aplica, de forma transparente, alguns comportamentos que independem 
 - [serialização de objetos de valor](#serializacao-de-objetos-de-valor);
 - [gerenciamento de transações](#gerenciamento-de-transacoes);
 - [CSRF no Swagger UI](#csrf-no-swagger-ui);
-- [expansão da consulta no Swagger UI](#expansao-da-consulta-no-swagger-ui).
+- [expansão da consulta no Swagger UI](#expansao-da-consulta-no-swagger-ui);
+- [objetos de valor no Swagger UI](#objetos-de-valor-no-swagger-ui).
 
 ## Registro de beans
 Implementações de [`IAgregadoRepositorio`](dominio.md#iagregadorepositorio), [`IAgregadoAplicacaoRepositorio`](aplicacao.md#iagregadoaplicacaorepositorio), [`IAgregadoServico`](dominio.md#iagregadoservico) e [`IAgregadoAplicacaoServico`](aplicacao.md#iagregadoaplicacaoservico) nunca precisam de `@Component`, `@Service` ou `@Repository`: `AgregadoRegistrador`, do módulo `d5-framework-infraestrutura`, varre os pacotes de autoconfiguração da aplicação — o pacote da classe anotada com `@SpringBootApplication` e seus subpacotes — em busca de classes concretas que implementem uma dessas quatro interfaces e não estejam anotadas, direta ou indiretamente, com `@Component` — o que inclui `@Service` e `@Repository` —, e registra cada uma como um bean com autowiring por construtor. Classes fora desses pacotes não são registradas.
@@ -79,3 +80,14 @@ O módulo `d5-framework-springdoc` corrige essa representação com um `Operatio
 ```
 
 Veja [`d5-framework-springdoc`](springdoc.md#springdocconfiguracao) para como esse customizador é registrado.
+
+## Objetos de valor no Swagger UI
+Os objetos de valor de string são serializados em JSON como uma string simples, conforme descrito em [serialização de objetos de valor](#serializacao-de-objetos-de-valor). O springdoc-openapi não conhece essa configuração do Jackson e, sem ajuste, documentaria esses tipos a partir de seus getters: um identificador com `getUnidadeFederativa()`, como o código IBGE de um município, apareceria no Swagger UI como um objeto `{ "unidadeFederativa": "string" }`, em vez de uma string.
+
+O módulo `d5-framework-springdoc` corrige essa representação com um `ModelConverter` que descreve como `string` todo tipo que estende `ObjetoValorStringAbstrato`.
+
+```java title="ObjetoValorStringConversor.java"
+--8<-- "framework/springdoc/src/main/java/dev/sauloaraujo/d5/framework/springdoc/ObjetoValorStringConversor.java"
+```
+
+Veja [`d5-framework-springdoc`](springdoc.md#objetovalorstringconversor) para como esse conversor é registrado.
