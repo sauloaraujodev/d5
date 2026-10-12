@@ -189,7 +189,8 @@
 	</dependencies>
 
 	<profiles>
-		<!-- Ativo por padrão. Desativado com -Dpublicacao, para que exemplo e gerador não sejam publicados. -->
+		<!-- Ativo por padrão. Desativado com -Dpublicacao, para que exemplo e
+		gerador não sejam publicados. -->
 		<profile>
 			<id>completo</id>
 
@@ -208,7 +209,8 @@
 		<profile>
 			<id>publicacao</id>
 
-			<!-- Ativado com -Dpublicacao, a mesma propriedade que desativa o perfil completo; -Ppublicacao não basta. -->
+			<!-- Ativado com -Dpublicacao, a mesma propriedade que desativa o
+			perfil completo; -Ppublicacao não basta. -->
 			<activation>
 				<property>
 					<name>publicacao</name>

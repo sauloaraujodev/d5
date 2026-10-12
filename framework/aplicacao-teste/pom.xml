@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>dev.sauloaraujo</groupId>
 			<artifactId>d5-framework-bdd</artifactId>
-		<type>pom</type>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 </project>
