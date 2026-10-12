@@ -14,9 +14,9 @@
 	<dependencies>
 <#if dominioCompartilhado??>
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${r"${project.groupId}"}</groupId>
 			<artifactId>${dominioCompartilhado}</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${r"${project.version}"}</version>
 		</dependency>
 
 <#elseif framework>

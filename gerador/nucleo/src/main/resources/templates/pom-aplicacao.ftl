@@ -27,9 +27,9 @@
 </#if>
 <#list subdominios as subdominio>
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${r"${project.groupId}"}</groupId>
 			<artifactId>${nome}-dominio-${subdominio}</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${r"${project.version}"}</version>
 		</dependency>
 
 </#list>

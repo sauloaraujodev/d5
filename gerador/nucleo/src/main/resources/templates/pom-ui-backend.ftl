@@ -51,15 +51,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${r"${project.groupId}"}</groupId>
 			<artifactId>${nome}-aplicacao</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${r"${project.version}"}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${r"${project.groupId}"}</groupId>
 			<artifactId>${nome}-dominio-compartilhado</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${r"${project.version}"}</version>
 		</dependency>
 
 <#if framework>
@@ -97,9 +97,9 @@
 </#if>
 
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${r"${project.groupId}"}</groupId>
 			<artifactId>${nome}-infraestrutura</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${r"${project.version}"}</version>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>

@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +22,9 @@ import freemarker.template.TemplateExceptionHandler;
 
 @Component
 public class Gerador {
+	private static final List<String> DIRETORIOS_PADRAO = List.of("src/main/java", "src/main/resources",
+			"src/test/java", "src/test/resources");
+
 	private final Configuration freemarker;
 
 	public Gerador() {
@@ -53,6 +57,11 @@ public class Gerador {
 		gerarAplicacao(raiz, groupId, nome, subdominiosOrdenados, framework);
 		gerarInfraestrutura(raiz, groupId, nome, framework);
 		gerarUiBackend(raiz, groupId, nome, framework);
+
+		var modulos = Objects.requireNonNull(raiz.listFiles(File::isDirectory));
+		for (var modulo : modulos) {
+			criarDiretoriosPadrao(modulo);
+		}
 	}
 
 	private void gerarPomRaiz(File raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
@@ -71,10 +80,6 @@ public class Gerador {
 		var mainJava = new File(modulo, "src/main/java/" + pacote.replace('.', '/'));
 		processar("package-info.java.ftl", Map.of("pacote", pacote), new File(mainJava, "package-info.java"));
 		processar("Autorizacao.java.ftl", Map.of("pacote", pacote), new File(mainJava, "Autorizacao.java"));
-
-		criarDiretorioVazio(new File(modulo, "src/main/resources"));
-		criarDiretorioVazio(new File(modulo, "src/test/java"));
-		criarDiretorioVazio(new File(modulo, "src/test/resources"));
 	}
 
 	private void gerarDominio(File raiz, String groupId, String nome, String subdominio, String artifactIdCompartilhado,
@@ -82,10 +87,6 @@ public class Gerador {
 		var modulo = new File(raiz, "dominio-" + subdominio);
 
 		gerarPomDominio(modulo, groupId, nome, nome + "-dominio-" + subdominio, artifactIdCompartilhado, framework);
-
-		criarDiretorioVazio(new File(modulo, "src/main/java"));
-		criarDiretorioVazio(new File(modulo, "src/main/resources"));
-		criarDiretorioVazio(new File(modulo, "src/test/resources"));
 
 		var pacote = groupId + "." + nome + ".dominio." + subdominio;
 		var testeJava = new File(modulo, "src/test/java/" + pacote.replace('.', '/'));
@@ -159,12 +160,19 @@ public class Gerador {
 		}
 	}
 
-	private void criarDiretorioVazio(File diretorio) {
-		try {
-			Files.createDirectories(diretorio.toPath());
-			Files.createFile(new File(diretorio, ".gitkeep").toPath());
-		} catch (IOException e) {
-			throw new IllegalStateException("Falha ao gerar " + diretorio, e);
+	private void criarDiretoriosPadrao(File modulo) {
+		for (var caminho : DIRETORIOS_PADRAO) {
+			var diretorio = new File(modulo, caminho).toPath();
+			try {
+				Files.createDirectories(diretorio);
+				try (var conteudo = Files.list(diretorio)) {
+					if (conteudo.findAny().isEmpty()) {
+						Files.createFile(diretorio.resolve(".gitkeep"));
+					}
+				}
+			} catch (IOException e) {
+				throw new IllegalStateException("Falha ao gerar " + diretorio, e);
+			}
 		}
 	}
 }

@@ -30,8 +30,8 @@
 
 	<modules>
 		<module>dominio-compartilhado</module>
-		<module>dominio-geografia</module>
 		<module>dominio-crm</module>
+		<module>dominio-geografia</module>
 		<module>aplicacao</module>
 		<module>infraestrutura</module>
 		<module>ui-backend</module>

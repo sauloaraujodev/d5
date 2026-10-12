@@ -7,7 +7,7 @@ No exemplo deste tutorial, o [domínio](referencia/ddd.md#dominio) foi decompost
 - **Geografia**, que contém os conceitos de **unidade federativa** e **município**;
 - **CRM (Customer Relationship Management)**, que contém o conceito de **cliente**.
 
-Este tutorial implementa apenas a unidade federativa. Município e cliente ilustram a decomposição em subdomínios, mas ficam fora do escopo — por isso, o módulo `exemplo-dominio-crm` permanece vazio.
+Este tutorial implementa apenas a unidade federativa. Município e cliente ilustram a decomposição em subdomínios, mas ficam fora do escopo — por isso, o módulo `exemplo-dominio-crm` contém apenas a [suíte do Cucumber](#testes), sem cenários.
 
 ## Projeto Maven
 Seguindo as [convenções](referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
@@ -103,7 +103,7 @@ O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no
 --8<-- "exemplo/pom.xml"
 ```
 
-Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; os de subdomínio dependem também do compartilhado. A aplicação depende de `d5-framework-aplicacao` e dos módulos de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — os módulos de subdomínio chegam transitivamente por ele. O backend depende de `d5-framework-ui-backend` e do módulo de aplicação cujos controladores expõem e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST.
+Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; os de subdomínio dependem também do compartilhado. A aplicação depende de `d5-framework-aplicacao` e dos módulos de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — os módulos de subdomínio chegam transitivamente por ele. O backend depende de `d5-framework-ui-backend`, do módulo de aplicação cujos controladores expõem, do domínio compartilhado — cujos papéis de [autorização](#autorizacao) a configuração de segurança usa — e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST.
 
 O diagrama a seguir ilustra essas dependências, tanto entre os módulos do exemplo quanto com os módulos do framework; uma seta de A para B indica que A depende de B, e uma seta tracejada indica uma dependência restrita ao tempo de execução:
 
@@ -136,6 +136,7 @@ graph TD
     IN --> AP
     UI --> FU
     UI --> AP
+    UI --> DC
     UI -.-> FS
     UI -.-> IN
 ```
@@ -288,7 +289,7 @@ Note que o serviço não leva nenhuma anotação do Spring: ele, os repositório
 ```
 
 ##### Testes
-O comportamento do serviço é especificado com cenários em Gherkin e automatizado com [Cucumber](https://cucumber.io). Crie a suíte que conecta o Cucumber ao JUnit Platform e seleciona os cenários em `src/test/resources`:
+O comportamento do serviço é especificado com cenários em Gherkin e automatizado com [Cucumber](https://cucumber.io). Crie a suíte que conecta o Cucumber ao JUnit Platform e seleciona os cenários em `src/test/resources` — todo módulo de subdomínio tem a sua, inclusive `exemplo-dominio-crm`:
 
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
 --8<-- "exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
