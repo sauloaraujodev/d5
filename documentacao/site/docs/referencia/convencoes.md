@@ -47,14 +47,13 @@ Nesta seção, `${agregado-hifenizado}` é o nome de um agregado em minúsculas,
 | Cenários Gherkin de um agregado | `${aplicacao}/dominio-${subdominio}/src/test/resources/features/${agregado-hifenizado}.feature` |
 
 ## Nomenclatura
-Nesta seção, `${Agregado}` é o nome de um agregado e `${Atributo}` é o nome de um atributo, ambos em `PascalCase`.
+Nesta seção, `${Agregado}` é o nome de um agregado, em `PascalCase`.
 
 | Elemento | Nome |
 | --- | --- |
 | Interface | Prefixo `I` — `I${Agregado}Repositorio` |
 | Classe abstrata | Sufixo `Abstrato`/`Abstrata` — `AgregadoServicoAbstrato` |
 | Agregado | `${Agregado}` |
-| Objeto de valor de um atributo do agregado | `${Agregado}${Atributo}` |
 | Serviço de domínio | `${Agregado}Servico` |
 | Repositório de domínio (interface e implementação) | `I${Agregado}Repositorio` e `${Agregado}Repositorio` |
 | Serviço de aplicação | `${Agregado}AplicacaoServico` |

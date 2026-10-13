@@ -9,11 +9,11 @@ import dev.sauloaraujo.d5.framework.dominio.IAgregado;
 
 public final class Cliente implements IAgregado<ClienteIdentificador> {
 	private final Optional<ClienteIdentificador> identificador;
-	private final ClienteCpf cpf;
+	private final Cpf cpf;
 	private final String nome;
 	private final Endereco endereco;
 
-	public Cliente(Optional<ClienteIdentificador> identificador, ClienteCpf cpf, String nome, Endereco endereco) {
+	public Cliente(Optional<ClienteIdentificador> identificador, Cpf cpf, String nome, Endereco endereco) {
 		this.identificador = Objects.requireNonNull(identificador);
 		this.cpf = Objects.requireNonNull(cpf);
 		this.nome = Validate.notBlank(nome, "Nome do cliente em branco");
@@ -25,7 +25,7 @@ public final class Cliente implements IAgregado<ClienteIdentificador> {
 		return identificador;
 	}
 
-	public ClienteCpf getCpf() {
+	public Cpf getCpf() {
 		return cpf;
 	}
 

@@ -12,7 +12,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import com.example.exemplo.aplicacao.crm.cliente.ClienteConsulta;
 import com.example.exemplo.aplicacao.crm.cliente.ClienteOrdenacao;
 import com.example.exemplo.dominio.crm.cliente.Cliente;
-import com.example.exemplo.dominio.crm.cliente.ClienteCpf;
+import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.Endereco;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
@@ -52,7 +52,7 @@ class ClienteAplicacaoRepositorioTest {
 	private static Cliente criar(String cpf, String nome, String municipio) {
 		var endereco = new Endereco("Rua A", "10", Optional.empty(), "Centro", new EnderecoCep("01310100"),
 				new MunicipioCodigoIbge(municipio));
-		return new Cliente(Optional.empty(), new ClienteCpf(cpf), nome, endereco);
+		return new Cliente(Optional.empty(), new Cpf(cpf), nome, endereco);
 	}
 
 	private static ClienteConsulta consultar(Optional<String> nome, Optional<String> municipio,

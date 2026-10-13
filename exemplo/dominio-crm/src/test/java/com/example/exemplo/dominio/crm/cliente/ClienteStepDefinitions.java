@@ -70,7 +70,7 @@ public final class ClienteStepDefinitions {
 		});
 
 		when(repositorio.existePorCpf(any(), any())).thenAnswer(chamada -> {
-			ClienteCpf cpf = chamada.getArgument(0);
+			Cpf cpf = chamada.getArgument(0);
 			Optional<ClienteIdentificador> identificadorIgnorado = chamada.getArgument(1);
 			return clientes.values().stream().anyMatch(
 					candidato -> candidato.getCpf().equals(cpf) && !foiIgnorado(candidato, identificadorIgnorado));
@@ -109,7 +109,7 @@ public final class ClienteStepDefinitions {
 	private static Cliente criar(Optional<String> identificador, String cpf, String nome, String municipio) {
 		var endereco = new Endereco("Avenida Paulista", "1000", Optional.empty(), "Bela Vista",
 				new EnderecoCep("01310100"), new MunicipioCodigoIbge(municipio));
-		return new Cliente(identificador.map(ClienteIdentificador::new), new ClienteCpf(cpf), nome, endereco);
+		return new Cliente(identificador.map(ClienteIdentificador::new), new Cpf(cpf), nome, endereco);
 	}
 
 	private void adicionarMunicipio(String codigoIbge, boolean extinto) {
@@ -259,7 +259,7 @@ public final class ClienteStepDefinitions {
 
 	@Entao("o cliente de CPF {string} passa a existir")
 	public void o_cliente_passa_a_existir(String cpf) {
-		assertTrue(clientes.values().stream().anyMatch(cliente -> cliente.getCpf().equals(new ClienteCpf(cpf))));
+		assertTrue(clientes.values().stream().anyMatch(cliente -> cliente.getCpf().equals(new Cpf(cpf))));
 	}
 
 	@Entao("a inclusão do cliente é rejeitada por falta de autorização")
@@ -290,7 +290,7 @@ public final class ClienteStepDefinitions {
 
 	@Entao("o cliente encontrado tem CPF {string} e nome {string}")
 	public void o_cliente_encontrado_tem(String cpf, String nome) {
-		assertEquals(new ClienteCpf(cpf), resultadoBusca.getCpf());
+		assertEquals(new Cpf(cpf), resultadoBusca.getCpf());
 		assertEquals(nome, resultadoBusca.getNome());
 	}
 
@@ -308,7 +308,7 @@ public final class ClienteStepDefinitions {
 	public void o_cliente_passa_a_ter(String identificador, String cpf, String nome) {
 		var cliente = clientes.get(identificador);
 		assertNotNull(cliente);
-		assertEquals(new ClienteCpf(cpf), cliente.getCpf());
+		assertEquals(new Cpf(cpf), cliente.getCpf());
 		assertEquals(nome, cliente.getNome());
 	}
 

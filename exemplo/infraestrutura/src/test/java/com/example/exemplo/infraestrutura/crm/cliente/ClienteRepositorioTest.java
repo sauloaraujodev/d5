@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 import com.example.exemplo.dominio.crm.cliente.Cliente;
-import com.example.exemplo.dominio.crm.cliente.ClienteCpf;
 import com.example.exemplo.dominio.crm.cliente.ClienteIdentificador;
+import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.Endereco;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
@@ -24,8 +24,8 @@ import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 @DataJpaTest
 class ClienteRepositorioTest {
 	private static final MunicipioCodigoIbge SAO_PAULO = new MunicipioCodigoIbge("3550308");
-	private static final ClienteCpf CPF_MARIA = new ClienteCpf("11111111111");
-	private static final ClienteCpf CPF_ANA = new ClienteCpf("22222222222");
+	private static final Cpf CPF_MARIA = new Cpf("11111111111");
+	private static final Cpf CPF_ANA = new Cpf("22222222222");
 
 	@Autowired
 	private IClienteRepositorioJpa repositorioJpa;
@@ -42,11 +42,11 @@ class ClienteRepositorioTest {
 				SAO_PAULO);
 	}
 
-	private static Cliente criar(ClienteCpf cpf, String nome) {
+	private static Cliente criar(Cpf cpf, String nome) {
 		return criar(cpf, nome, Optional.empty());
 	}
 
-	private static Cliente criar(ClienteCpf cpf, String nome, Optional<String> complemento) {
+	private static Cliente criar(Cpf cpf, String nome, Optional<String> complemento) {
 		return new Cliente(Optional.empty(), cpf, nome, criarEndereco(complemento));
 	}
 

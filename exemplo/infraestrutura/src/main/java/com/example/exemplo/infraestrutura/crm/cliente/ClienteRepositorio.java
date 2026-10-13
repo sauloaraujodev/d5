@@ -4,9 +4,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.example.exemplo.dominio.crm.cliente.Cliente;
-import com.example.exemplo.dominio.crm.cliente.ClienteCpf;
 import com.example.exemplo.dominio.crm.cliente.ClienteIdentificador;
 import com.example.exemplo.dominio.crm.cliente.ClienteServico;
+import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.Endereco;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.crm.cliente.spi.IClienteRepositorio;
@@ -44,7 +44,7 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 		var endereco = new Endereco(agregadoJpa.getLogradouro(), agregadoJpa.getNumero(),
 				Optional.ofNullable(agregadoJpa.getComplemento()), agregadoJpa.getBairro(),
 				new EnderecoCep(agregadoJpa.getCep()), new MunicipioCodigoIbge(agregadoJpa.getMunicipio()));
-		return new Cliente(Optional.of(identificador), new ClienteCpf(agregadoJpa.getCpf()), agregadoJpa.getNome(),
+		return new Cliente(Optional.of(identificador), new Cpf(agregadoJpa.getCpf()), agregadoJpa.getNome(),
 				endereco);
 	}
 
@@ -74,7 +74,7 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 	}
 
 	@Override
-	public boolean existePorCpf(ClienteCpf cpf, Optional<ClienteIdentificador> identificadorIgnorado) {
+	public boolean existePorCpf(Cpf cpf, Optional<ClienteIdentificador> identificadorIgnorado) {
 		Objects.requireNonNull(cpf);
 		Objects.requireNonNull(identificadorIgnorado);
 

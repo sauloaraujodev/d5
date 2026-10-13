@@ -3,7 +3,7 @@ package com.example.exemplo.infraestrutura.crm.cliente;
 import org.jspecify.annotations.Nullable;
 
 import com.example.exemplo.dominio.crm.cliente.Cliente;
-import com.example.exemplo.dominio.crm.cliente.ClienteCpf;
+import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 
@@ -27,7 +27,7 @@ public class ClienteJpa implements IAgregadoJpa<Cliente> {
 
 	@Column(name = "CLI_CPF", unique = true)
 	@NotNull
-	@Size(max = ClienteCpf.TAMANHO)
+	@Size(max = Cpf.TAMANHO)
 	private String cpf;
 
 	@Column(name = "CLI_NM")
