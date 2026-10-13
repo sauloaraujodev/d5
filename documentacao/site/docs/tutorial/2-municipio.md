@@ -53,7 +53,7 @@ O nome de um município é único apenas na unidade federativa a que ele pertenc
 ```
 
 #### Serviço
-Como na unidade federativa, o serviço estende [`AgregadoServicoAbstrato`](../referencia/framework/dominio.md#agregadoservicoabstrato), agora parametrizado por `MunicipioAutorizacoes`, e libera a busca a qualquer usuário e as demais operações — inclusive extinguir — somente a administradores. Além de `IMunicipioRepositorio`, ele recebe [`IUnidadeFederativaRepositorio`](1-unidade-federativa.md#repositorio), para verificar a existência da unidade federativa do município. Em `validarInclusaoAlteracao`, o serviço:
+Como na unidade federativa, o serviço estende [`AgregadoServicoAbstrato`](../referencia/framework/dominio.md#agregadoservicoabstrato), agora parametrizado por `MunicipioAutorizacoes`, e libera a busca a qualquer usuário e as demais operações — inclusive extinguir — somente a administradores. As autorizações dependem apenas do usuário, e não do estado do município: um administrador continua autorizado a alterar e a extinguir um município extinto, e é o serviço que rejeita essas operações, [validando o estado](../referencia/programacao.md#validacao-de-estado) do município. Autorização e estado são coisas distintas — a primeira diz quem pode executar uma operação; o segundo, se a operação é possível —, e por isso a rejeição de uma operação sobre um município extinto responde 409, e não 403. Além de `IMunicipioRepositorio`, ele recebe [`IUnidadeFederativaRepositorio`](1-unidade-federativa.md#repositorio), para verificar a existência da unidade federativa do município. Em `validarInclusaoAlteracao`, o serviço:
 
 - [valida o argumento](../referencia/programacao.md#validacao-de-argumentos), rejeitando um município já extinto, que só pode se tornar extinto pela ação de extinguir;
 - usa `validarExistencia`, com o modelo de mensagem de [`UnidadeFederativaServico`](1-unidade-federativa.md#servico), para exigir que a unidade federativa exista;
@@ -245,7 +245,7 @@ Inclua a unidade federativa de São Paulo, como na lição 1, e, em seguida, inc
 
 ![Parâmetro identificador preenchido com 3550308 na operação de extinguir](../assets/tutorial/2-municipio/03-extinguir-parametro.png)
 
-Depois disso, a alteração do município responde 409, com a mensagem `O município 3550308 está extinto`. O recurso devolvido por `GET /backend/geografia/municipio/{identificador}/alteracao` mostra o município extinto e inclui a autorização `extinguir`, que o cliente pode usar para exibir ou ocultar a ação:
+Depois disso, a alteração do município responde 409, com a mensagem `O município 3550308 está extinto`. O recurso devolvido por `GET /backend/geografia/municipio/{identificador}/alteracao` mostra o município extinto e inclui a autorização `extinguir`, que o cliente pode usar para exibir ou ocultar a ação. Como as autorizações não dependem do estado do município, `extinguir` continua `true` para um administrador; para saber se a ação ainda é possível, o cliente consulta o atributo `extinto` do município:
 
 ![Resposta 200 da alteração, com o município extinto e a autorização extinguir](../assets/tutorial/2-municipio/04-alteracao-resposta.png)
 

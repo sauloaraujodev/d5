@@ -103,7 +103,7 @@ O identificador do cliente não tem formato definido pelo domínio — é um nú
 ```
 
 #### CPF e CEP
-O CPF e o CEP são formados por onze e oito dígitos, respectivamente, e, como a sigla e o código IBGE, herdam de [`ObjetoValorRegexAbstrato`](../referencia/framework/dominio.md#objetovalorregexabstrato). Seguindo as [convenções](../referencia/convencoes.md#nomenclatura), o nome de cada um combina o conceito ao qual pertence — o cliente e o endereço — com o atributo.
+O CPF e o CEP são formados por onze e oito dígitos, respectivamente, e, como a sigla e o código IBGE, herdam de [`ObjetoValorRegexAbstrato`](../referencia/framework/dominio.md#objetovalorregexabstrato). Seguindo as [convenções](../referencia/convencoes.md#nomenclatura), o nome de cada um combina o conceito ao qual pertence — o cliente e o endereço — com o atributo. Para manter o exemplo simples, o CPF valida apenas o formato, e não os dígitos verificadores: `11111111111`, usado nos testes e nas capturas desta lição, é aceito, embora não seja um CPF válido.
 
 ```java title="exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/ClienteCpf.java"
 --8<-- "exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/ClienteCpf.java"
