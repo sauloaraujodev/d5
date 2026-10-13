@@ -21,6 +21,8 @@ Realiza o conceito de [objeto de valor](../ddd.md#objeto-de-valor). `IObjetoValo
 
 O parâmetro de `equals` é anotado com `@Nullable` porque sobrescreve `Object.equals`, cujo contrato admite `null`.
 
+No tutorial, [`Endereco`](../../tutorial/3-cliente.md#endereco), formado por vários atributos, implementa `IObjetoValor` diretamente.
+
 ### `ObjetoValorStringAbstrato`
 Classe base para objetos de valor representados por uma única `String` — um código, uma sigla, um nome. Guarda o valor em um atributo `final`, valida-o contra `null` no construtor e implementa `equals`, `hashCode` e `toString` a partir dele.
 
@@ -30,6 +32,8 @@ Classe base para objetos de valor representados por uma única `String` — um c
 
 Duas instâncias são iguais quando têm a mesma classe concreta (`getClass()`) e o mesmo valor. Portanto, objetos de valor de tipos diferentes com o mesmo valor nunca são iguais. `toString` devolve o valor sem alteração — usado pelo backend para serializar e converter essas instâncias como uma `String` pura; veja [Serialização de objetos de valor](comportamentos.md#serializacao-de-objetos-de-valor).
 
+No tutorial, [`ClienteIdentificador`](../../tutorial/3-cliente.md#identificador), cujo valor é gerado pelo banco de dados e não tem formato definido pelo domínio, herda dessa classe.
+
 ### `ObjetoValorRegexAbstrato`
 Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito por uma expressão regular. Além do valor, o construtor recebe o `formato` (a expressão regular) e a `mensagem` de erro (um modelo com um `%s` para o valor inválido), e valida com `Validate.matchesPattern`, que exige que o valor **inteiro** corresponda à expressão regular — não basta conter um trecho que corresponda. A validação de `null`, herdada de `ObjetoValorStringAbstrato`, ocorre antes da validação do formato.
 
@@ -37,7 +41,7 @@ Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito 
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/ObjetoValorRegexAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaSigla`](../../tutorial.md#sigla) e [`UnidadeFederativaCodigoIbge`](../../tutorial.md#codigo-ibge) herdam dessa classe.
+No tutorial, [`UnidadeFederativaSigla`](../../tutorial/1-unidade-federativa.md#sigla) e [`UnidadeFederativaCodigoIbge`](../../tutorial/1-unidade-federativa.md#codigo-ibge) herdam dessa classe.
 
 ## Entidade
 
@@ -48,7 +52,7 @@ Identificador de uma [entidade](../ddd.md#entidade). É um [`IObjetoValor`](#iob
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IIdentificador.java"
 ```
 
-No tutorial, [`UnidadeFederativaCodigoIbge`](../../tutorial.md#codigo-ibge) implementa essa interface.
+No tutorial, [`UnidadeFederativaCodigoIbge`](../../tutorial/1-unidade-federativa.md#codigo-ibge) implementa essa interface.
 
 ### `IEntidade`
 Realiza o conceito de [entidade](../ddd.md#entidade). `IEntidade` é parametrizada pelo tipo `I` do identificador (um [`IIdentificador`](#iidentificador)) e expõe `getIdentificador`, que devolve um [`Optional`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html){target="_blank"} vazio enquanto a entidade ainda não tem identificador atribuído.
@@ -66,7 +70,7 @@ Realiza o conceito de [agregado](../ddd.md#agregado): sua raiz. `IAgregado` este
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/IAgregado.java"
 ```
 
-No tutorial, [`UnidadeFederativa`](../../tutorial.md#agregado) implementa `IAgregado<UnidadeFederativaCodigoIbge>`.
+No tutorial, [`UnidadeFederativa`](../../tutorial/1-unidade-federativa.md#agregado) implementa `IAgregado<UnidadeFederativaCodigoIbge>`, com um identificador sempre presente. Já [`Cliente`](../../tutorial/3-cliente.md#agregado) implementa `IAgregado<ClienteIdentificador>` com um identificador gerado pelo banco de dados, que só está presente depois da inclusão.
 
 ## Repositório
 
@@ -95,7 +99,7 @@ Implementação de `IAgregadoAutorizacoes` que recebe os quatro valores booleano
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/AgregadoAutorizacoes.java"
 ```
 
-No tutorial, [`UnidadeFederativaServico`](../../tutorial.md#servico) devolve um `AgregadoAutorizacoes<UnidadeFederativa>` que libera a busca a qualquer usuário e as demais operações somente a administradores.
+No tutorial, [`UnidadeFederativaServico`](../../tutorial/1-unidade-federativa.md#servico) devolve um `AgregadoAutorizacoes<UnidadeFederativa>` que libera a busca a qualquer usuário e as demais operações somente a administradores. Já [`MunicipioAutorizacoes`](../../tutorial/2-municipio.md#autorizacoes) estende `AgregadoAutorizacoes`, acrescentando a autorização da ação de extinguir.
 
 ## Segurança
 
@@ -106,7 +110,7 @@ Dá acesso a informações do usuário autenticado: `getUsuario`, `getAutorizaco
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/spi/ISegurancaServico.java"
 ```
 
-No tutorial, [`UnidadeFederativaServico`](../../tutorial.md#servico) recebe um `ISegurancaServico` no construtor e o consulta em `criarAutorizacoes`.
+No tutorial, [`UnidadeFederativaServico`](../../tutorial/1-unidade-federativa.md#servico) recebe um `ISegurancaServico` no construtor e o consulta em `criarAutorizacoes`.
 
 ## Serviço
 
@@ -128,7 +132,7 @@ Implementação base de [`IAgregadoServico`](#iagregadoservico). Recebe no const
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/AgregadoServicoAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaServico`](../../tutorial.md#servico) estende `AgregadoServicoAbstrato` e sobrescreve `criarAutorizacoes` e `validarInclusaoAlteracao`.
+No tutorial, [`UnidadeFederativaServico`](../../tutorial/1-unidade-federativa.md#servico) estende `AgregadoServicoAbstrato` e sobrescreve `criarAutorizacoes` e `validarInclusaoAlteracao`; na [lição 2](../../tutorial/2-municipio.md#unidade-federativa-referenciada), passa a sobrescrever também `validarExclusao`. [`MunicipioServico`](../../tutorial/2-municipio.md#servico) sobrescreve ainda `validarAlteracao` e acrescenta a ação `extinguir`, que reutiliza `validarAutorizacao` e `validarExistencia`.
 
 ## Exceções
 
@@ -139,7 +143,7 @@ Estende `IllegalStateException`. Lançada por [`AgregadoServicoAbstrato.validarI
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/AgregadoExistenteExcecao.java"
 ```
 
-No tutorial, [`UnidadeFederativaServico`](../../tutorial.md#servico) a lança — através de `validarInexistencia` — quando a sigla ou o nome já pertencem a outra unidade federativa.
+No tutorial, [`UnidadeFederativaServico`](../../tutorial/1-unidade-federativa.md#servico) a lança — através de `validarInexistencia` — quando a sigla ou o nome já pertencem a outra unidade federativa.
 
 ### `AgregadoInexistenteExcecao`
 Estende `NoSuchElementException`. Declarada por [`IAgregadoRepositorio.buscarPorIdentificador`](#iagregadorepositorio), e lançada por [`AgregadoServicoAbstrato.validarExistencia`](#agregadoservicoabstrato) ao alterar ou excluir um agregado cujo identificador não existe. O backend converte essa exceção em uma resposta [404 Not Found](ui-backend.md#excecaomanipulador).

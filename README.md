@@ -40,7 +40,8 @@ Os módulos `d5-framework-*-teste` e `d5-framework-bdd` têm `packaging` `pom`; 
 
 ## Estrutura
 - `framework`: módulos publicados no Maven Central.
-- `exemplo`: aplicação de exemplo construída no tutorial.
+- `exemplo`: aplicação de exemplo construída no tutorial, no estado final, ao fim da lição 3.
+- `exemplo1` e `exemplo2`: a mesma aplicação ao fim das lições 1 e 2 do tutorial. Ficam fora do build e são verificadas com `mvn -f exemplo1 verify` e `mvn -f exemplo2 verify`. O build da documentação interrompe-se se um arquivo divergir entre versões consecutivas sem que a lição o altere de propósito; veja `documentacao/site/hooks/exemplos.py`.
 - `gerador`: gerador de projetos D5.
 - `documentacao`: fonte do site.
 

@@ -9,7 +9,7 @@ D5, trocadilho com as cinco letras D de **DDD**-**D**riven **D**evelopment, agil
 - [Spring Boot](https://spring.io/projects/spring-boot){target="_blank"};
 - [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"}.
 
-Siga o [tutorial](tutorial.md) para aprender a desenvolver com o framework de D5.
+Siga o [tutorial](tutorial/index.md) para aprender a desenvolver com o framework de D5.
 
 ## Como usar
 O framework é publicado no [Maven Central](https://central.sonatype.com/namespace/dev.sauloaraujo){target="_blank"}, com `groupId` `dev.sauloaraujo`, e requer Java 25. Enquanto a versão for `1.0.0-SNAPSHOT`, declare também o repositório de snapshots no `pom.xml` do projeto raiz:
@@ -41,4 +41,4 @@ O `d5-pai`:
 - gerencia as versões dos módulos do framework, que são declarados sem `<version>`;
 - declara a dependência de [JSpecify](https://jspecify.dev){target="_blank"} em todos os módulos e configura a verificação de nulidade em tempo de compilação; veja [Evite `null`](referencia/programacao.md#evite-null).
 
-O [tutorial](tutorial.md) mostra o projeto completo.
+O [tutorial](tutorial/index.md) mostra o projeto completo.

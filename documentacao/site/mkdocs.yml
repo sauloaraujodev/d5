@@ -3,6 +3,9 @@ site_description: D5 acelera o desenvolvimento de aplicações web com DDD, arqu
 site_author: Saulo Araujo
 site_url: https://d5.sauloaraujo.dev
 
+hooks:
+  - hooks/exemplos.py
+
 extra_css:
   - stylesheets/extra.css
 
@@ -32,7 +35,11 @@ theme:
 
 nav:
   - Visão geral: index.md
-  - Tutorial: tutorial.md
+  - Tutorial:
+      - tutorial/index.md
+      - Lição 1 - Unidade federativa: tutorial/1-unidade-federativa.md
+      - Lição 2 - Município: tutorial/2-municipio.md
+      - Lição 3 - Cliente: tutorial/3-cliente.md
   - Referência:
       - DDD: referencia/ddd.md
       - Convenções: referencia/convencoes.md

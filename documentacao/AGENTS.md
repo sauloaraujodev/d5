@@ -8,15 +8,24 @@ Cada página usa H1 para o título e H2, H3... para as seções, refletindo a hi
 
 Blocos de código incluem o arquivo-fonte real via snippet (`--8<--`) em vez de colar o código, para nunca ficarem desatualizados.
 
-Por padrão, as páginas descrevem em tom direto e impessoal — `tutorial.md` é a exceção, com tom imperativo.
+Por padrão, as páginas descrevem em tom direto e impessoal — as lições do tutorial são a exceção, com tom imperativo.
 
 Ao adicionar, remover ou alterar uma interface, classe ou convenção do framework, a página de referência correspondente é atualizada no mesmo commit.
 
 ## index.md
 Menciona os principais conceitos de engenharia de software e tecnologias utilizados em D5.
 
-## tutorial.md
-Em tom imperativo, descreve, passo a passo, como desenvolver uma aplicação de exemplo com o framework de D5.
+## tutorial/index.md
+Apresenta os subdomínios da aplicação de exemplo e as lições do tutorial, indicando o que cada uma acrescenta e o diretório do repositório com o projeto ao final dela.
+
+## tutorial/*.md (lições)
+Em tom imperativo, cada lição descreve, passo a passo, como desenvolver um agregado da aplicação de exemplo com o framework de D5: `1-unidade-federativa.md`, `2-municipio.md` e `3-cliente.md`. Cada lição parte do projeto deixado pela anterior e explica apenas o que acrescenta ou altera.
+
+Os snippets de cada lição incluem os arquivos do diretório com o projeto ao final dela — `exemplo1`, `exemplo2` e `exemplo`, respectivamente —, mas o título de cada bloco de código mostra o caminho em `exemplo`, onde o leitor desenvolve o projeto.
+
+Um arquivo presente em duas versões consecutivas é idêntico nelas, exceto os que a lição seguinte altera de propósito, listados em `ALTERACOES`, no hook `site/hooks/exemplos.py`. O hook verifica essa regra a cada build da documentação e o interrompe quando ela é violada. Ao alterar um arquivo de uma versão, replique a alteração nas demais versões em que ele aparece igual; ao fazer uma lição alterar um arquivo da anterior, registre-o em `ALTERACOES`.
+
+As capturas do Swagger UI de cada lição ficam em `assets/tutorial/<lição>` e são geradas por `documentacao/capturas/capturar.sh`, nunca manualmente; veja `documentacao/capturas/README.md`.
 
 Deve explicar apenas o necessário acerca do framework de D5 para que o leitor entenda o código de exemplo completamente.
 

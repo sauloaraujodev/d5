@@ -79,7 +79,7 @@ A classe não declara `@RestController` nem o caminho base dos endpoints: a subc
 
 Os métodos mapeados para `POST` — `incluir`, `alterar` e `excluir` — são executados dentro de uma transação automaticamente; veja [Gerenciamento de transações](comportamentos.md#gerenciamento-de-transacoes).
 
-No tutorial, [`UnidadeFederativaControlador`](../../tutorial.md#controlador) estende `AgregadoControladorAbstrato`.
+No tutorial, [`UnidadeFederativaControlador`](../../tutorial/1-unidade-federativa.md#controlador) estende `AgregadoControladorAbstrato`, e [`MunicipioControlador`](../../tutorial/2-municipio.md#controlador) acrescenta às operações herdadas a ação de extinguir.
 
 ## Tratamento de erros
 
@@ -142,7 +142,7 @@ Também expõe, como bean, o `PasswordEncoder` devolvido por `codificadorSenha`,
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/SegurancaConfiguracaoAbstrata.java"
 ```
 
-No tutorial, [`SegurancaConfiguracao`](../../tutorial.md#seguranca) estende `SegurancaConfiguracaoAbstrata`, implementando `autorizar` e declarando os usuários da aplicação.
+No tutorial, [`SegurancaConfiguracao`](../../tutorial/1-unidade-federativa.md#seguranca) estende `SegurancaConfiguracaoAbstrata`, implementando `autorizar` e declarando os usuários da aplicação.
 
 ### `EntradaAutenticacaoSemDesafio`
 Por padrão, a autenticação HTTP Basic do Spring Security responde a uma requisição não autenticada com o cabeçalho `WWW-Authenticate`, que faz o navegador abrir o diálogo nativo de login — inadequado para uma SPA ou para o Swagger UI, que devem tratar a autenticação por conta própria. Esta implementação de `AuthenticationEntryPoint` responde `401` com um corpo JSON, sem esse cabeçalho.
@@ -186,7 +186,7 @@ Expõe, através de `GET` no caminho base da subclasse, o recurso devolvido pelo
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/AutenticacaoControladorAbstrato.java"
 ```
 
-No tutorial, [`AutenticacaoControlador`](../../tutorial.md#autenticacao) estende `AutenticacaoControladorAbstrato`.
+No tutorial, [`AutenticacaoControlador`](../../tutorial/1-unidade-federativa.md#autenticacao) estende `AutenticacaoControladorAbstrato`.
 
 ### `AutenticacaoRecurso`
 Recurso devolvido por `AutenticacaoControladorAbstrato`, com o nome do usuário autenticado.

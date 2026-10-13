@@ -17,7 +17,7 @@ Representa uma projeção somente leitura de um [agregado](../ddd.md#agregado) `
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/IProjecao.java"
 ```
 
-No tutorial, [`UnidadeFederativaProjecao`](../../tutorial.md#projecao) implementa `IProjecao<UnidadeFederativa>`.
+No tutorial, [`UnidadeFederativaProjecao`](../../tutorial/1-unidade-federativa.md#projecao) implementa `IProjecao<UnidadeFederativa>`.
 
 ## Ordenação
 
@@ -28,7 +28,7 @@ Marca um `enum` como uma das propriedades pelas quais uma [projeção](#iprojeca
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/IOrdenacao.java"
 ```
 
-No tutorial, [`UnidadeFederativaOrdenacao`](../../tutorial.md#ordenacao) implementa `IOrdenacao<UnidadeFederativaProjecao>`.
+No tutorial, [`UnidadeFederativaOrdenacao`](../../tutorial/1-unidade-federativa.md#ordenacao) implementa `IOrdenacao<UnidadeFederativaProjecao>`.
 
 ## Consulta
 
@@ -48,7 +48,7 @@ No backend, a consulta é instanciada pelo Spring MVC a partir dos parâmetros d
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/Consulta.java"
 ```
 
-No tutorial, [`UnidadeFederativaConsulta`](../../tutorial.md#consulta) estende `Consulta<UnidadeFederativaOrdenacao>`, acrescentando os atributos `sigla` e `nome` para filtrar a pesquisa.
+No tutorial, [`UnidadeFederativaConsulta`](../../tutorial/1-unidade-federativa.md#consulta) estende `Consulta<UnidadeFederativaOrdenacao>`, acrescentando os atributos `sigla` e `nome` para filtrar a pesquisa.
 
 ## Resultado da consulta
 
@@ -84,7 +84,7 @@ Implementação base de `IAgregadoAplicacaoServico`. É parametrizada pelo ident
 --8<-- "framework/aplicacao/src/main/java/dev/sauloaraujo/d5/framework/aplicacao/impl/AgregadoAplicacaoServicoAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaAplicacaoServico`](../../tutorial.md#servico-de-aplicacao) estende `AgregadoAplicacaoServicoAbstrato`.
+No tutorial, [`UnidadeFederativaAplicacaoServico`](../../tutorial/1-unidade-federativa.md#servico-de-aplicacao) estende `AgregadoAplicacaoServicoAbstrato`.
 
 ## Repositório de aplicação
 
@@ -97,4 +97,4 @@ Dá acesso, através de `pesquisar`, às [projeções](#iprojecao) `P` de um agr
 
 Implementações são registradas automaticamente como beans — veja [Registro de beans](comportamentos.md#registro-de-beans).
 
-No tutorial, [`IUnidadeFederativaAplicacaoRepositorio`](../../tutorial.md#repositorio-de-aplicacao) estende essa interface. Sua implementação com Spring Data JPA estende [`AgregadoAplicacaoRepositorioAbstrato`](infraestrutura.md#agregadoaplicacaorepositorioabstrato), do módulo `d5-framework-infraestrutura`.
+No tutorial, [`IUnidadeFederativaAplicacaoRepositorio`](../../tutorial/1-unidade-federativa.md#repositorio-de-aplicacao) estende essa interface. Sua implementação com Spring Data JPA estende [`AgregadoAplicacaoRepositorioAbstrato`](infraestrutura.md#agregadoaplicacaorepositorioabstrato), do módulo `d5-framework-infraestrutura`.

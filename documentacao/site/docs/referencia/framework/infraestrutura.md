@@ -16,7 +16,7 @@ Marca uma classe como a entidade JPA correspondente a um [agregado](../ddd.md#ag
 --8<-- "framework/infraestrutura/src/main/java/dev/sauloaraujo/d5/framework/infraestrutura/IAgregadoJpa.java"
 ```
 
-No tutorial, [`UnidadeFederativaJpa`](../../tutorial.md#entidade-jpa) implementa `IAgregadoJpa<UnidadeFederativa>`.
+No tutorial, [`UnidadeFederativaJpa`](../../tutorial/1-unidade-federativa.md#entidade-jpa) implementa `IAgregadoJpa<UnidadeFederativa>`.
 
 ## Repositório
 
@@ -27,7 +27,7 @@ Implementação base de [`IAgregadoRepositorio`](dominio.md#iagregadorepositorio
 --8<-- "framework/infraestrutura/src/main/java/dev/sauloaraujo/d5/framework/infraestrutura/AgregadoRepositorioAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaRepositorio`](../../tutorial.md#implementacao-do-repositorio) estende `AgregadoRepositorioAbstrato` e implementa `paraJpa`, `paraAgregado` e `paraIdentificadorJpa`.
+No tutorial, [`UnidadeFederativaRepositorio`](../../tutorial/1-unidade-federativa.md#implementacao-do-repositorio) estende `AgregadoRepositorioAbstrato` e implementa `paraJpa`, `paraAgregado` e `paraIdentificadorJpa`.
 
 ## Repositório de aplicação
 
@@ -40,7 +40,7 @@ Também expõe `paraLike`, que converte um filtro textual opcional em um padrão
 --8<-- "framework/infraestrutura/src/main/java/dev/sauloaraujo/d5/framework/infraestrutura/AgregadoAplicacaoRepositorioAbstrato.java"
 ```
 
-No tutorial, [`UnidadeFederativaAplicacaoRepositorio`](../../tutorial.md#implementacao-do-repositorio-de-aplicacao) estende `AgregadoAplicacaoRepositorioAbstrato`, implementa `pesquisar(UnidadeFederativaConsulta, Pageable)` e `paraPropriedadeOrdenacao`, e usa `paraLike` para filtrar pela sigla e pelo nome.
+No tutorial, [`UnidadeFederativaAplicacaoRepositorio`](../../tutorial/1-unidade-federativa.md#implementacao-do-repositorio-de-aplicacao) estende `AgregadoAplicacaoRepositorioAbstrato`, implementa `pesquisar(UnidadeFederativaConsulta, Pageable)` e `paraPropriedadeOrdenacao`, e usa `paraLike` para filtrar pela sigla e pelo nome. Já [`MunicipioAplicacaoRepositorio`](../../tutorial/2-municipio.md#implementacao-do-repositorio-de-aplicacao) mapeia, em `paraPropriedadeOrdenacao`, a ordenação pelo nome da unidade federativa para uma propriedade qualificada pelo alias de uma junção da consulta.
 
 ## Segurança
 
