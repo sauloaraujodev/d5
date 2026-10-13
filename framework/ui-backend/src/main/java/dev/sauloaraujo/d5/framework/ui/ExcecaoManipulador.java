@@ -39,7 +39,9 @@ import jakarta.validation.ConstraintViolationException;
 public class ExcecaoManipulador {
 	private static final Logger LOG = LoggerFactory.getLogger(ExcecaoManipulador.class);
 	private static final String SQLSTATE_DADO_INVALIDO = "22";
+	private static final String SQLSTATE_VIOLACAO_INTEGRIDADE = "23";
 	private static final String VALOR_FORA_DOS_LIMITES = "Um ou mais valores informados excedem o tamanho ou o intervalo permitidos.";
+	private static final String RESTRICAO_VIOLADA = "Os dados informados violam uma restrição do banco de dados, como a unicidade de um valor.";
 
 	@ExceptionHandler(AccessDeniedException.class)
 	ResponseEntity<Object> tratarAcessoNegado(AccessDeniedException excecao) {
@@ -121,6 +123,9 @@ public class ExcecaoManipulador {
 				var estado = sqlException.getSQLState();
 				if (estado != null && estado.startsWith(SQLSTATE_DADO_INVALIDO)) {
 					return corpo(HttpStatus.UNPROCESSABLE_CONTENT, VALOR_FORA_DOS_LIMITES);
+				}
+				if (estado != null && estado.startsWith(SQLSTATE_VIOLACAO_INTEGRIDADE)) {
+					return corpo(HttpStatus.CONFLICT, RESTRICAO_VIOLADA);
 				}
 			}
 		}
