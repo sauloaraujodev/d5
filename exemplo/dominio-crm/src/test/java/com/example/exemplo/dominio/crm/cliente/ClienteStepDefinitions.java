@@ -163,9 +163,19 @@ public final class ClienteStepDefinitions {
 		incluir(cpf, nome, municipio);
 	}
 
+	@Quando("eu tento incluir o cliente de identificador {string}, CPF {string}, nome {string} e município {string}")
+	public void eu_tento_incluir_o_cliente_com_identificador(String identificador, String cpf, String nome,
+			String municipio) {
+		incluir(Optional.of(identificador), cpf, nome, municipio);
+	}
+
 	private void incluir(String cpf, String nome, String municipio) {
+		incluir(Optional.empty(), cpf, nome, municipio);
+	}
+
+	private void incluir(Optional<String> identificador, String cpf, String nome, String municipio) {
 		try {
-			resultadoInclusao = servico.incluir(criar(Optional.empty(), cpf, nome, municipio));
+			resultadoInclusao = servico.incluir(criar(identificador, cpf, nome, municipio));
 		} catch (RuntimeException excecao) {
 			excecaoCapturada = excecao;
 		}
@@ -255,6 +265,12 @@ public final class ClienteStepDefinitions {
 	@Entao("a inclusão do cliente é rejeitada por falta de autorização")
 	public void a_inclusao_e_rejeitada_por_falta_de_autorizacao() {
 		assertInstanceOf(NaoAutorizadoExcecao.class, excecaoCapturada);
+	}
+
+	@Entao("a inclusão é rejeitada porque o identificador do cliente é gerado na inclusão")
+	public void a_inclusao_e_rejeitada_pelo_identificador_informado() {
+		assertInstanceOf(IllegalArgumentException.class, excecaoCapturada);
+		assertEquals(ClienteServico.IDENTIFICADOR_INFORMADO, excecaoCapturada.getMessage());
 	}
 
 	@Entao("a inclusão é rejeitada porque já existe um cliente com o CPF {string}")

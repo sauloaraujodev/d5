@@ -19,6 +19,7 @@ public final class ClienteServico
 	public static final String IDENTIFICADOR_INEXISTENTE_MODELO = "Não existe cliente com o identificador %s";
 	public static final String IDENTIFICADOR_EXISTENTE_MODELO = "Já existe um cliente com o identificador %s";
 	public static final String CPF_EXISTENTE_MODELO = "Já existe um cliente com o CPF %s";
+	public static final String IDENTIFICADOR_INFORMADO = "O identificador do cliente é gerado na inclusão e não deve ser informado";
 
 	private final IClienteRepositorio repositorio;
 	private final IMunicipioRepositorio municipioRepositorio;
@@ -37,6 +38,13 @@ public final class ClienteServico
 
 		var administrador = getSegurancaServico().possuiAutorizacao(Autorizacao.ADMINISTRADOR.name());
 		return new AgregadoAutorizacoes<>(administrador, true, administrador, administrador);
+	}
+
+	@Override
+	protected void validarInclusao(Cliente agregado) {
+		Objects.requireNonNull(agregado);
+
+		Validate.isTrue(agregado.getIdentificador().isEmpty(), IDENTIFICADOR_INFORMADO);
 	}
 
 	@Override
