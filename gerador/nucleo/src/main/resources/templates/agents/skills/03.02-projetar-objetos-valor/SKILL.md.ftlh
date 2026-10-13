@@ -10,7 +10,7 @@ Quando existe um conceito no domínio que identifica a entidade **E** (por exemp
 
 Para cada entidade **E** que não possui um conceito no domínio que a identifique, existe um objeto de valor artificial chamado **E**Identificador que possui um único atributo do tipo String chamado valor.
 
-Objetos de valor são declarados no módulo do contexto delimitado que corresponde ao subdomínio **S** no qual eles foram identificados ou no módulo compartilhado, caso eles sejam referenciados em mais de um subdomínio.
+Objetos de valor são declarados no módulo do contexto delimitado que corresponde ao subdomínio **S** ao qual eles pertencem, mesmo que sejam referenciados em outros subdomínios. Apenas objetos de valor que não pertencem a nenhum subdomínio específico e são comuns a todos eles são declarados no módulo compartilhado.
 
 Atributos opcionais são declarados `nullable`.
 

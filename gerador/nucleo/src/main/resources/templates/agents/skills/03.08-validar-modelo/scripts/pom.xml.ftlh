@@ -17,11 +17,6 @@
                 <version>3.6.3</version>
                 <configuration>
                     <mainClass>org.contextmapper.cli.ContextMapperCLI</mainClass>
-                    <arguments>
-                        <argument>validate</argument>
-                        <argument>--input</argument>
-                        <argument>docs/projeto.cml</argument>
-                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

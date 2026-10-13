@@ -17,10 +17,9 @@ Domain dominio {
 BoundedContext compartilhado {
     Module compartilhado {
     	Aggregate compartilhado {
-			// artificial
-			ValueObject EntidadeAIdentificador {
-				String valor
-			}
+    		enum Autorizacao {
+    			ADMINISTRADOR, USUARIO
+    		}
     	}
     }
 }
@@ -50,16 +49,21 @@ BoundedContext subdominioA implements subdominioA {
     			DateTime atributoDateTime
     			
 	    		Repository EntidadeARepository {
-	    			void incluir(@EntidadeA agregado);
-	    			boolean existe(@EntidadeAIdentificador identificador);
-					@EntidadeA buscar(@EntidadeAIdentificador identificador);
+	    			@EntidadeA incluir(@EntidadeA agregado);
+	    			boolean existePorIdentificador(@EntidadeAIdentificador identificador);
+	    			@EntidadeA buscarPorIdentificador(@EntidadeAIdentificador identificador);
 	    			void alterar(@EntidadeA agregado);
 	    			void excluir(@EntidadeAIdentificador identificador);
 				}
     		}
-    		    		
+
+    		// artificial
+    		ValueObject EntidadeAIdentificador {
+    			String valor
+    		}
+
     		Service EntidadeAServico {
-    			void incluir(@EntidadeA agregado);
+    			@EntidadeA incluir(@EntidadeA agregado);
     			@EntidadeA buscar(@EntidadeAIdentificador identificador);
     			void alterar(@EntidadeA agregado);
     			void excluir(@EntidadeAIdentificador identificador);
@@ -72,11 +76,13 @@ BoundedContext subdominioA implements subdominioA {
 # docs/subdominioB/projeto.cml
 ```
 import "../compartilhado/projeto.cml"
+import "../subdominioA/projeto.cml"
 
 ContextMap {
-	contains subdominioB, compartilhado
+	contains subdominioB, subdominioA, compartilhado
 
 	subdominioB Downstream-Upstream compartilhado
+	subdominioB Downstream-Upstream subdominioA
 }
 
 BoundedContext subdominioB implements subdominioB {
@@ -92,9 +98,9 @@ BoundedContext subdominioB implements subdominioB {
     			-List<EntidadeAIdentificador> entidadesA
     			
 	    		Repository EntidadeBRepository {
-	    			void incluir(@EntidadeB agregado);
-	    			boolean existe(@EntidadeBCodigo identificador);
-	    			@EntidadeB buscar(@EntidadeBCodigo identificador);
+	    			@EntidadeB incluir(@EntidadeB agregado);
+	    			boolean existePorIdentificador(@EntidadeBCodigo identificador);
+	    			@EntidadeB buscarPorIdentificador(@EntidadeBCodigo identificador);
 	    			void alterar(@EntidadeB agregado);
 	    			void excluir(@EntidadeBCodigo identificador);
 				}
@@ -106,7 +112,7 @@ BoundedContext subdominioB implements subdominioB {
     		}
 
     		Service EntidadeBServico {
-    			void incluir(@EntidadeB agregado);
+    			@EntidadeB incluir(@EntidadeB agregado);
     			@EntidadeB buscar(@EntidadeBCodigo identificador);
     			void alterar(@EntidadeB agregado);
     			void excluir(@EntidadeBCodigo identificador);

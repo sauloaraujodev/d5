@@ -36,18 +36,20 @@
 - version: ${d5Project.version}
 
 ### Módulos
-- dominio-compartilhado (classes referenciadas em mais de um módulo de subdomínio)
+- dominio-compartilhado (conceitos que não pertencem a nenhum subdomínio específico e são comuns a todos eles, por exemplo, os papéis de autorização)
 - dominio-**S** (entidades, objetos de valor, serviços e SPIs de um subdomínio **S**, por exemplo, interfaces de repositórios)
 - aplicacao (serviços de aplicação, projeções de entidades e SPIs da camada de aplicação, por exemplo, interfaces de repositórios de aplicação)
 - infraestrutura (implementações das SPIs)
 - ui-backend (controladores REST do backend para o frontend)
 - ui-frontend (aplicação Angular do frontend)
 
+Um conceito que pertence a um subdomínio fica no módulo dele, mesmo que outros subdomínios o usem. Todo módulo dominio-**S** depende de dominio-compartilhado e pode depender também do módulo de outro subdomínio cujos conceitos ele referencia, desde que as dependências entre módulos de subdomínio não formem um ciclo.
+
 ## Documentação e modelos
 Para cada subdomínio **S**:
 
 - docs/**S**/funcionalidades/*.md (especificações de funcionalidades de **S** no formato Markdown)
-- dominio-**S**/src/test/resources/*.feature (especificações de testes de **S** na linguagem Gherkin)
+- dominio-**S**/src/test/resources/features/*.feature (especificações de testes de **S** na linguagem Gherkin)
 - docs/**S**/projeto.cml (modelo de projeto de software de **S** na linguagem do Context Mapper)
 - docs/**S**/projeto.dbml (modelo de projeto de banco de dados relacional de **S** na linguagem DBML)
 
@@ -67,7 +69,7 @@ A interface do repositório de aplicação de **A** pertence ao pacote ${d5Proje
 
 A implementação dos repositórios de **A** pertence ao pacote ${d5Project.groupId}.${d5Project.name}.infraestrutura.**S**.**A**.
 
-O controlador REST de **A** pertence ao pacote ${d5Project.groupId}.${d5Project.name}.ui.**S**.**A**.
+O controlador REST de **A** pertence ao pacote ${d5Project.groupId}.${d5Project.name}.ui.backend.**S**.**A**.
 
 Todos os pacotes são anotados com @NullMarked.
 
