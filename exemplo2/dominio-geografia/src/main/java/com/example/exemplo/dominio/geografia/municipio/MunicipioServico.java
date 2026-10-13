@@ -40,10 +40,15 @@ public final class MunicipioServico
 	}
 
 	@Override
-	protected void validarInclusaoAlteracao(Municipio agregado) {
+	protected void validarInclusao(Municipio agregado) {
 		Objects.requireNonNull(agregado);
 
 		Validate.isTrue(!agregado.isExtinto(), EXTINCAO_INDEVIDA);
+	}
+
+	@Override
+	protected void validarInclusaoAlteracao(Municipio agregado) {
+		Objects.requireNonNull(agregado);
 
 		validarExistencia(unidadeFederativaRepositorio::existePorIdentificador, agregado.getUnidadeFederativa(),
 				UnidadeFederativaServico.IDENTIFICADOR_INEXISTENTE_MODELO);
@@ -56,6 +61,8 @@ public final class MunicipioServico
 	@Override
 	protected void validarAlteracao(Municipio agregado) {
 		Objects.requireNonNull(agregado);
+
+		Validate.isTrue(!agregado.isExtinto(), EXTINCAO_INDEVIDA);
 
 		var identificador = agregado.getIdentificador().orElseThrow();
 		var municipio = repositorio.buscarPorIdentificador(identificador);

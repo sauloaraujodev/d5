@@ -16,3 +16,5 @@ Construtores e métodos devem validar seus argumentos com [`Objects.requireNonNu
 
 ## Validação de estado
 Métodos devem validar se o estado atual do objeto e da aplicação como um todo permitem sua execução. Em caso negativo, devem lançar [`IllegalStateException`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalStateException.html){target="_blank"}.
+
+Os argumentos são validados antes do estado: um argumento inválido torna a execução impossível em qualquer estado, e validá-lo primeiro faz a exceção lançada apontar o motivo real da rejeição.
