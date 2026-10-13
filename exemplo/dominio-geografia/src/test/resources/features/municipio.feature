@@ -89,6 +89,19 @@ Funcionalidade: Gerenciar municípios
     Quando eu tento alterar o município de código IBGE "3550308" para nome "Cidade de São Paulo"
     Então a alteração é rejeitada porque o município "3550308" está extinto
 
+  Cenário: Não é possível alterar um município extinto, ainda que para o nome de outro município
+    Dado que sou um administrador do cadastro de municípios
+    E que existe um município extinto com código IBGE "3550308", nome "São Paulo"
+    E que existe um município com código IBGE "3548500", nome "Santos"
+    Quando eu tento alterar o município de código IBGE "3550308" para nome "Santos"
+    Então a alteração é rejeitada porque o município "3550308" está extinto
+
+  Cenário: Não é possível alterar um município extinto, ainda que o mantendo extinto
+    Dado que sou um administrador do cadastro de municípios
+    E que existe um município extinto com código IBGE "3550308", nome "São Paulo"
+    Quando eu tento alterar o município de código IBGE "3550308" para extinto com nome "Cidade de São Paulo"
+    Então a alteração é rejeitada porque o município "3550308" está extinto
+
   Cenário: Não é possível extinguir um município por meio da alteração
     Dado que sou um administrador do cadastro de municípios
     E que existe um município com código IBGE "3550308", nome "São Paulo"

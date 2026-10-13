@@ -59,7 +59,7 @@ Como na unidade federativa, o serviço estende [`AgregadoServicoAbstrato`](../re
 - usa `validarExistencia`, com o modelo de mensagem de [`UnidadeFederativaServico`](1-unidade-federativa.md#servico), para exigir que a unidade federativa exista;
 - usa `validarInexistencia` e `existePorNome` para exigir que o nome seja único na unidade federativa.
 
-Em `validarAlteracao`, ponto de extensão exclusivo da alteração, o serviço rejeita a alteração de um município extinto. Por fim, `extinguir` valida a autorização `extinguir` com `validarAutorizacao` e a existência do município com `validarExistencia` — ambos herdados de `AgregadoServicoAbstrato` — e persiste o município devolvido por `Municipio.extinguir`.
+Em `validarAlteracao`, ponto de extensão exclusivo da alteração, o serviço rejeita a alteração de um município extinto. Como `AgregadoServicoAbstrato` chama `validarAlteracao` antes de `validarInclusaoAlteracao`, essa é a mensagem da resposta mesmo que o município recebido também viole outra regra — por exemplo, um nome já usado na unidade federativa. Por fim, `extinguir` valida a autorização `extinguir` com `validarAutorizacao` e a existência do município com `validarExistencia` — ambos herdados de `AgregadoServicoAbstrato` — e persiste o município devolvido por `Municipio.extinguir`.
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/MunicipioServico.java"
 --8<-- "exemplo2/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/MunicipioServico.java"

@@ -41,8 +41,8 @@ public abstract class AgregadoServicoAbstrato<I extends IIdentificador, A extend
 		if (identificador.isPresent()) {
 			validarInexistencia(identificador.get());
 		}
-		validarInclusaoAlteracao(agregado);
 		validarInclusao(agregado);
+		validarInclusaoAlteracao(agregado);
 		return repositorio.incluir(agregado);
 	}
 
@@ -84,8 +84,8 @@ public abstract class AgregadoServicoAbstrato<I extends IIdentificador, A extend
 		var identificador = agregado.getIdentificador().orElseThrow();
 		validarAutorizacao(Optional.of(identificador), IAgregadoAutorizacoes::getAlterar);
 		validarExistencia(identificador);
-		validarInclusaoAlteracao(agregado);
 		validarAlteracao(agregado);
+		validarInclusaoAlteracao(agregado);
 		repositorio.alterar(agregado);
 	}
 
