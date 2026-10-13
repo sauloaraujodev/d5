@@ -29,7 +29,7 @@ As capturas do Swagger UI de cada lição ficam em `assets/tutorial/<lição>` e
 
 Deve explicar apenas o necessário acerca do framework de D5 para que o leitor entenda o código de exemplo completamente.
 
-Conceitos de DDD são ser mencionados com links para eles em `referencia/ddd.md`.
+Conceitos de DDD são mencionados com links para eles em `referencia/ddd.md`.
 
 Convenções são mencionadas com links para elas em `referencia/convencoes.md`.
 
@@ -40,10 +40,10 @@ Interfaces e classes do framework são mencionadas com links para elas em uma da
 Comportamentos automáticos são mencionados com links para eles em `referencia/framework/comportamentos.md`.
 
 ## referencia/ddd.md
-Descrever, sucintamente, os conceitos de DDD utilizados em D5.
+Descreve, sucintamente, os conceitos de DDD utilizados em D5.
 
 ## referencia/convencoes.md
-Detalhar todas as convenções de D5.
+Detalha todas as convenções de D5.
 
 ## referencia/framework/index.md
 Descreve, sucintamente, o projeto pai `d5-pai`, do qual o `pom.xml` raiz de uma aplicação D5 herda, e os módulos do framework de D5, exceto o módulo d5-framework-bdd, que não deve ser utilizado diretamente, por ser um detalhe de implementação.
@@ -54,7 +54,7 @@ Detalha as interfaces e classes do framework do módulo do framework de D5 assoc
 Quando uma interface ou classe realiza um conceito de DDD, a página menciona esse conceito com link para ele em `referencia/ddd.md`.
 
 ## referencia/framework/comportamentos.md
-Detalha os comportamentos automáticos implementado pelo framework.
+Detalha os comportamentos automáticos implementados pelo framework.
 
 ## referencia/programacao.md
 Detalha as práticas de programação defensiva adotadas em D5.

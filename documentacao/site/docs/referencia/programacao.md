@@ -1,6 +1,10 @@
 # Programação defensiva
 No contexto de uma linguagem orientada a objetos, [programação defensiva](https://en.wikipedia.org/wiki/Defensive_programming){target="_blank"} consiste em o código de uma classe não permitir que seus objetos sejam criados ou colocados em um estado inválido. As regras a seguir contribuem para que isso ocorra.
 
+As regras valem para o código principal, e não para o de teste. Um teste precisa, justamente, provocar situações inválidas — passar `null` para verificar que um construtor o rejeita, por exemplo —, e os frameworks de teste exigem atributos mutáveis: as step definitions do Cucumber guardam, entre um passo e outro, o resultado da operação e a exceção capturada, e os testes do JUnit recebem as dependências por `@Autowired` e as preparam em `@BeforeEach`.
+
+As [entidades JPA](convencoes.md#entidades-jpa) são outra exceção às regras de `Optional`, de atributos `final` e de validação de argumentos. O JPA exige atributos não `final` e um construtor sem argumentos, e um atributo opcional da entidade é `null`, anotado com [`@Nullable`](https://jspecify.dev/docs/api/org/jspecify/annotations/Nullable.html){target="_blank"}. Suas restrições são verificadas pelo Bean Validation antes de cada gravação, e não pelo construtor; veja [Validação das entidades JPA](framework/comportamentos.md#validacao-das-entidades-jpa). As regras do domínio continuam garantidas pelo agregado e por seus objetos de valor, a partir dos quais a entidade JPA é criada.
+
 ## Evite `null`
 Todo pacote não vazio deve ser anotado com [`@NullMarked`](https://jspecify.dev/docs/user-guide/#nullmarked){target="_blank"}.
 
