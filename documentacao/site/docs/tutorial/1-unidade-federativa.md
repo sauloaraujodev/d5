@@ -1,6 +1,8 @@
 # Lição 1: unidade federativa
 Nesta lição, você vai criar o projeto e implementar, camada por camada, o agregado unidade federativa do subdomínio Geografia. Ao final, o projeto corresponde ao diretório `exemplo1` do repositório de D5.
 
+Para seguir o tutorial, você precisa do Java 25 e do Maven.
+
 ## Projeto Maven
 Seguindo as [convenções](../referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
 
@@ -80,7 +82,7 @@ exemplo
 ```
 
 ### Arquivos pom.xml
-Crie um `pom.xml` para o projeto raiz e um para cada módulo, seguindo as [convenções](../referencia/convencoes.md#maven). O raiz herda de `d5-pai` e declara os cinco módulos.
+Crie um `pom.xml` para o projeto raiz e um para cada módulo, seguindo as [convenções](../referencia/convencoes.md#maven). O raiz herda de [`d5-pai`](../referencia/framework/index.md#projeto-pai) — que define Java 25 e Spring Boot 4.1 e gerencia as versões dos módulos do framework, declarados, por isso, sem `<version>` — e declara os cinco módulos.
 
 O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no repositório principal, porque a versão atual, `1.0.0-SNAPSHOT`, ainda não é uma versão final. Por isso, o `pom.xml` do projeto raiz declara esse repositório em `<repositories>`; os módulos o herdam.
 

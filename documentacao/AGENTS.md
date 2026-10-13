@@ -46,7 +46,7 @@ Descrever, sucintamente, os conceitos de DDD utilizados em D5.
 Detalhar todas as convenções de D5.
 
 ## referencia/framework/index.md
-Descreve, sucintamente, os módulos do framework de D5, exceto o módulo d5-framework-bdd, que não deve ser utilizado diretamente, por ser um detalhe de implementação.
+Descreve, sucintamente, o projeto pai `d5-pai`, do qual o `pom.xml` raiz de uma aplicação D5 herda, e os módulos do framework de D5, exceto o módulo d5-framework-bdd, que não deve ser utilizado diretamente, por ser um detalhe de implementação.
 
 ## referencia/framework/*.md
 Detalha as interfaces e classes do framework do módulo do framework de D5 associado à página. Todos os parâmetros de tipo, construtores, métodos públicos e protegidos são documentados. Contém links para uso dessas interfaces e classes no tutorial.
