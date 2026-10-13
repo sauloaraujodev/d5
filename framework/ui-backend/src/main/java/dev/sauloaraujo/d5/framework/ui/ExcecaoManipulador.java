@@ -91,9 +91,6 @@ public class ExcecaoManipulador {
 
 	@ExceptionHandler(TypeMismatchException.class)
 	ResponseEntity<Object> tratarParametroInvalido(TypeMismatchException excecao) {
-		if (excecao instanceof ConversionNotSupportedException) {
-			return tratarExcecaoNaoMapeada(excecao);
-		}
 		return tratarConversao(excecao, excecao.getPropertyName(), excecao.getValue());
 	}
 
@@ -169,6 +166,10 @@ public class ExcecaoManipulador {
 
 	private ResponseEntity<Object> tratarConversao(TypeMismatchException excecao, @Nullable String nomeParametro,
 			@Nullable Object valor) {
+		if (excecao instanceof ConversionNotSupportedException) {
+			return tratarExcecaoNaoMapeada(excecao);
+		}
+
 		for (Throwable causa = excecao; causa != null; causa = causa.getCause()) {
 			if (causa instanceof ConversionFailedException conversao
 					&& ObjetoValorStringAbstrato.class.isAssignableFrom(conversao.getTargetType().getType())) {

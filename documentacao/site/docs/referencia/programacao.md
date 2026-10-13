@@ -21,4 +21,4 @@ Construtores e métodos devem validar seus argumentos com [`Objects.requireNonNu
 ## Validação de estado
 Métodos devem validar se o estado atual do objeto e da aplicação como um todo permitem sua execução. Em caso negativo, devem lançar [`IllegalStateException`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalStateException.html){target="_blank"}.
 
-Os argumentos são validados antes do estado: um argumento inválido torna a execução impossível em qualquer estado, e validá-lo primeiro faz a exceção lançada apontar o motivo real da rejeição.
+Os argumentos são validados antes do estado: um argumento inválido torna a execução impossível em qualquer estado, e validá-lo primeiro faz a exceção lançada apontar o motivo real da rejeição. A exceção é a existência do objeto sobre o qual a operação age: se ele não existe, a operação fica sem objeto, e essa ausência é o motivo real da rejeição, ainda que os argumentos também sejam inválidos. Por isso, na alteração de um agregado, [`AgregadoServicoAbstrato`](framework/dominio.md#agregadoservicoabstrato) verifica a existência antes de validar o agregado recebido.

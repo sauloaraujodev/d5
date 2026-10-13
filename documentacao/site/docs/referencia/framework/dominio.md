@@ -35,7 +35,7 @@ Duas instâncias são iguais quando têm a mesma classe concreta (`getClass()`) 
 No tutorial, [`ClienteIdentificador`](../../tutorial/3-cliente.md#identificador), cujo valor é gerado pelo banco de dados e não tem formato definido pelo domínio, herda dessa classe.
 
 ### `ObjetoValorRegexAbstrato`
-Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito por uma expressão regular. Além do valor, o construtor recebe o `formato` (a expressão regular) e a `mensagem` de erro (um modelo com um `%s` para o valor inválido), e valida com `Validate.matchesPattern`, que exige que o valor **inteiro** corresponda à expressão regular — não basta conter um trecho que corresponda. A validação de `null`, herdada de `ObjetoValorStringAbstrato`, ocorre antes da validação do formato.
+Estende `ObjetoValorStringAbstrato` para valores cujo formato pode ser descrito por uma expressão regular. Além do valor, o construtor recebe o `formato` (a expressão regular) e a `mensagem` de erro — formatada com `String.format`, de modo que um `%s` opcional é substituído pelo valor inválido e um `%` literal deve ser escrito `%%` —, e valida com `Validate.matchesPattern`, que exige que o valor **inteiro** corresponda à expressão regular — não basta conter um trecho que corresponda. A validação de `null`, herdada de `ObjetoValorStringAbstrato`, ocorre antes da validação do formato.
 
 ```java title="ObjetoValorRegexAbstrato.java"
 --8<-- "framework/dominio/src/main/java/dev/sauloaraujo/d5/framework/dominio/impl/ObjetoValorRegexAbstrato.java"
