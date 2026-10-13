@@ -80,11 +80,25 @@ class ClienteRepositorioTest {
 	}
 
 	@Test
+	void buscaPorIdentificadorNaoNumericoLancaExcecao() {
+		var excecao = assertThrows(AgregadoInexistenteExcecao.class,
+				() -> repositorio.buscarPorIdentificador(new ClienteIdentificador("abc")));
+
+		assertEquals("Não existe cliente com o identificador abc", excecao.getMessage());
+	}
+
+	@Test
 	void existePorIdentificador() {
 		var cliente = repositorio.incluir(criar(CPF_MARIA, "Maria"));
 
 		assertTrue(repositorio.existePorIdentificador(cliente.getIdentificador().orElseThrow()));
 		assertFalse(repositorio.existePorIdentificador(new ClienteIdentificador("999")));
+	}
+
+	@Test
+	void naoExistePorIdentificadorNaoNumerico() {
+		assertFalse(repositorio.existePorIdentificador(new ClienteIdentificador("abc")));
+		assertFalse(repositorio.existePorIdentificador(new ClienteIdentificador("99999999999999999999")));
 	}
 
 	@Test

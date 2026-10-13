@@ -12,6 +12,7 @@ import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.crm.cliente.spi.IClienteRepositorio;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 
+import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
 
 public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdentificador, Cliente, Long, ClienteJpa>
@@ -51,7 +52,25 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 	protected Long paraIdentificadorJpa(ClienteIdentificador identificador) {
 		Objects.requireNonNull(identificador);
 
-		return Long.valueOf(identificador.toString());
+		return converter(identificador).orElseThrow(() -> {
+			var mensagem = ClienteServico.IDENTIFICADOR_INEXISTENTE_MODELO.formatted(identificador);
+			return new AgregadoInexistenteExcecao(mensagem);
+		});
+	}
+
+	private static Optional<Long> converter(ClienteIdentificador identificador) {
+		try {
+			return Optional.of(Long.valueOf(identificador.toString()));
+		} catch (NumberFormatException excecao) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public boolean existePorIdentificador(ClienteIdentificador identificador) {
+		Objects.requireNonNull(identificador);
+
+		return converter(identificador).isPresent() && super.existePorIdentificador(identificador);
 	}
 
 	@Override

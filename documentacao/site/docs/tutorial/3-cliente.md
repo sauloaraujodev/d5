@@ -254,7 +254,7 @@ O identificador é um `Long` gerado pelo banco de dados — por isso é anotado 
 ```
 
 #### Implementação do repositório
-`paraIdentificadorJpa` converte o identificador do domínio para o `Long` da entidade JPA, e `paraAgregado` faz a conversão inversa — exigindo, com `Objects.requireNonNull`, que a entidade lida do banco de dados tenha identificador. `paraJpa` e `paraAgregado` também convertem o endereço de e para as colunas da entidade JPA.
+`paraIdentificadorJpa` converte o identificador do domínio para o `Long` da entidade JPA, e `paraAgregado` faz a conversão inversa — exigindo, com `Objects.requireNonNull`, que a entidade lida do banco de dados tenha identificador. Como o domínio trata o identificador apenas como texto, ele pode receber um valor que não é um `Long` — `abc`, por exemplo. Nenhum cliente pode ter esse identificador, por isso `paraIdentificadorJpa` lança, nesse caso, [`AgregadoInexistenteExcecao`](../referencia/framework/dominio.md#agregadoinexistenteexcecao) com a mesma mensagem de um identificador inexistente, e `existePorIdentificador` é sobrescrito para devolver `false`. Assim, buscar, alterar ou excluir o cliente `abc` responde 404, como para qualquer outro cliente inexistente, sem expor o tipo usado pela infraestrutura. `paraJpa` e `paraAgregado` também convertem o endereço de e para as colunas da entidade JPA.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorio.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorio.java"
