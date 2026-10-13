@@ -1,7 +1,6 @@
 package dev.sauloaraujo.d5.framework.ui.seguranca;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -37,7 +36,6 @@ public abstract class SegurancaConfiguracaoAbstrata {
 				.authorizeHttpRequests(autorizacao -> {
 					autorizacao.requestMatchers(SWAGGER).permitAll();
 					autorizar(autorizacao);
-					autorizacao.requestMatchers(HttpMethod.POST, SAIR).authenticated();					
 					autorizacao.requestMatchers(BACKEND).denyAll();
 				})
 				.httpBasic(basico -> basico.authenticationEntryPoint(entradaSemDesafio))

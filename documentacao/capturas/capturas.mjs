@@ -104,7 +104,8 @@ async function abrirSwagger() {
 	await cdp('Emulation.setDeviceMetricsOverride', { width: LARGURA, height: ALTURA, deviceScaleFactor: 1, mobile: false });
 	await cdp('Page.navigate', { url: `${BASE}/swagger-ui/index.html` });
 	await aguardar(`window.ui && document.querySelector('.opblock')`);
-	// Obtém o cookie XSRF-TOKEN e recarrega, porque o Swagger UI só lê o cookie ao carregar a página.
+	// Autentica antes das capturas, porque a primeira requisição autenticada renova o token de CSRF e apaga o
+	// cookie XSRF-TOKEN, e recarrega a página para receber o novo cookie.
 	await avaliar(`fetch('/backend/autenticacao', { headers: { Authorization: 'Basic ' + btoa('a:a') } }).then(r => r.status)`);
 	await cdp('Page.reload');
 	await dormir(500);
