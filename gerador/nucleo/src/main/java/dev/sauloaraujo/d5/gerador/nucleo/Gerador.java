@@ -116,12 +116,17 @@ public class Gerador {
 
 	private void copiarD5(Path destino) {
 		try {
-			for (var recurso : new PathMatchingResourcePatternResolver().getResources("classpath*:d5/**")) {
+			var resolvedor = new PathMatchingResourcePatternResolver();
+			var raiz = resolvedor.getResource("classpath:d5/").getURI().getSchemeSpecificPart();
+			for (var recurso : resolvedor.getResources("classpath*:d5/**")) {
 				if (!recurso.isReadable()) {
 					continue;
 				}
-				var caminho = recurso.getURL().toString();
-				var arquivo = destino.resolve(caminho.substring(caminho.lastIndexOf("/d5/") + 4));
+				var caminho = recurso.getURI().getSchemeSpecificPart();
+				if (!caminho.startsWith(raiz)) {
+					throw new IllegalStateException("Recurso " + caminho + " fora de " + raiz);
+				}
+				var arquivo = destino.resolve(caminho.substring(raiz.length()));
 				Files.createDirectories(arquivo.getParent());
 				try (var entrada = recurso.getInputStream()) {
 					Files.copy(entrada, arquivo, StandardCopyOption.REPLACE_EXISTING);
