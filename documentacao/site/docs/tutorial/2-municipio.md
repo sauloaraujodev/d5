@@ -5,6 +5,7 @@ O município segue a mesma estrutura da unidade federativa — objetos de valor,
 
 - o identificador do município contém o identificador da unidade federativa;
 - o município referencia a unidade federativa pelo identificador, e não por um objeto;
+- a entidade JPA do município, por sua vez, referencia a da unidade federativa por uma associação `@ManyToOne`;
 - o serviço valida a existência de outro agregado e oferece uma ação além das quatro operações básicas: extinguir;
 - a projeção traz o nome da unidade federativa, obtido por junção na consulta JPQL;
 - a unidade federativa passa a ser referenciada e, por isso, não pode mais ser excluída enquanto houver municípios nela.
@@ -153,21 +154,21 @@ A persistência de município fica no pacote `com.example.exemplo.infraestrutura
 ```
 
 #### Entidade JPA
-Assim como no agregado, a entidade JPA do município guarda apenas o código da unidade federativa, em uma coluna simples, e não uma associação `@ManyToOne` com `UnidadeFederativaJpa`: as entidades JPA de agregados diferentes permanecem independentes. A coluna da unidade federativa, derivada do identificador, também não pode ser alterada. A coluna `extinto` também é anotada com `@NotNull`: mesmo sendo de um tipo primitivo, que nunca é `null`, o Hibernate só a declara `not null` no banco de dados com essa anotação. A restrição de unicidade sobre a unidade federativa e o nome reforça no banco de dados a unicidade validada pelo serviço, mas, como a do nome da unidade federativa, diferencia maiúsculas de minúsculas.
+Diferente do agregado, que referencia a unidade federativa apenas pelo código, a entidade JPA do município a mapeia por uma associação `@ManyToOne` com `UnidadeFederativaJpa`, cuja coluna, `UFI_ID`, é uma chave estrangeira: o banco de dados rejeita, assim, um município de uma unidade federativa inexistente e a exclusão de uma unidade federativa com municípios, ainda que os serviços já impeçam essas situações. A associação é apenas um detalhe da persistência e é preguiçosa (`FetchType.LAZY`), para que ler um município não carregue a unidade federativa. Como a unidade federativa é derivada do identificador, a coluna também não pode ser alterada. A coluna `extinto` também é anotada com `@NotNull`: mesmo sendo de um tipo primitivo, que nunca é `null`, o Hibernate só a declara `not null` no banco de dados com essa anotação. A restrição de unicidade sobre a unidade federativa e o nome reforça no banco de dados a unicidade validada pelo serviço, mas, como a do nome da unidade federativa, diferencia maiúsculas de minúsculas.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"
 ```
 
 #### Repositório Spring Data
-`existePorNome` restringe a verificação à unidade federativa informada e, como na unidade federativa, compara os nomes em minúsculas. Já a consulta de `pesquisar` obtém o nome da unidade federativa através de uma junção explícita — `join UnidadeFederativaJpa u on u.identificador = m.unidadeFederativa` —, que dispensa uma associação entre as entidades JPA. A junção é interna: um município sempre pertence a uma unidade federativa existente, garantia dada pelo serviço de município na inclusão e pelo de unidade federativa na exclusão.
+`existePorNome` restringe a verificação à unidade federativa informada e, como na unidade federativa, compara os nomes em minúsculas. Como a unidade federativa é uma associação, a verificação compara o seu identificador — `m.unidadeFederativa.identificador`. Já a consulta de `pesquisar` obtém o nome da unidade federativa através de uma junção pela associação — `join m.unidadeFederativa u` —, e o filtro pela unidade federativa compara `u.identificador`. A junção é interna: um município sempre pertence a uma unidade federativa existente, garantia dada pelo serviço de município na inclusão e pelo de unidade federativa na exclusão.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/IMunicipioRepositorioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/IMunicipioRepositorioJpa.java"
 ```
 
 #### Implementação do repositório
-`paraJpa` deriva a coluna da unidade federativa do identificador do município, e `paraAgregado` informa explicitamente o indicador de extinção lido do banco de dados.
+Para preencher a associação, `paraJpa` obtém a unidade federativa, derivada do identificador do município, com `getReferenceById` de `IUnidadeFederativaRepositorioJpa`, recebido no construtor, que devolve uma referência sem consultar o banco de dados. `paraAgregado` não precisa ler a associação, já que a unidade federativa é derivada do identificador, e informa explicitamente o indicador de extinção lido do banco de dados.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioRepositorio.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioRepositorio.java"
@@ -181,7 +182,7 @@ Em `paraPropriedadeOrdenacao`, a ordenação pelo nome da unidade federativa é 
 ```
 
 #### Unidade federativa referenciada
-Implemente `existeReferencia` no repositório de unidade federativa. A consulta verifica se algum município referencia a unidade federativa; caso outros agregados passem a referenciá-la, basta acrescentar suas verificações a essa consulta.
+Implemente `existeReferencia` no repositório de unidade federativa. A consulta verifica se algum município referencia a unidade federativa, comparando `m.unidadeFederativa.identificador`; caso outros agregados passem a referenciá-la, basta acrescentar suas verificações a essa consulta.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
@@ -192,19 +193,19 @@ Implemente `existeReferencia` no repositório de unidade federativa. A consulta 
 ```
 
 #### Testes do repositório
-Escreva os testes do repositório de município, cobrindo, além das operações do repositório, as variações de `existePorNome`: na mesma unidade federativa, em outra unidade federativa, ignorando o identificador do próprio município e ignorando maiúsculas e minúsculas.
+Escreva os testes do repositório de município, cobrindo, além das operações do repositório, as variações de `existePorNome`: na mesma unidade federativa, em outra unidade federativa, ignorando o identificador do próprio município e ignorando maiúsculas e minúsculas. Por causa da chave estrangeira, os testes persistem a unidade federativa antes dos municípios, diretamente através de `IUnidadeFederativaRepositorioJpa`.
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioRepositorioTest.java"
 --8<-- "exemplo2/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioRepositorioTest.java"
 ```
 
-Como a junção da pesquisa é interna, os testes do repositório de aplicação persistem as unidades federativas antes dos municípios, diretamente através de `IUnidadeFederativaRepositorioJpa`. Além dos filtros, eles cobrem a ordenação pelo nome da unidade federativa.
+Pelo mesmo motivo, e porque a junção da pesquisa é interna, os testes do repositório de aplicação também persistem as unidades federativas antes dos municípios. Além dos filtros, eles cobrem a ordenação pelo nome da unidade federativa.
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioAplicacaoRepositorioTest.java"
 --8<-- "exemplo2/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioAplicacaoRepositorioTest.java"
 ```
 
-Acrescente aos testes do repositório de unidade federativa a verificação de `existeReferencia`, persistindo um município diretamente através de `IMunicipioRepositorioJpa`:
+Acrescente aos testes do repositório de unidade federativa a verificação de `existeReferencia`, persistindo um município diretamente através de `IMunicipioRepositorioJpa`, com a unidade federativa obtida por `getReferenceById`:
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorioTest.java"
 --8<-- "exemplo2/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorioTest.java"

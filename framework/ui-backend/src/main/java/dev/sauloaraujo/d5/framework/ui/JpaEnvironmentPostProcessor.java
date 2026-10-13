@@ -10,7 +10,7 @@ import org.springframework.core.env.MapPropertySource;
 public class JpaEnvironmentPostProcessor implements EnvironmentPostProcessor {
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		environment.getPropertySources().addLast(
-				new MapPropertySource("d5-framework-ui-backend", Map.of("spring.jpa.open-in-view", false)));
+		environment.getPropertySources()
+				.addLast(new MapPropertySource("d5-framework-ui-backend", Map.of("spring.jpa.open-in-view", false)));
 	}
 }

@@ -5,14 +5,17 @@ import org.jspecify.annotations.Nullable;
 import com.example.exemplo.dominio.crm.cliente.Cliente;
 import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
-import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.municipio.MunicipioJpa;
 
 import dev.sauloaraujo.d5.framework.infraestrutura.IAgregadoJpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -59,16 +62,16 @@ public class ClienteJpa implements IAgregadoJpa<Cliente> {
 	@Size(max = EnderecoCep.TAMANHO)
 	private String cep;
 
-	@Column(name = "CLI_MUN_ID")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "MUN_ID")
 	@NotNull
-	@Size(max = MunicipioCodigoIbge.TAMANHO)
-	private String municipio;
+	private MunicipioJpa municipio;
 
 	protected ClienteJpa() {
 	}
 
 	public ClienteJpa(@Nullable Long identificador, String cpf, String nome, String logradouro, String numero,
-			@Nullable String complemento, String bairro, String cep, String municipio) {
+			@Nullable String complemento, String bairro, String cep, MunicipioJpa municipio) {
 		this.identificador = identificador;
 		this.cpf = cpf;
 		this.nome = nome;
@@ -112,7 +115,7 @@ public class ClienteJpa implements IAgregadoJpa<Cliente> {
 		return cep;
 	}
 
-	public String getMunicipio() {
+	public MunicipioJpa getMunicipio() {
 		return municipio;
 	}
 }

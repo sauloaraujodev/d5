@@ -39,14 +39,17 @@ class ClienteAplicacaoRepositorioTest {
 
 	@BeforeEach
 	void configurar() {
-		repositorio = new ClienteRepositorio(repositorioJpa);
+		repositorio = new ClienteRepositorio(repositorioJpa, municipioRepositorioJpa);
 		repositorioAplicacao = new ClienteAplicacaoRepositorio(repositorioJpa);
 
 		unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("35", "SP", "São Paulo"));
 		unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("33", "RJ", "Rio de Janeiro"));
-		municipioRepositorioJpa.save(new MunicipioJpa("3550308", "São Paulo", "35", false));
-		municipioRepositorioJpa.save(new MunicipioJpa("3548500", "Santos", "35", false));
-		municipioRepositorioJpa.save(new MunicipioJpa("3304557", "Rio de Janeiro", "33", false));
+		municipioRepositorioJpa.save(new MunicipioJpa("3550308", "São Paulo",
+				unidadeFederativaRepositorioJpa.getReferenceById("35"), false));
+		municipioRepositorioJpa.save(
+				new MunicipioJpa("3548500", "Santos", unidadeFederativaRepositorioJpa.getReferenceById("35"), false));
+		municipioRepositorioJpa.save(new MunicipioJpa("3304557", "Rio de Janeiro",
+				unidadeFederativaRepositorioJpa.getReferenceById("33"), false));
 	}
 
 	private static Cliente criar(String cpf, String nome, String municipio) {

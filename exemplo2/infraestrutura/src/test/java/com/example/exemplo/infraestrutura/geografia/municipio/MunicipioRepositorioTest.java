@@ -15,6 +15,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import com.example.exemplo.dominio.geografia.municipio.Municipio;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.IUnidadeFederativaRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.UnidadeFederativaJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 
@@ -26,11 +28,16 @@ class MunicipioRepositorioTest {
 	@Autowired
 	private IMunicipioRepositorioJpa repositorioJpa;
 
+	@Autowired
+	private IUnidadeFederativaRepositorioJpa unidadeFederativaRepositorioJpa;
+
 	private MunicipioRepositorio repositorio;
 
 	@BeforeEach
 	void configurar() {
-		repositorio = new MunicipioRepositorio(repositorioJpa);
+		repositorio = new MunicipioRepositorio(repositorioJpa, unidadeFederativaRepositorioJpa);
+
+		unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("35", "SP", "São Paulo"));
 	}
 
 	private static Municipio criar(String codigoIbge, String nome) {

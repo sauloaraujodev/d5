@@ -148,7 +148,8 @@ class UnidadeFederativaRepositorioTest {
 	void existeReferenciaPorMunicipio() {
 		repositorio.incluir(criar("35", "SP", "São Paulo"));
 		repositorio.incluir(criar("33", "RJ", "Rio de Janeiro"));
-		municipioRepositorioJpa.save(new MunicipioJpa("3550308", "São Paulo", "35", false));
+		municipioRepositorioJpa
+				.save(new MunicipioJpa("3550308", "São Paulo", repositorioJpa.getReferenceById("35"), false));
 
 		assertTrue(repositorio.existeReferencia(new UnidadeFederativaCodigoIbge("35")));
 		assertFalse(repositorio.existeReferencia(new UnidadeFederativaCodigoIbge("33")));

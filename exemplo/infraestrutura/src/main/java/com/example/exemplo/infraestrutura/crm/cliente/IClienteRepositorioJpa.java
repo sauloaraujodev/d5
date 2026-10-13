@@ -18,13 +18,13 @@ public interface IClienteRepositorioJpa extends JpaRepository<ClienteJpa, Long> 
 	boolean existePorCpf(String cpf, @Nullable Long identificadorIgnorado);
 
 	@Query("""
-			select new com.example.exemplo.aplicacao.crm.cliente.ClienteProjecao(c.identificador, c.nome, c.municipio, m.nome, m.unidadeFederativa, u.nome)
+			select new com.example.exemplo.aplicacao.crm.cliente.ClienteProjecao(c.identificador, c.nome, m.identificador, m.nome, u.identificador, u.nome)
 			  from ClienteJpa c
-			  join MunicipioJpa m on m.identificador = c.municipio
-			  join UnidadeFederativaJpa u on u.identificador = m.unidadeFederativa
+			  join c.municipio m
+			  join m.unidadeFederativa u
 			 where (:nome is null or lower(c.nome) like :nome escape '\\')
-			   and (:municipio is null or c.municipio = :municipio)
-			   and (:unidadeFederativa is null or m.unidadeFederativa = :unidadeFederativa)
+			   and (:municipio is null or m.identificador = :municipio)
+			   and (:unidadeFederativa is null or u.identificador = :unidadeFederativa)
 			""")
 	Page<ClienteProjecao> pesquisar(@Nullable String nome, @Nullable String municipio,
 			@Nullable String unidadeFederativa, Pageable pageable);

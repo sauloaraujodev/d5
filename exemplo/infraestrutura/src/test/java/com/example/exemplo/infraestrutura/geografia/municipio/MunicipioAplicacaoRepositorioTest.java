@@ -34,7 +34,7 @@ class MunicipioAplicacaoRepositorioTest {
 
 	@BeforeEach
 	void configurar() {
-		repositorio = new MunicipioRepositorio(repositorioJpa);
+		repositorio = new MunicipioRepositorio(repositorioJpa, unidadeFederativaRepositorioJpa);
 		repositorioAplicacao = new MunicipioAplicacaoRepositorio(repositorioJpa);
 
 		unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("35", "SP", "São Paulo"));

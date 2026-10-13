@@ -13,7 +13,7 @@ public interface IMunicipioRepositorioJpa extends JpaRepository<MunicipioJpa, St
 			select count(m) > 0
 			  from MunicipioJpa m
 			 where lower(m.nome) = lower(:nome)
-			   and m.unidadeFederativa = :unidadeFederativa
+			   and m.unidadeFederativa.identificador = :unidadeFederativa
 			   and (:identificadorIgnorado is null or m.identificador <> :identificadorIgnorado)
 			""")
 	boolean existePorNome(String nome, String unidadeFederativa, @Nullable String identificadorIgnorado);
@@ -21,16 +21,16 @@ public interface IMunicipioRepositorioJpa extends JpaRepository<MunicipioJpa, St
 	@Query("""
 			select count(c) > 0
 			  from ClienteJpa c
-			 where c.municipio = :identificador
+			 where c.municipio.identificador = :identificador
 			""")
 	boolean existeReferencia(String identificador);
 
 	@Query("""
-			select new com.example.exemplo.aplicacao.geografia.municipio.MunicipioProjecao(m.identificador, m.nome, m.unidadeFederativa, u.nome, m.extinto)
+			select new com.example.exemplo.aplicacao.geografia.municipio.MunicipioProjecao(m.identificador, m.nome, u.identificador, u.nome, m.extinto)
 			  from MunicipioJpa m
-			  join UnidadeFederativaJpa u on u.identificador = m.unidadeFederativa
+			  join m.unidadeFederativa u
 			 where (:nome is null or lower(m.nome) like :nome escape '\\')
-			   and (:unidadeFederativa is null or m.unidadeFederativa = :unidadeFederativa)
+			   and (:unidadeFederativa is null or u.identificador = :unidadeFederativa)
 			""")
 	Page<MunicipioProjecao> pesquisar(@Nullable String nome, @Nullable String unidadeFederativa, Pageable pageable);
 }

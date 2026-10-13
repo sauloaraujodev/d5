@@ -8,6 +8,7 @@ import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioServico;
 import com.example.exemplo.dominio.geografia.municipio.spi.IMunicipioRepositorio;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.IUnidadeFederativaRepositorioJpa;
 
 import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
 
@@ -15,11 +16,14 @@ public class MunicipioRepositorio
 		extends AgregadoRepositorioAbstrato<MunicipioCodigoIbge, Municipio, String, MunicipioJpa>
 		implements IMunicipioRepositorio {
 	private final IMunicipioRepositorioJpa repositorioJpa;
+	private final IUnidadeFederativaRepositorioJpa unidadeFederativaRepositorioJpa;
 
-	public MunicipioRepositorio(IMunicipioRepositorioJpa repositorioJpa) {
+	public MunicipioRepositorio(IMunicipioRepositorioJpa repositorioJpa,
+			IUnidadeFederativaRepositorioJpa unidadeFederativaRepositorioJpa) {
 		super(repositorioJpa, MunicipioServico.IDENTIFICADOR_INEXISTENTE_MODELO);
 
 		this.repositorioJpa = Objects.requireNonNull(repositorioJpa);
+		this.unidadeFederativaRepositorioJpa = Objects.requireNonNull(unidadeFederativaRepositorioJpa);
 	}
 
 	@Override
@@ -27,8 +31,9 @@ public class MunicipioRepositorio
 		Objects.requireNonNull(agregado);
 
 		var identificador = agregado.getIdentificador().orElseThrow().toString();
-		return new MunicipioJpa(identificador, agregado.getNome(), agregado.getUnidadeFederativa().toString(),
-				agregado.isExtinto());
+		var unidadeFederativa = unidadeFederativaRepositorioJpa
+				.getReferenceById(agregado.getUnidadeFederativa().toString());
+		return new MunicipioJpa(identificador, agregado.getNome(), unidadeFederativa, agregado.isExtinto());
 	}
 
 	@Override

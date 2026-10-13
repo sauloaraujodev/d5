@@ -2,19 +2,22 @@ package com.example.exemplo.infraestrutura.geografia.municipio;
 
 import com.example.exemplo.dominio.geografia.municipio.Municipio;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
-import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.UnidadeFederativaJpa;
 
 import dev.sauloaraujo.d5.framework.infraestrutura.IAgregadoJpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "MUN_MUNICIPIO", uniqueConstraints = @UniqueConstraint(columnNames = { "MUN_UFI_ID", "MUN_NM" }))
+@Table(name = "MUN_MUNICIPIO", uniqueConstraints = @UniqueConstraint(columnNames = { "UFI_ID", "MUN_NM" }))
 public class MunicipioJpa implements IAgregadoJpa<Municipio> {
 	@Id
 	@Column(name = "MUN_ID", updatable = false)
@@ -27,10 +30,10 @@ public class MunicipioJpa implements IAgregadoJpa<Municipio> {
 	@Size(max = 100)
 	private String nome;
 
-	@Column(name = "MUN_UFI_ID", updatable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "UFI_ID", updatable = false)
 	@NotNull
-	@Size(max = UnidadeFederativaCodigoIbge.TAMANHO)
-	private String unidadeFederativa;
+	private UnidadeFederativaJpa unidadeFederativa;
 
 	@Column(name = "MUN_EX")
 	@NotNull
@@ -39,7 +42,7 @@ public class MunicipioJpa implements IAgregadoJpa<Municipio> {
 	protected MunicipioJpa() {
 	}
 
-	public MunicipioJpa(String identificador, String nome, String unidadeFederativa, boolean extinto) {
+	public MunicipioJpa(String identificador, String nome, UnidadeFederativaJpa unidadeFederativa, boolean extinto) {
 		this.identificador = identificador;
 		this.nome = nome;
 		this.unidadeFederativa = unidadeFederativa;
@@ -54,7 +57,7 @@ public class MunicipioJpa implements IAgregadoJpa<Municipio> {
 		return nome;
 	}
 
-	public String getUnidadeFederativa() {
+	public UnidadeFederativaJpa getUnidadeFederativa() {
 		return unidadeFederativa;
 	}
 

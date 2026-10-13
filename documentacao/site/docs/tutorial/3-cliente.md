@@ -240,21 +240,21 @@ A persistência de cliente fica no pacote `com.example.exemplo.infraestrutura.cr
 ```
 
 #### Entidade JPA
-O identificador é um `Long` gerado pelo banco de dados — por isso é anotado com `@GeneratedValue` e admite `null` antes da inclusão. Os atributos do endereço são mapeados para colunas da própria tabela de clientes, e o município, como na entidade JPA do município, é guardado apenas pelo seu código. Além da do identificador, a coluna do complemento, opcional, é a única sem `@NotNull`. A coluna do CPF é única, garantindo no banco de dados a mesma unicidade validada pelo serviço.
+O identificador é um `Long` gerado pelo banco de dados — por isso é anotado com `@GeneratedValue` e admite `null` antes da inclusão. Os atributos do endereço são mapeados para colunas da própria tabela de clientes. Já o município, como a unidade federativa na [entidade JPA do município](2-municipio.md#entidade-jpa), é mapeado por uma associação `@ManyToOne` preguiçosa com `MunicipioJpa`, cuja coluna, `MUN_ID`, é uma chave estrangeira — enquanto o endereço continua referenciando o município pelo [código IBGE](2-municipio.md#codigo-ibge). Diferente da do município, porém, essa coluna pode ser alterada, já que o cliente pode mudar de município. Além da do identificador, a coluna do complemento, opcional, é a única sem `@NotNull`. A coluna do CPF é única, garantindo no banco de dados a mesma unicidade validada pelo serviço.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteJpa.java"
 ```
 
 #### Repositório Spring Data
-`existePorCpf` segue o padrão das verificações de unicidade das lições anteriores. A consulta de `pesquisar` faz duas junções explícitas: com o município do endereço e, a partir dele, com a unidade federativa.
+`existePorCpf` segue o padrão das verificações de unicidade das lições anteriores. A consulta de `pesquisar` faz duas junções pelas associações: com o município do endereço — `join c.municipio m` — e, a partir dele, com a unidade federativa — `join m.unidadeFederativa u`. O filtro pelo município compara `m.identificador`, e `existeReferencia`, no repositório de município, `c.municipio.identificador`.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/IClienteRepositorioJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/IClienteRepositorioJpa.java"
 ```
 
 #### Implementação do repositório
-`paraIdentificadorJpa` converte o identificador do domínio para o `Long` da entidade JPA, e `paraAgregado` faz a conversão inversa — exigindo, com `Objects.requireNonNull`, que a entidade lida do banco de dados tenha identificador. Como o domínio trata o identificador apenas como texto, ele pode receber um valor que não é um `Long` — `abc`, por exemplo. Nenhum cliente pode ter esse identificador, por isso `paraIdentificadorJpa` lança, nesse caso, [`AgregadoInexistenteExcecao`](../referencia/framework/dominio.md#agregadoinexistenteexcecao) com a mesma mensagem de um identificador inexistente, e `existePorIdentificador` é sobrescrito para devolver `false`. Assim, buscar, alterar ou excluir o cliente `abc` responde 404, como para qualquer outro cliente inexistente, sem expor o tipo usado pela infraestrutura. `paraJpa` e `paraAgregado` também convertem o endereço de e para as colunas da entidade JPA.
+`paraIdentificadorJpa` converte o identificador do domínio para o `Long` da entidade JPA, e `paraAgregado` faz a conversão inversa — exigindo, com `Objects.requireNonNull`, que a entidade lida do banco de dados tenha identificador. Como o domínio trata o identificador apenas como texto, ele pode receber um valor que não é um `Long` — `abc`, por exemplo. Nenhum cliente pode ter esse identificador, por isso `paraIdentificadorJpa` lança, nesse caso, [`AgregadoInexistenteExcecao`](../referencia/framework/dominio.md#agregadoinexistenteexcecao) com a mesma mensagem de um identificador inexistente, e `existePorIdentificador` é sobrescrito para devolver `false`. Assim, buscar, alterar ou excluir o cliente `abc` responde 404, como para qualquer outro cliente inexistente, sem expor o tipo usado pela infraestrutura. `paraJpa` e `paraAgregado` também convertem o endereço de e para as colunas da entidade JPA. Como no [repositório de município](2-municipio.md#implementacao-do-repositorio), `paraJpa` preenche a associação com `getReferenceById`, aqui de `IMunicipioRepositorioJpa`, recebido no construtor. Já `paraAgregado`, diferente do repositório de município, precisa ler a associação: lê dela apenas o código do município, que a referência preguiçosa fornece sem carregá-lo — inclusive fora de uma transação, como nas requisições `GET`, já que o [open session in view está desativado](../referencia/framework/comportamentos.md#open-session-in-view-desativado).
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorio.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorio.java"
@@ -281,7 +281,7 @@ Implemente `existeReferencia` no repositório de município, com uma consulta qu
 É no módulo de infraestrutura, que conhece as entidades JPA de todos os subdomínios, que a referência do CRM ao subdomínio Geografia é verificada.
 
 #### Testes do repositório
-Escreva os testes do repositório de cliente, cobrindo as operações do repositório — inclusive a geração do identificador na inclusão e um cliente sem complemento — e as variações de `existePorCpf`:
+Escreva os testes do repositório de cliente, cobrindo as operações do repositório — inclusive a geração do identificador na inclusão e um cliente sem complemento — e as variações de `existePorCpf`. Por causa das chaves estrangeiras, os testes persistem a unidade federativa e o município antes dos clientes:
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorioTest.java"
 --8<-- "exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteRepositorioTest.java"

@@ -18,6 +18,10 @@ import com.example.exemplo.dominio.crm.cliente.Cpf;
 import com.example.exemplo.dominio.crm.cliente.Endereco;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.municipio.IMunicipioRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.municipio.MunicipioJpa;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.IUnidadeFederativaRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.UnidadeFederativaJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 
@@ -30,11 +34,20 @@ class ClienteRepositorioTest {
 	@Autowired
 	private IClienteRepositorioJpa repositorioJpa;
 
+	@Autowired
+	private IMunicipioRepositorioJpa municipioRepositorioJpa;
+
+	@Autowired
+	private IUnidadeFederativaRepositorioJpa unidadeFederativaRepositorioJpa;
+
 	private ClienteRepositorio repositorio;
 
 	@BeforeEach
 	void configurar() {
-		repositorio = new ClienteRepositorio(repositorioJpa);
+		repositorio = new ClienteRepositorio(repositorioJpa, municipioRepositorioJpa);
+
+		var saoPaulo = unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("35", "SP", "São Paulo"));
+		municipioRepositorioJpa.save(new MunicipioJpa("3550308", "São Paulo", saoPaulo, false));
 	}
 
 	private static Endereco criarEndereco(Optional<String> complemento) {

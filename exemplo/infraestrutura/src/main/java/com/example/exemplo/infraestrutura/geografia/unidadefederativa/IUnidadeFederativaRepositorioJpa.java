@@ -28,7 +28,7 @@ public interface IUnidadeFederativaRepositorioJpa extends JpaRepository<UnidadeF
 	@Query("""
 			select count(m) > 0
 			  from MunicipioJpa m
-			 where m.unidadeFederativa = :identificador
+			 where m.unidadeFederativa.identificador = :identificador
 			""")
 	boolean existeReferencia(String identificador);
 

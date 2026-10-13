@@ -17,6 +17,8 @@ import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
 import com.example.exemplo.dominio.geografia.unidadefederativa.UnidadeFederativaCodigoIbge;
 import com.example.exemplo.infraestrutura.crm.cliente.ClienteJpa;
 import com.example.exemplo.infraestrutura.crm.cliente.IClienteRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.IUnidadeFederativaRepositorioJpa;
+import com.example.exemplo.infraestrutura.geografia.unidadefederativa.UnidadeFederativaJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 
@@ -29,13 +31,18 @@ class MunicipioRepositorioTest {
 	private IMunicipioRepositorioJpa repositorioJpa;
 
 	@Autowired
+	private IUnidadeFederativaRepositorioJpa unidadeFederativaRepositorioJpa;
+
+	@Autowired
 	private IClienteRepositorioJpa clienteRepositorioJpa;
 
 	private MunicipioRepositorio repositorio;
 
 	@BeforeEach
 	void configurar() {
-		repositorio = new MunicipioRepositorio(repositorioJpa);
+		repositorio = new MunicipioRepositorio(repositorioJpa, unidadeFederativaRepositorioJpa);
+
+		unidadeFederativaRepositorioJpa.save(new UnidadeFederativaJpa("35", "SP", "São Paulo"));
 	}
 
 	private static Municipio criar(String codigoIbge, String nome) {
@@ -127,7 +134,7 @@ class MunicipioRepositorioTest {
 		repositorio.incluir(criar("3550308", "São Paulo"));
 		repositorio.incluir(criar("3548500", "Santos"));
 		clienteRepositorioJpa.save(new ClienteJpa(null, "11111111111", "Maria", "Avenida Paulista", "1000", null,
-				"Bela Vista", "01310100", "3550308"));
+				"Bela Vista", "01310100", repositorioJpa.getReferenceById("3550308")));
 
 		assertTrue(repositorio.existeReferencia(new MunicipioCodigoIbge("3550308")));
 		assertFalse(repositorio.existeReferencia(new MunicipioCodigoIbge("3548500")));

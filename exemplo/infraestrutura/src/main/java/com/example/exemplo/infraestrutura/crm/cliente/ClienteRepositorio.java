@@ -11,6 +11,7 @@ import com.example.exemplo.dominio.crm.cliente.Endereco;
 import com.example.exemplo.dominio.crm.cliente.EnderecoCep;
 import com.example.exemplo.dominio.crm.cliente.spi.IClienteRepositorio;
 import com.example.exemplo.dominio.geografia.municipio.MunicipioCodigoIbge;
+import com.example.exemplo.infraestrutura.geografia.municipio.IMunicipioRepositorioJpa;
 
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
@@ -18,11 +19,13 @@ import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
 public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdentificador, Cliente, Long, ClienteJpa>
 		implements IClienteRepositorio {
 	private final IClienteRepositorioJpa repositorioJpa;
+	private final IMunicipioRepositorioJpa municipioRepositorioJpa;
 
-	public ClienteRepositorio(IClienteRepositorioJpa repositorioJpa) {
+	public ClienteRepositorio(IClienteRepositorioJpa repositorioJpa, IMunicipioRepositorioJpa municipioRepositorioJpa) {
 		super(repositorioJpa, ClienteServico.IDENTIFICADOR_INEXISTENTE_MODELO);
 
 		this.repositorioJpa = Objects.requireNonNull(repositorioJpa);
+		this.municipioRepositorioJpa = Objects.requireNonNull(municipioRepositorioJpa);
 	}
 
 	@Override
@@ -31,9 +34,10 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 
 		var identificador = agregado.getIdentificador().map(this::paraIdentificadorJpa).orElse(null);
 		var endereco = agregado.getEndereco();
+		var municipio = municipioRepositorioJpa.getReferenceById(endereco.getMunicipio().toString());
 		return new ClienteJpa(identificador, agregado.getCpf().toString(), agregado.getNome(), endereco.getLogradouro(),
 				endereco.getNumero(), endereco.getComplemento().orElse(null), endereco.getBairro(),
-				endereco.getCep().toString(), endereco.getMunicipio().toString());
+				endereco.getCep().toString(), municipio);
 	}
 
 	@Override
@@ -43,9 +47,9 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 		var identificador = new ClienteIdentificador(Objects.requireNonNull(agregadoJpa.getIdentificador()).toString());
 		var endereco = new Endereco(agregadoJpa.getLogradouro(), agregadoJpa.getNumero(),
 				Optional.ofNullable(agregadoJpa.getComplemento()), agregadoJpa.getBairro(),
-				new EnderecoCep(agregadoJpa.getCep()), new MunicipioCodigoIbge(agregadoJpa.getMunicipio()));
-		return new Cliente(Optional.of(identificador), new Cpf(agregadoJpa.getCpf()), agregadoJpa.getNome(),
-				endereco);
+				new EnderecoCep(agregadoJpa.getCep()),
+				new MunicipioCodigoIbge(agregadoJpa.getMunicipio().getIdentificador()));
+		return new Cliente(Optional.of(identificador), new Cpf(agregadoJpa.getCpf()), agregadoJpa.getNome(), endereco);
 	}
 
 	@Override
