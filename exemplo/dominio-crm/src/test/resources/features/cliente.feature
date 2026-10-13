@@ -25,6 +25,12 @@ Funcionalidade: Gerenciar clientes
     Quando eu tento incluir o cliente de identificador "999", CPF "11111111111", nome "Maria" e município "3550308"
     Então a inclusão é rejeitada porque o identificador do cliente é gerado na inclusão
 
+  Cenário: Não é possível incluir um cliente com o identificador de outro cliente
+    Dado que sou um administrador do cadastro de clientes
+    E que existe um cliente com identificador "1", CPF "22222222222" e nome "Ana"
+    Quando eu tento incluir o cliente de identificador "1", CPF "11111111111", nome "Maria" e município "3550308"
+    Então a inclusão é rejeitada porque o identificador do cliente é gerado na inclusão
+
   Cenário: Não é possível incluir um cliente com CPF já existente
     Dado que sou um administrador do cadastro de clientes
     E que existe um cliente com identificador "1", CPF "11111111111" e nome "Maria"

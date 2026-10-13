@@ -37,11 +37,11 @@ public abstract class AgregadoServicoAbstrato<I extends IIdentificador, A extend
 	public A incluir(A agregado) {
 		Objects.requireNonNull(agregado);
 		validarAutorizacao(Optional.empty(), IAgregadoAutorizacoes::getIncluir);
+		validarInclusao(agregado);
 		var identificador = agregado.getIdentificador();
 		if (identificador.isPresent()) {
 			validarInexistencia(identificador.get());
 		}
-		validarInclusao(agregado);
 		validarInclusaoAlteracao(agregado);
 		return repositorio.incluir(agregado);
 	}
