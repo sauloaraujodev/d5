@@ -139,7 +139,7 @@ O repositório expõe `existePorCpf`, que, como `existePorSigla` na unidade fede
 ```
 
 #### Serviço
-O serviço recebe, além do repositório de cliente, o [repositório de município](2-municipio.md#repositorio), do subdomínio Geografia. Em `validarInclusaoAlteracao`, ele exige que o CPF seja único, que o município do endereço exista e, [validando o estado](../referencia/programacao.md#validacao-de-estado) da aplicação, que o município não esteja extinto — reutilizando, nas duas últimas regras, os modelos de mensagem de [`MunicipioServico`](2-municipio.md#servico) e de [`Municipio`](2-municipio.md#agregado). Como a regra vale também para a alteração, um cliente de um município extinto só pode ser alterado se o seu endereço passar a apontar para outro município.
+O serviço recebe, além do repositório de cliente, o [repositório de município](2-municipio.md#repositorio), do subdomínio Geografia. Em `validarInclusaoAlteracao`, ele exige que o CPF seja único e, [validando o estado](../referencia/programacao.md#validacao-de-estado) da aplicação, que o município do endereço não esteja extinto, reutilizando o modelo de mensagem de [`Municipio`](2-municipio.md#agregado). Para isso, busca o município com `buscarPorIdentificador`, que já lança [`AgregadoInexistenteExcecao`](../referencia/framework/dominio.md#agregadoinexistenteexcecao) quando ele não existe — dispensando uma verificação de existência à parte. Como a regra vale também para a alteração, um cliente de um município extinto só pode ser alterado se o seu endereço passar a apontar para outro município.
 
 Na inclusão, `AgregadoServicoAbstrato` só verifica a inexistência do identificador quando ele está presente; como o identificador do cliente é gerado pelo banco de dados, essa verificação não ocorre.
 

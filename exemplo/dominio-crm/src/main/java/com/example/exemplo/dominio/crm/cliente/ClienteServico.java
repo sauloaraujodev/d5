@@ -8,7 +8,6 @@ import org.apache.commons.lang3.Validate;
 import com.example.exemplo.dominio.Autorizacao;
 import com.example.exemplo.dominio.crm.cliente.spi.IClienteRepositorio;
 import com.example.exemplo.dominio.geografia.municipio.Municipio;
-import com.example.exemplo.dominio.geografia.municipio.MunicipioServico;
 import com.example.exemplo.dominio.geografia.municipio.spi.IMunicipioRepositorio;
 
 import dev.sauloaraujo.d5.framework.dominio.impl.AgregadoAutorizacoes;
@@ -48,8 +47,6 @@ public final class ClienteServico
 				CPF_EXISTENTE_MODELO);
 
 		var municipio = agregado.getEndereco().getMunicipio();
-		validarExistencia(municipioRepositorio::existePorIdentificador, municipio,
-				MunicipioServico.IDENTIFICADOR_INEXISTENTE_MODELO);
 		Validate.validState(!municipioRepositorio.buscarPorIdentificador(municipio).isExtinto(),
 				Municipio.EXTINTO_MODELO, municipio);
 	}

@@ -46,9 +46,6 @@ public final class ClienteStepDefinitions {
 	private RuntimeException excecaoCapturada;
 
 	public ClienteStepDefinitions() {
-		when(municipioRepositorio.existePorIdentificador(any()))
-				.thenAnswer(chamada -> municipios.containsKey(chamada.getArgument(0).toString()));
-
 		when(municipioRepositorio.buscarPorIdentificador(any())).thenAnswer(chamada -> {
 			MunicipioCodigoIbge codigoIbge = chamada.getArgument(0);
 			var municipio = municipios.get(codigoIbge.toString());
