@@ -5,6 +5,7 @@ O framework aplica, de forma transparente, alguns comportamentos que independem 
 - [serialização de objetos de valor](#serializacao-de-objetos-de-valor);
 - [gerenciamento de transações](#gerenciamento-de-transacoes);
 - [validação das entidades JPA](#validacao-das-entidades-jpa);
+- [open session in view desativado](#open-session-in-view-desativado);
 - [CSRF no Swagger UI](#csrf-no-swagger-ui);
 - [expansão da consulta no Swagger UI](#expansao-da-consulta-no-swagger-ui);
 - [objetos de valor no Swagger UI](#objetos-de-valor-no-swagger-ui).
@@ -58,6 +59,8 @@ A transação não impede, por si só, que duas requisições concorrentes passe
 
 A configuração abaixo registra esse `TransactionAttributeSource` e o conecta a um `TransactionInterceptor`, aplicado a todo bean do contexto através de um `BeanFactoryTransactionAttributeSourceAdvisor` — dispensando a anotação `@EnableTransactionManagement` e qualquer `@Transactional` explícito.
 
+Como o `DefaultAdvisorAutoProxyCreator` é um `BeanPostProcessor`, ele e os beans de que depende são criados antes dos demais, quando nem todos os `BeanPostProcessor` estão registrados. Por isso, como na configuração de transações do próprio Spring, os métodos `@Bean` são estáticos e os beans são marcados com `@Role(BeanDefinition.ROLE_INFRASTRUCTURE)`, e o `TransactionInterceptor` não recebe o gerenciador de transações: ele o obtém do contexto apenas na primeira chamada transacional. Assim, o gerenciador de transações e o `EntityManagerFactory` não são criados antecipadamente, e o Spring não registra avisos de beans que deixaram de ser processados por todos os `BeanPostProcessor`.
+
 ```java title="TransacaoConfiguracao.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/transacao/TransacaoConfiguracao.java"
 ```
@@ -75,6 +78,15 @@ O Hibernate Validator escolhe o idioma das mensagens pela localidade padrão da 
 Essas anotações expressam apenas as restrições da persistência — como o tamanho de uma coluna —, e não as regras do domínio, que o agregado e seus objetos de valor já garantem; veja [Entidades JPA](../convencoes.md#entidades-jpa).
 
 No tutorial, [`UnidadeFederativaJpa`](../../tutorial/1-unidade-federativa.md#entidade-jpa) declara dessa forma as restrições de suas colunas.
+
+## Open session in view desativado
+O Spring Boot ativa por padrão o *open session in view*: um `EntityManager` permanece aberto durante toda a requisição HTTP, permitindo que associações preguiçosas sejam carregadas depois do serviço, inclusive durante a serialização da resposta — e registra um aviso ao iniciar a aplicação quando a propriedade `spring.jpa.open-in-view` não é definida. Uma aplicação D5 não precisa desse padrão: as escritas ocorrem em uma transação que termina com o método do controlador, e as pesquisas devolvem [projeções](aplicacao.md#iprojecao), e não entidades JPA — que, além disso, não têm associações entre si.
+
+Por isso, o módulo `d5-framework-ui-backend` define `false` como valor padrão dessa propriedade através de `JpaEnvironmentPostProcessor`, registrado em `META-INF/spring.factories` pelo mesmo motivo que [`SpringDocEnvironmentPostProcessor`](springdoc.md#springdocenvironmentpostprocessor). Como a propriedade é acrescentada com a menor precedência, qualquer outra fonte de configuração a redefine — por exemplo, `spring.jpa.open-in-view=true` no `application.properties` da aplicação.
+
+```java title="JpaEnvironmentPostProcessor.java"
+--8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/JpaEnvironmentPostProcessor.java"
+```
 
 ## CSRF no Swagger UI
 Toda operação de escrita exposta pelo backend exige um token de CSRF, enviado pelo cliente através do cabeçalho `X-XSRF-TOKEN` — mas o Swagger UI só anexa esse cabeçalho automaticamente às requisições quando a propriedade `springdoc.swagger-ui.csrf.enabled` está `true`. O módulo `d5-framework-springdoc` define esse valor como padrão através de um `EnvironmentPostProcessor`, dispensando essa configuração em quem depende dele.

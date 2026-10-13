@@ -7,7 +7,8 @@ Possui as classes que expõem um [agregado](../ddd.md#agregado) como uma API RES
 - [tratamento de erros](#tratamento-de-erros);
 - [segurança](#seguranca);
 - [conversão](#conversao);
-- [transações](#transacoes).
+- [transações](#transacoes);
+- [open session in view](#open-session-in-view).
 
 ## `Backend`
 Declara `PREFIXO`, o prefixo `backend/` usado no `@RequestMapping` de todo controlador do backend.
@@ -209,3 +210,8 @@ Fazem todo [objeto de valor](dominio.md#objetovalorstringabstrato) que estende `
 
 ### `TransacaoConfiguracao` e `PostMappingTransactionAttributeSource`
 Envolvem em uma transação todo método de controlador mapeado para `POST`, sem `@Transactional` nem `@EnableTransactionManagement`. Veja [Gerenciamento de transações](comportamentos.md#gerenciamento-de-transacoes).
+
+## Open session in view
+
+### `JpaEnvironmentPostProcessor`
+Define `false` como valor padrão da propriedade `spring.jpa.open-in-view`, desativando o padrão *open session in view*. Veja [Open session in view desativado](comportamentos.md#open-session-in-view-desativado).
