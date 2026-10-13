@@ -202,9 +202,24 @@ public final class ClienteStepDefinitions {
 		alterar(identificador, cpf, nome);
 	}
 
+	@Quando("eu altero o cliente de identificador {string} para CPF {string}, nome {string} e município {string}")
+	public void eu_altero_o_cliente_e_o_municipio(String identificador, String cpf, String nome, String municipio) {
+		alterar(identificador, cpf, nome, municipio);
+	}
+
+	@Quando("eu tento alterar o cliente de identificador {string} para CPF {string}, nome {string} e município {string}")
+	public void eu_tento_alterar_o_cliente_e_o_municipio(String identificador, String cpf, String nome,
+			String municipio) {
+		alterar(identificador, cpf, nome, municipio);
+	}
+
 	private void alterar(String identificador, String cpf, String nome) {
+		alterar(identificador, cpf, nome, MUNICIPIO_PADRAO);
+	}
+
+	private void alterar(String identificador, String cpf, String nome, String municipio) {
 		try {
-			servico.alterar(criar(Optional.of(identificador), cpf, nome, MUNICIPIO_PADRAO));
+			servico.alterar(criar(Optional.of(identificador), cpf, nome, municipio));
 		} catch (RuntimeException excecao) {
 			excecaoCapturada = excecao;
 		}
@@ -252,9 +267,7 @@ public final class ClienteStepDefinitions {
 
 	@Entao("a inclusão é rejeitada porque não existe município com o identificador {string}")
 	public void a_inclusao_e_rejeitada_por_municipio_inexistente(String codigoIbge) {
-		assertInstanceOf(AgregadoInexistenteExcecao.class, excecaoCapturada);
-		assertEquals(String.format(MunicipioServico.IDENTIFICADOR_INEXISTENTE_MODELO, codigoIbge),
-				excecaoCapturada.getMessage());
+		assertMensagemDeMunicipioInexistente(codigoIbge);
 	}
 
 	@Entao("a inclusão é rejeitada porque o município {string} está extinto")
@@ -286,6 +299,13 @@ public final class ClienteStepDefinitions {
 		assertEquals(nome, cliente.getNome());
 	}
 
+	@Entao("o cliente de identificador {string} passa a ter o município {string}")
+	public void o_cliente_passa_a_ter_o_municipio(String identificador, String municipio) {
+		var cliente = clientes.get(identificador);
+		assertNotNull(cliente);
+		assertEquals(new MunicipioCodigoIbge(municipio), cliente.getEndereco().getMunicipio());
+	}
+
 	@Entao("a alteração do cliente é rejeitada por falta de autorização")
 	public void a_alteracao_e_rejeitada_por_falta_de_autorizacao() {
 		assertInstanceOf(NaoAutorizadoExcecao.class, excecaoCapturada);
@@ -299,6 +319,11 @@ public final class ClienteStepDefinitions {
 	@Entao("a alteração é rejeitada porque já existe um cliente com o CPF {string}")
 	public void a_alteracao_e_rejeitada_pelo_cpf(String cpf) {
 		assertMensagemDeCpfExistente(cpf);
+	}
+
+	@Entao("a alteração é rejeitada porque não existe município com o identificador {string}")
+	public void a_alteracao_e_rejeitada_por_municipio_inexistente(String codigoIbge) {
+		assertMensagemDeMunicipioInexistente(codigoIbge);
 	}
 
 	@Entao("a alteração é rejeitada porque o município {string} está extinto")
@@ -334,6 +359,12 @@ public final class ClienteStepDefinitions {
 	private void assertMensagemDeInexistencia(String identificador) {
 		assertInstanceOf(AgregadoInexistenteExcecao.class, excecaoCapturada);
 		assertEquals(String.format(ClienteServico.IDENTIFICADOR_INEXISTENTE_MODELO, identificador),
+				excecaoCapturada.getMessage());
+	}
+
+	private void assertMensagemDeMunicipioInexistente(String codigoIbge) {
+		assertInstanceOf(AgregadoInexistenteExcecao.class, excecaoCapturada);
+		assertEquals(String.format(MunicipioServico.IDENTIFICADOR_INEXISTENTE_MODELO, codigoIbge),
 				excecaoCapturada.getMessage());
 	}
 

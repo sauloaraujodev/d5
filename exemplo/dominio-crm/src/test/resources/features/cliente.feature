@@ -80,6 +80,21 @@ Funcionalidade: Gerenciar clientes
     Quando eu tento alterar o cliente de identificador "1" para CPF "11111111111" e nome "Maria Silva"
     Então a alteração é rejeitada porque o município "3550308" está extinto
 
+  Cenário: Alterar um cliente de um município extinto para outro município
+    Dado que sou um administrador do cadastro de clientes
+    E que existe um cliente com identificador "1", CPF "11111111111" e nome "Maria"
+    E que o município de código IBGE "3550308" foi extinto
+    E que existe o município de código IBGE "3509502"
+    Quando eu altero o cliente de identificador "1" para CPF "11111111111", nome "Maria" e município "3509502"
+    Então o cliente é alterado com sucesso
+    E o cliente de identificador "1" passa a ter o município "3509502"
+
+  Cenário: Não é possível alterar um cliente para um município inexistente
+    Dado que sou um administrador do cadastro de clientes
+    E que existe um cliente com identificador "1", CPF "11111111111" e nome "Maria"
+    Quando eu tento alterar o cliente de identificador "1" para CPF "11111111111", nome "Maria" e município "3304557"
+    Então a alteração é rejeitada porque não existe município com o identificador "3304557"
+
   Cenário: Excluir um cliente
     Dado que sou um administrador do cadastro de clientes
     E que existe um cliente com identificador "1", CPF "11111111111" e nome "Maria"
