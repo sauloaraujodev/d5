@@ -75,8 +75,8 @@ public final class ClienteStepDefinitions {
 		when(repositorio.existePorCpf(any(), any())).thenAnswer(chamada -> {
 			ClienteCpf cpf = chamada.getArgument(0);
 			Optional<ClienteIdentificador> identificadorIgnorado = chamada.getArgument(1);
-			return clientes.values().stream()
-					.anyMatch(candidato -> candidato.getCpf().equals(cpf) && !foiIgnorado(candidato, identificadorIgnorado));
+			return clientes.values().stream().anyMatch(
+					candidato -> candidato.getCpf().equals(cpf) && !foiIgnorado(candidato, identificadorIgnorado));
 		});
 
 		when(repositorio.incluir(any())).thenAnswer(chamada -> {
@@ -116,8 +116,7 @@ public final class ClienteStepDefinitions {
 	}
 
 	private void adicionarMunicipio(String codigoIbge, boolean extinto) {
-		var municipio = new Municipio(new MunicipioCodigoIbge(codigoIbge), "Município " + codigoIbge,
-				Optional.empty());
+		var municipio = new Municipio(new MunicipioCodigoIbge(codigoIbge), "Município " + codigoIbge, Optional.empty());
 		municipios.put(codigoIbge, extinto ? municipio.extinguir() : municipio);
 	}
 

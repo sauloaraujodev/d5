@@ -51,8 +51,8 @@ class MunicipioAplicacaoRepositorioTest {
 
 	private static MunicipioConsulta consultar(MunicipioOrdenacao ordenacao, Optional<String> nome,
 			Optional<String> unidadeFederativa) {
-		return new MunicipioConsulta(Optional.of(ordenacao), Optional.empty(), Optional.empty(), Optional.empty(),
-				nome, unidadeFederativa);
+		return new MunicipioConsulta(Optional.of(ordenacao), Optional.empty(), Optional.empty(), Optional.empty(), nome,
+				unidadeFederativa);
 	}
 
 	@Test
@@ -79,8 +79,8 @@ class MunicipioAplicacaoRepositorioTest {
 		repositorio.incluir(criar("3509502", "Campinas"));
 		repositorio.incluir(criar("3303302", "Niterói"));
 
-		var resultado = repositorioAplicacao.pesquisar(
-				consultar(MunicipioOrdenacao.UNIDADE_FEDERATIVA_NOME, Optional.empty(), Optional.empty()));
+		var resultado = repositorioAplicacao
+				.pesquisar(consultar(MunicipioOrdenacao.UNIDADE_FEDERATIVA_NOME, Optional.empty(), Optional.empty()));
 
 		assertEquals("Niterói", resultado.getProjecoes().get(0).getNome());
 		assertEquals("Campinas", resultado.getProjecoes().get(1).getNome());

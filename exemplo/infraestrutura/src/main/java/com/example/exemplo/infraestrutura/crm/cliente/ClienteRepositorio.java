@@ -30,9 +30,9 @@ public class ClienteRepositorio extends AgregadoRepositorioAbstrato<ClienteIdent
 
 		var identificador = agregado.getIdentificador().map(this::paraIdentificadorJpa).orElse(null);
 		var endereco = agregado.getEndereco();
-		return new ClienteJpa(identificador, agregado.getCpf().toString(), agregado.getNome(),
-				endereco.getLogradouro(), endereco.getNumero(), endereco.getComplemento().orElse(null),
-				endereco.getBairro(), endereco.getCep().toString(), endereco.getMunicipio().toString());
+		return new ClienteJpa(identificador, agregado.getCpf().toString(), agregado.getNome(), endereco.getLogradouro(),
+				endereco.getNumero(), endereco.getComplemento().orElse(null), endereco.getBairro(),
+				endereco.getCep().toString(), endereco.getMunicipio().toString());
 	}
 
 	@Override

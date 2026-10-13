@@ -24,8 +24,8 @@ public final class MunicipioProjecao implements IProjecao<Municipio> {
 		this.extinto = extinto;
 	}
 
-	public MunicipioProjecao(String identificador, String nome, String unidadeFederativa,
-			String unidadeFederativaNome, boolean extinto) {
+	public MunicipioProjecao(String identificador, String nome, String unidadeFederativa, String unidadeFederativaNome,
+			boolean extinto) {
 		this(new MunicipioCodigoIbge(identificador), nome, new UnidadeFederativaCodigoIbge(unidadeFederativa),
 				unidadeFederativaNome, extinto);
 	}

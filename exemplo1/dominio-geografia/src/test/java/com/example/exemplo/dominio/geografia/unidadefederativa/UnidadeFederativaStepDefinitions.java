@@ -60,8 +60,9 @@ public final class UnidadeFederativaStepDefinitions {
 		when(repositorio.existePorNome(any(), any())).thenAnswer(chamada -> {
 			String nome = chamada.getArgument(0);
 			Optional<UnidadeFederativaCodigoIbge> identificadorIgnorado = chamada.getArgument(1);
-			return unidadesFederativas.values().stream().anyMatch(
-					candidata -> candidata.getNome().equalsIgnoreCase(nome) && !foiIgnorada(candidata, identificadorIgnorado));
+			return unidadesFederativas.values().stream()
+					.anyMatch(candidata -> candidata.getNome().equalsIgnoreCase(nome)
+							&& !foiIgnorada(candidata, identificadorIgnorado));
 		});
 
 		when(repositorio.incluir(any())).thenAnswer(chamada -> {
