@@ -154,7 +154,7 @@ graph TD
     ```
 
 ## Unidade federativa
-Uma unidade federativa é identificada por um código IBGE. Além disso, possui sigla e nome únicos. A sigla e o código IBGE são [objetos de valor](../referencia/framework/dominio.md#iobjetovalor) associados ao [agregado](../referencia/framework/dominio.md#iagregado) unidade federativa. Seguindo as [convenções](../referencia/convencoes.md#pacotes), o pacote dos três é `com.example.exemplo.dominio.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+Uma unidade federativa é identificada por um código IBGE. Além disso, possui sigla e nome únicos. A sigla e o código IBGE são [objetos de valor](../referencia/ddd.md#objeto-de-valor) associados ao [agregado](../referencia/ddd.md#agregado) unidade federativa. Seguindo as [convenções](../referencia/convencoes.md#pacotes), o pacote dos três é `com.example.exemplo.dominio.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/package-info.java"
 --8<-- "exemplo1/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/package-info.java"
@@ -163,7 +163,7 @@ Uma unidade federativa é identificada por um código IBGE. Além disso, possui 
 ### Domínio
 
 #### Sigla
-A sigla é formada por duas letras maiúsculas e é única para cada unidade federativa. Portanto, seu formato pode ser definido através de uma expressão regular. Objetos de valor desse tipo herdam de [`ObjetoValorRegexAbstrato`](../referencia/framework/dominio.md#objetovalorregexabstrato).
+A sigla é formada por duas letras maiúsculas. Portanto, seu formato pode ser definido através de uma expressão regular. Objetos de valor desse tipo herdam de [`ObjetoValorRegexAbstrato`](../referencia/framework/dominio.md#objetovalorregexabstrato).
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaSigla.java"
 --8<-- "exemplo1/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaSigla.java"
@@ -177,7 +177,7 @@ O código IBGE é formado por dois dígitos e, portanto, também herda de [`Obje
 ```
 
 #### Agregado
-Unidade federativa, código IBGE e sigla formam um [agregado](../referencia/framework/dominio.md#iagregado), com `UnidadeFederativa` como raiz — por isso ela implementa `IAgregado`.
+Unidade federativa, código IBGE e sigla formam um [agregado](../referencia/framework/dominio.md#iagregado), com `UnidadeFederativa` como raiz — por isso ela implementa `IAgregado`, parametrizada pelo tipo do identificador. Seu construtor [valida os argumentos](../referencia/programacao.md#validacao-de-argumentos), rejeitando um nome em branco.
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativa.java"
 --8<-- "exemplo1/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativa.java"
@@ -295,7 +295,7 @@ O primeiro passo é a entidade JPA, que mapeia o agregado para a tabela `UFI_UNI
 ```
 
 #### Repositório Spring Data
-Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. `existePorNome` compara os nomes em minúsculas, de modo que "São Paulo" e "SÃO PAULO" sejam considerados o mesmo nome. Por fim, declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pela sigla e pelo nome apenas quando o parâmetro correspondente não é nulo. Os filtros são case insensitive porque comparam a sigla e o nome em minúsculas com o padrão produzido por `paraLike`, já em minúsculas, declarando `\` como caractere de escape.
+Em seguida, crie a interface [Spring Data JPA](https://spring.io/projects/spring-data-jpa){target="_blank"} que dá acesso à entidade. Além de estender `JpaRepository`, ela declara `existePorSigla` e `existePorNome` com consultas JPQL escritas explicitamente, já que essas verificações — que ignoram opcionalmente o identificador da própria unidade federativa — não são derivadas automaticamente do nome do método. `existePorNome` compara os nomes em minúsculas, de modo que "São Paulo" e "SÃO PAULO" sejam considerados o mesmo nome. Por fim, declara `pesquisar`, cuja consulta JPQL instancia a [`UnidadeFederativaProjecao`](#projecao) diretamente através de uma expressão `select new`, filtrando pela sigla e pelo nome apenas quando o parâmetro correspondente não é nulo. Os filtros ignoram maiúsculas e minúsculas porque comparam a sigla e o nome em minúsculas com o padrão produzido por `paraLike`, já em minúsculas, declarando `\` como caractere de escape.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
 --8<-- "exemplo1/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/IUnidadeFederativaRepositorioJpa.java"
@@ -378,7 +378,16 @@ Por fim, crie a classe com o `main` que sobe a aplicação, anotada com `@Spring
 ```
 
 #### Testando com o Swagger UI
-Suba `BackendAplicacao` — pela IDE ou executando `mvn spring-boot:run` no módulo `exemplo/ui-backend` — e acesse `http://localhost:8080/swagger-ui/index.html`. Como `d5-framework-springdoc` está no classpath, o Swagger UI é gerado automaticamente a partir dos controladores do backend, listados sob a tag `unidade-federativa-controlador`:
+Suba `BackendAplicacao` pela IDE ou, no diretório `exemplo`, executando:
+
+```bash
+mvn install
+mvn -f ui-backend spring-boot:run
+```
+
+O `mvn install` é necessário porque `spring-boot:run`, executado apenas no módulo `ui-backend`, resolve os demais módulos do projeto a partir do repositório Maven local. A aplicação usa um banco H2 em memória, trazido por `d5-framework-infraestrutura`, cujas tabelas são criadas a partir das entidades JPA a cada inicialização — portanto, os dados incluídos se perdem quando a aplicação é encerrada.
+
+Acesse `http://localhost:8080/swagger-ui/index.html`. Como `d5-framework-springdoc` está no classpath, o Swagger UI é gerado automaticamente a partir dos controladores do backend, listados sob a tag `unidade-federativa-controlador`:
 
 ![Visão geral do Swagger UI, listando as operações de UnidadeFederativaControlador](../assets/tutorial/1-unidade-federativa/01-visao-geral.png)
 

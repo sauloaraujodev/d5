@@ -111,7 +111,7 @@ As classes de aplicação do município ficam no pacote `com.example.exemplo.apl
 ```
 
 #### Projeção
-Uma lista de municípios costuma exibir o nome da unidade federativa de cada um, e não apenas seu código. Por isso, a projeção traz, além do código da unidade federativa, seu nome — que não pertence ao agregado município, mas é obtido pela consulta que instancia a projeção.
+Uma lista de municípios costuma exibir o nome da unidade federativa de cada um, e não apenas seu código. Por isso, a projeção traz, além do identificador, do nome, do indicador de extinção e do código da unidade federativa, o nome da unidade federativa — que não pertence ao agregado município, mas é obtido pela consulta que instancia a projeção.
 
 ```java title="exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/municipio/MunicipioProjecao.java"
 --8<-- "exemplo2/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/municipio/MunicipioProjecao.java"
@@ -161,7 +161,7 @@ Assim como no agregado, a entidade JPA do município guarda apenas o código da 
 ```
 
 #### Repositório Spring Data
-`existePorNome` restringe a verificação à unidade federativa informada. Já a consulta de `pesquisar` obtém o nome da unidade federativa através de uma junção explícita — `join UnidadeFederativaJpa u on u.identificador = m.unidadeFederativa` —, que dispensa uma associação entre as entidades JPA. A junção é interna: um município sempre pertence a uma unidade federativa existente, garantia dada pelo serviço de município na inclusão e pelo de unidade federativa na exclusão.
+`existePorNome` restringe a verificação à unidade federativa informada e, como na unidade federativa, compara os nomes em minúsculas. Já a consulta de `pesquisar` obtém o nome da unidade federativa através de uma junção explícita — `join UnidadeFederativaJpa u on u.identificador = m.unidadeFederativa` —, que dispensa uma associação entre as entidades JPA. A junção é interna: um município sempre pertence a uma unidade federativa existente, garantia dada pelo serviço de município na inclusão e pelo de unidade federativa na exclusão.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/IMunicipioRepositorioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/IMunicipioRepositorioJpa.java"

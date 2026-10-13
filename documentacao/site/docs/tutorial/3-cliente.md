@@ -112,7 +112,7 @@ O CPF e o CEP são formados por onze e oito dígitos, respectivamente, e, como a
 ```
 
 #### Endereço
-O endereço é um [objeto de valor](../referencia/ddd.md#objeto-de-valor) formado por vários atributos — logradouro, número, complemento opcional, bairro, CEP e município —, por isso implementa [`IObjetoValor`](../referencia/framework/dominio.md#iobjetovalor) diretamente e redefine `equals` e `hashCode` a partir de todos eles. Como o município referencia a unidade federativa, o endereço referencia o município apenas pelo seu [código IBGE](2-municipio.md#codigo-ibge).
+O endereço é um [objeto de valor](../referencia/ddd.md#objeto-de-valor) formado por vários atributos — logradouro, número, complemento opcional, bairro, CEP e município —, por isso implementa [`IObjetoValor`](../referencia/framework/dominio.md#iobjetovalor) diretamente e redefine `equals` e `hashCode` a partir de todos eles. Assim como o município referencia a unidade federativa apenas pelo identificador, o endereço referencia o município apenas pelo seu [código IBGE](2-municipio.md#codigo-ibge).
 
 ```java title="exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/Endereco.java"
 --8<-- "exemplo/dominio-crm/src/main/java/com/example/exemplo/dominio/crm/cliente/Endereco.java"
