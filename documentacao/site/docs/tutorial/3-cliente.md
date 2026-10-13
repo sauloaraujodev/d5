@@ -39,6 +39,8 @@ O cliente referencia o município e, para validar essa referência, seu serviço
 --8<-- "exemplo/dominio-crm/pom.xml"
 ```
 
+Um módulo de subdomínio pode depender de outro, desde que as dependências entre eles não formem um ciclo — por isso Geografia nunca dependerá do CRM. Já o código IBGE do município não vai para o domínio compartilhado, ainda que passe a ser usado pelos dois subdomínios: ele pertence a Geografia, e o compartilhado só contém conceitos sem um subdomínio dono; veja [Dependências entre módulos de domínio](../referencia/convencoes.md#dependencias-entre-modulos-de-dominio).
+
 O módulo de aplicação, que vai conter o serviço de aplicação do cliente, passa a depender também de `exemplo-dominio-crm`:
 
 ```xml title="exemplo/aplicacao/pom.xml"

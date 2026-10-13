@@ -12,6 +12,11 @@ Nas convenções a seguir, `${aplicacao}` é o nome da aplicação e `${subdomin
 | UI — backend | `${aplicacao}-ui-backend` | `${aplicacao}/ui-backend` |
 | UI — frontend | `${aplicacao}-ui-frontend` | `${aplicacao}/ui-frontend` |
 
+### Dependências entre módulos de domínio
+O domínio compartilhado contém apenas os conceitos que não pertencem a nenhum subdomínio específico e são comuns a todos eles — como os papéis de autorização. Ser usado por mais de um subdomínio não basta: um conceito que pertence a um subdomínio fica no módulo dele, mesmo que outros subdomínios o usem.
+
+Todo módulo de subdomínio depende do domínio compartilhado. Um módulo de subdomínio pode depender também de outro, quando seus conceitos referenciam os do outro, desde que as dependências entre os módulos de subdomínio não formem um ciclo.
+
 ## Pacotes
 Nesta seção, `${groupId}` é o `groupId` do projeto raiz e de seus módulos. Já `${agregado}` é o nome de um agregado.
 

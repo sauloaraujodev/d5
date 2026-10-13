@@ -6,7 +6,7 @@ Para seguir o tutorial, você precisa do Java 25 e do Maven.
 ## Projeto Maven
 Seguindo as [convenções](../referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
 
-- **`exemplo-dominio-compartilhado`**, do qual os módulos correspondentes a subdomínios dependem e que vai conter as classes utilizadas em mais de um deles;
+- **`exemplo-dominio-compartilhado`**, do qual os módulos correspondentes a subdomínios dependem e que vai conter os conceitos que não pertencem a nenhum subdomínio específico e são comuns a todos eles, como os papéis de autorização; veja [Dependências entre módulos de domínio](../referencia/convencoes.md#dependencias-entre-modulos-de-dominio);
 - **`exemplo-dominio-geografia`**, correspondente ao subdomínio Geografia;
 - **`exemplo-aplicacao`**, com os serviços de aplicação, projeções e consultas de todos os subdomínios;
 - **`exemplo-infraestrutura`**, com as implementações JPA dos repositórios dos agregados de todos os subdomínios;
