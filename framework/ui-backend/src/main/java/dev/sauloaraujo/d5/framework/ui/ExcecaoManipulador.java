@@ -1,5 +1,6 @@
 package dev.sauloaraujo.d5.framework.ui;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ import dev.sauloaraujo.d5.framework.dominio.spi.NaoAutorizadoExcecao;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class ExcecaoManipulador {
 	private static final Logger LOG = LoggerFactory.getLogger(ExcecaoManipulador.class);
+	private static final String SQLSTATE_DADO_INVALIDO = "22";
+	private static final String VALOR_FORA_DOS_LIMITES = "Um ou mais valores informados excedem o tamanho ou o intervalo permitidos.";
 
 	@ExceptionHandler(AccessDeniedException.class)
 	ResponseEntity<Object> tratarAcessoNegado(AccessDeniedException excecao) {
@@ -105,6 +109,20 @@ public class ExcecaoManipulador {
 		}
 
 		return corpo(HttpStatus.BAD_REQUEST, "Parâmetros da requisição inválidos.");
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	ResponseEntity<Object> tratarViolacaoIntegridade(DataIntegrityViolationException excecao) {
+		for (Throwable causa = excecao; causa != null; causa = causa.getCause()) {
+			if (causa instanceof SQLException sqlException) {
+				var estado = sqlException.getSQLState();
+				if (estado != null && estado.startsWith(SQLSTATE_DADO_INVALIDO)) {
+					return corpo(HttpStatus.UNPROCESSABLE_CONTENT, VALOR_FORA_DOS_LIMITES);
+				}
+			}
+		}
+
+		return tratarExcecaoNaoMapeada(excecao);
 	}
 
 	@ExceptionHandler(BeanInstantiationException.class)
