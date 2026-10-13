@@ -9,18 +9,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "UFI_UNIDADE_FEDERATIVA")
 public class UnidadeFederativaJpa implements IAgregadoJpa<UnidadeFederativa> {
 	@Id
-	@Column(name = "UFI_ID", length = UnidadeFederativaCodigoIbge.TAMANHO, nullable = false, updatable = false)
+	@Column(name = "UFI_ID", updatable = false)
+	@NotNull
+	@Size(max = UnidadeFederativaCodigoIbge.TAMANHO)
 	private String identificador;
 
-	@Column(name = "UFI_SG", length = UnidadeFederativaSigla.TAMANHO, nullable = false, unique = true)
+	@Column(name = "UFI_SG", unique = true)
+	@NotNull
+	@Size(max = UnidadeFederativaSigla.TAMANHO)
 	private String sigla;
 
-	@Column(name = "UFI_NM", length = 50, nullable = false, unique = true)
+	@Column(name = "UFI_NM", unique = true)
+	@NotNull
+	@Size(max = 50)
 	private String nome;
 
 	protected UnidadeFederativaJpa() {

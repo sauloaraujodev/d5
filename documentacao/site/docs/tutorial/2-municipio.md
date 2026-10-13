@@ -154,7 +154,7 @@ A persistência de município fica no pacote `com.example.exemplo.infraestrutura
 ```
 
 #### Entidade JPA
-Assim como no agregado, a entidade JPA do município guarda apenas o código da unidade federativa, em uma coluna simples, e não uma associação `@ManyToOne` com `UnidadeFederativaJpa`: as entidades JPA de agregados diferentes permanecem independentes. A coluna da unidade federativa, derivada do identificador, também não pode ser alterada. A restrição de unicidade sobre a unidade federativa e o nome garante no banco de dados a mesma unicidade validada pelo serviço.
+Assim como no agregado, a entidade JPA do município guarda apenas o código da unidade federativa, em uma coluna simples, e não uma associação `@ManyToOne` com `UnidadeFederativaJpa`: as entidades JPA de agregados diferentes permanecem independentes. A coluna da unidade federativa, derivada do identificador, também não pode ser alterada. A coluna `extinto` também é anotada com `@NotNull`: mesmo sendo de um tipo primitivo, que nunca é `null`, o Hibernate só a declara `not null` no banco de dados com essa anotação. A restrição de unicidade sobre a unidade federativa e o nome garante no banco de dados a mesma unicidade validada pelo serviço.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"

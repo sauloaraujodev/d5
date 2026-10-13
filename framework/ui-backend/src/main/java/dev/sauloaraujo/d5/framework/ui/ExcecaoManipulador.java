@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import dev.sauloaraujo.d5.framework.dominio.impl.ObjetoValorStringAbstrato;
 import dev.sauloaraujo.d5.framework.dominio.spi.NaoAutenticadoExcecao;
 import dev.sauloaraujo.d5.framework.dominio.spi.NaoAutorizadoExcecao;
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -119,6 +122,25 @@ public class ExcecaoManipulador {
 				if (estado != null && estado.startsWith(SQLSTATE_DADO_INVALIDO)) {
 					return corpo(HttpStatus.UNPROCESSABLE_CONTENT, VALOR_FORA_DOS_LIMITES);
 				}
+			}
+		}
+
+		return tratarExcecaoNaoMapeada(excecao);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	ResponseEntity<Object> tratarRestricaoViolada(ConstraintViolationException excecao) {
+		var mensagem = excecao.getConstraintViolations().stream()
+				.map(violacao -> violacao.getPropertyPath() + ": " + violacao.getMessage()).sorted()
+				.collect(Collectors.joining("; "));
+		return corpo(HttpStatus.UNPROCESSABLE_CONTENT, mensagem);
+	}
+
+	@ExceptionHandler(TransactionSystemException.class)
+	ResponseEntity<Object> tratarFalhaTransacao(TransactionSystemException excecao) {
+		for (Throwable causa = excecao; causa != null; causa = causa.getCause()) {
+			if (causa instanceof ConstraintViolationException restricaoViolada) {
+				return tratarRestricaoViolada(restricaoViolada);
 			}
 		}
 

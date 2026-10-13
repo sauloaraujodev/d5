@@ -4,6 +4,7 @@ O framework aplica, de forma transparente, alguns comportamentos que independem 
 - [registro de beans](#registro-de-beans);
 - [serialização de objetos de valor](#serializacao-de-objetos-de-valor);
 - [gerenciamento de transações](#gerenciamento-de-transacoes);
+- [validação das entidades JPA](#validacao-das-entidades-jpa);
 - [CSRF no Swagger UI](#csrf-no-swagger-ui);
 - [expansão da consulta no Swagger UI](#expansao-da-consulta-no-swagger-ui);
 - [objetos de valor no Swagger UI](#objetos-de-valor-no-swagger-ui).
@@ -60,6 +61,20 @@ A configuração abaixo registra esse `TransactionAttributeSource` e o conecta a
 ```java title="TransacaoConfiguracao.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/transacao/TransacaoConfiguracao.java"
 ```
+
+## Validação das entidades JPA
+O módulo `d5-framework-infraestrutura` depende de `spring-boot-starter-validation`, que traz o [Hibernate Validator](https://hibernate.org/validator/){target="_blank"}. Com ele no classpath, o Hibernate usa as anotações do Bean Validation de uma entidade JPA — como `@NotNull` e `@Size` — de duas formas, sem nenhuma configuração na aplicação:
+
+- ao gerar o esquema do banco de dados, `@NotNull` torna a coluna `not null` — inclusive a de um atributo de tipo primitivo, que, sem a anotação, o Hibernate declara anulável — e o `max` de `@Size` define seu tamanho, dispensando `nullable` e `length` na `@Column`;
+- antes de cada `insert` e `update`, valida a entidade e, se alguma restrição for violada, lança `ConstraintViolationException` sem enviar o comando ao banco de dados — o que independe do banco e do driver JDBC. [`ExcecaoManipulador`](ui-backend.md#excecaomanipulador) responde [422 Unprocessable Content](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/422){target="_blank"}, com a mensagem de cada violação precedida da propriedade da entidade — por exemplo, `nome: tamanho deve ser entre 0 e 100`.
+
+Para entidades cujo identificador é atribuído pela aplicação, a validação ocorre na confirmação da transação, e não na chamada a `save`; nesse caso, a exceção chega a `ExcecaoManipulador` como causa de uma `TransactionSystemException`.
+
+O Hibernate Validator escolhe o idioma das mensagens pela localidade padrão da JVM. Para que as mensagens fiquem em português, como as demais respostas do backend, independentemente do servidor, [`ValidacaoConfiguracao`](infraestrutura.md#validacaoconfiguracao) fornece ao Hibernate uma `ValidatorFactory` com a localidade `pt-BR`.
+
+Essas anotações expressam apenas as restrições da persistência — como o tamanho de uma coluna —, e não as regras do domínio, que o agregado e seus objetos de valor já garantem; veja [Entidades JPA](../convencoes.md#entidades-jpa).
+
+No tutorial, [`UnidadeFederativaJpa`](../../tutorial/1-unidade-federativa.md#entidade-jpa) declara dessa forma as restrições de suas colunas.
 
 ## CSRF no Swagger UI
 Toda operação de escrita exposta pelo backend exige um token de CSRF, enviado pelo cliente através do cabeçalho `X-XSRF-TOKEN` — mas o Swagger UI só anexa esse cabeçalho automaticamente às requisições quando a propriedade `springdoc.swagger-ui.csrf.enabled` está `true`. O módulo `d5-framework-springdoc` define esse valor como padrão através de um `EnvironmentPostProcessor`, dispensando essa configuração em quem depende dele.

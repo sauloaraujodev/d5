@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "CLI_CLIENTE")
@@ -23,28 +25,43 @@ public class ClienteJpa implements IAgregadoJpa<Cliente> {
 	@Column(name = "CLI_ID", updatable = false)
 	private @Nullable Long identificador;
 
-	@Column(name = "CLI_CPF", length = ClienteCpf.TAMANHO, nullable = false, unique = true)
+	@Column(name = "CLI_CPF", unique = true)
+	@NotNull
+	@Size(max = ClienteCpf.TAMANHO)
 	private String cpf;
 
-	@Column(name = "CLI_NM", length = 100, nullable = false)
+	@Column(name = "CLI_NM")
+	@NotNull
+	@Size(max = 100)
 	private String nome;
 
-	@Column(name = "CLI_LOGRADOURO", length = 100, nullable = false)
+	@Column(name = "CLI_LOGRADOURO")
+	@NotNull
+	@Size(max = 100)
 	private String logradouro;
 
-	@Column(name = "CLI_NUMERO", length = 10, nullable = false)
+	@Column(name = "CLI_NUMERO")
+	@NotNull
+	@Size(max = 10)
 	private String numero;
 
-	@Column(name = "CLI_COMPLEMENTO", length = 50)
+	@Column(name = "CLI_COMPLEMENTO")
+	@Size(max = 50)
 	private @Nullable String complemento;
 
-	@Column(name = "CLI_BAIRRO", length = 50, nullable = false)
+	@Column(name = "CLI_BAIRRO")
+	@NotNull
+	@Size(max = 50)
 	private String bairro;
 
-	@Column(name = "CLI_CEP", length = EnderecoCep.TAMANHO, nullable = false)
+	@Column(name = "CLI_CEP")
+	@NotNull
+	@Size(max = EnderecoCep.TAMANHO)
 	private String cep;
 
-	@Column(name = "CLI_MUN_ID", length = MunicipioCodigoIbge.TAMANHO, nullable = false)
+	@Column(name = "CLI_MUN_ID")
+	@NotNull
+	@Size(max = MunicipioCodigoIbge.TAMANHO)
 	private String municipio;
 
 	protected ClienteJpa() {

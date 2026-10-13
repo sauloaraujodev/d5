@@ -4,6 +4,7 @@ Possui classes para implementar, com [Spring Data JPA](https://spring.io/project
 - [entidade JPA](#entidade-jpa);
 - [repositório](#repositorio);
 - [repositório de aplicação](#repositorio-de-aplicacao);
+- [validação](#validacao);
 - [segurança](#seguranca);
 - [registro de beans](#registro-de-beans).
 
@@ -41,6 +42,15 @@ Também expõe `paraLike`, que converte um filtro textual opcional em um padrão
 ```
 
 No tutorial, [`UnidadeFederativaAplicacaoRepositorio`](../../tutorial/1-unidade-federativa.md#implementacao-do-repositorio-de-aplicacao) estende `AgregadoAplicacaoRepositorioAbstrato`, implementa `pesquisar(UnidadeFederativaConsulta, Pageable)` e `paraPropriedadeOrdenacao`, e usa `paraLike` para filtrar pela sigla e pelo nome. Já [`MunicipioAplicacaoRepositorio`](../../tutorial/2-municipio.md#implementacao-do-repositorio-de-aplicacao) mapeia, em `paraPropriedadeOrdenacao`, a ordenação pelo nome da unidade federativa para uma propriedade qualificada pelo alias de uma junção da consulta.
+
+## Validação
+
+### `ValidacaoConfiguracao`
+Fornece ao Hibernate, através de um `HibernatePropertiesCustomizer`, a `ValidatorFactory` que ele usa para validar as entidades JPA antes de gravá-las, configurada com a localidade `pt-BR`, para que as mensagens das violações fiquem em português independentemente da localidade padrão da JVM. Fecha a `ValidatorFactory` quando o contexto do Spring é encerrado. É registrada como autoconfiguração do módulo. Veja [Validação das entidades JPA](comportamentos.md#validacao-das-entidades-jpa).
+
+```java title="ValidacaoConfiguracao.java"
+--8<-- "framework/infraestrutura/src/main/java/dev/sauloaraujo/d5/framework/infraestrutura/ValidacaoConfiguracao.java"
+```
 
 ## Segurança
 

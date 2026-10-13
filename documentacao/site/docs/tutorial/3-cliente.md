@@ -238,7 +238,7 @@ A persistência de cliente fica no pacote `com.example.exemplo.infraestrutura.cr
 ```
 
 #### Entidade JPA
-O identificador é um `Long` gerado pelo banco de dados — por isso é anotado com `@GeneratedValue` e admite `null` antes da inclusão. Os atributos do endereço são mapeados para colunas da própria tabela de clientes, e o município, como na entidade JPA do município, é guardado apenas pelo seu código. A coluna do CPF é única, garantindo no banco de dados a mesma unicidade validada pelo serviço.
+O identificador é um `Long` gerado pelo banco de dados — por isso é anotado com `@GeneratedValue` e admite `null` antes da inclusão. Os atributos do endereço são mapeados para colunas da própria tabela de clientes, e o município, como na entidade JPA do município, é guardado apenas pelo seu código. O complemento, opcional, é a única coluna sem `@NotNull`. A coluna do CPF é única, garantindo no banco de dados a mesma unicidade validada pelo serviço.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteJpa.java"
 --8<-- "exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/crm/cliente/ClienteJpa.java"

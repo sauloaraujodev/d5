@@ -68,3 +68,10 @@ Nesta seção, `${Agregado}` é o nome de um agregado e `${Atributo}` é o nome 
 | Step definitions | `${Agregado}StepDefinitions` |
 | Testes do repositório e do repositório de aplicação | `${Agregado}RepositorioTest` e `${Agregado}AplicacaoRepositorioTest` |
 | Configuração Spring Boot dos testes de infraestrutura | `InfraestruturaTesteAplicacao` |
+
+## Entidades JPA
+As restrições de uma coluna que o Bean Validation consegue expressar são declaradas com suas anotações — `@NotNull` em vez de `nullable = false` e `@Size(max = ...)` em vez de `length` —, e a `@Column` declara apenas o que elas não expressam, como `name`, `unique` e `updatable`. Assim, o Hibernate usa as mesmas anotações para gerar o esquema e para validar a entidade antes de gravá-la; veja [Validação das entidades JPA](framework/comportamentos.md#validacao-das-entidades-jpa).
+
+Essas anotações expressam apenas restrições da persistência, como o tamanho de uma coluna. Regras do domínio — como um nome não poder estar em branco ou um código seguir um formato — ficam no agregado e em seus objetos de valor e não são repetidas na entidade JPA.
+
+Quando o tamanho de uma coluna é o de um objeto de valor, `@Size` usa a constante do objeto de valor — por exemplo, `@Size(max = UnidadeFederativaSigla.TAMANHO)`. Os demais tamanhos são escritos diretamente na anotação, sem constante.
