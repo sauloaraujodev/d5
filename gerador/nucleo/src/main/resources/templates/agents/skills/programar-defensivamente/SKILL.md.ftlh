@@ -16,8 +16,10 @@ Validações de que parâmetros não são nulos são feitas com Objects.requireN
 
 Atributos imutáveis são final.
 
-Construtores e métodos validam argumentos e, em caso negativo, lançam IllegalArgumentException.
+Construtores e métodos validam argumentos e, em caso negativo, lançam IllegalArgumentException. As validações são feitas com os métodos da classe org.apache.commons.lang3.Validate, por exemplo, Validate.notBlank e Validate.isTrue.
 
 Métodos lançam NoSuchElementException quando um argumento identifica um objeto inexistente.
 
-Métodos validam se o estado do sistema permite suas execuções e, em caso negativo, lançam IllegalStateException.
+Métodos validam se o estado do sistema permite suas execuções e, em caso negativo, lançam IllegalStateException, por exemplo, com Validate.validState.
+
+Os argumentos são validados antes do estado, para que a exceção lançada aponte o motivo real da rejeição. A exceção é a existência do objeto sobre o qual o método age: se ele não existe, essa ausência é o motivo real da rejeição, ainda que os argumentos também sejam inválidos.
