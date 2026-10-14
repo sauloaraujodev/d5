@@ -28,5 +28,3 @@ Gera, em um arquivo zip, a estrutura de um projeto D5: o `pom.xml` raiz, um mód
 
 !!! note
     O gerador só funciona quando esta página é servida pela aplicação `d5-site`, que expõe o endpoint `/api/gerador`.
-
-[![GNU AGPLv3](assets/agplv3-with-text-162x68.png)](https://www.gnu.org/licenses/agpl-3.0.html){ target=_blank }
