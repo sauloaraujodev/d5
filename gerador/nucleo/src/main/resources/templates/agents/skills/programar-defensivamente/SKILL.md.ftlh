@@ -8,7 +8,7 @@ Entidades JPA são exceção às regras de Optional, de atributos final e de val
 
 Pacotes são anotados com org.jspecify.annotations.NullMarked.
 
-Atributos e parâmetros opcionais, por exemplo, aqueles declarados como nullable nos modelos de projeto de software, são Optional.
+Atributos e parâmetros opcionais, por exemplo, aqueles declarados como nullable nos modelos de projeto de software, são Optional. A exceção são os contratos de bibliotecas e frameworks que não admitem Optional, como o parâmetro de equals e os parâmetros das consultas Spring Data JPA declaradas com @Query: nesses casos, o valor ausente é null, anotado com org.jspecify.annotations.Nullable.
 
 Métodos que pesquisam um único objeto não retornam Optional, lançam NoSuchElementException.
 

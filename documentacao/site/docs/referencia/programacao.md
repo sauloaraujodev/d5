@@ -12,6 +12,8 @@ Em projetos que herdam de `d5-pai`, essa regra é verificada na compilação do 
 
 Atributos, parâmetros ou tipos de retorno não obrigatórios devem ser do tipo [`Optional`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html){target="_blank"}.
 
+A exceção são os contratos de bibliotecas e frameworks que não admitem `Optional`: neles, um valor ausente é `null`, anotado com [`@Nullable`](https://jspecify.dev/docs/api/org/jspecify/annotations/Nullable.html){target="_blank"}. É o caso do parâmetro de `equals`, que sobrescreve `Object.equals`, como em [`IObjetoValor`](framework/dominio.md#iobjetovalor), e dos parâmetros das consultas Spring Data JPA declaradas com `@Query`, em que um filtro ausente é `null` — por isso, [`paraLike`](framework/infraestrutura.md#agregadoaplicacaorepositorioabstrato) devolve `null` na ausência de filtro.
+
 ## Atributos `final`
 Atributos devem ser declarados como `final`.
 
