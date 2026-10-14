@@ -41,12 +41,12 @@ Os módulos `d5-framework-*-teste` e `d5-framework-bdd` têm `packaging` `pom`; 
 ## Estrutura
 - `framework`: módulos publicados no Maven Central.
 - `exemplo`: aplicação de exemplo construída no tutorial, no estado final, ao fim da lição 3.
-- `exemplo1` e `exemplo2`: a mesma aplicação ao fim das lições 1 e 2 do tutorial. Ficam fora do build e são verificadas com `mvn -f exemplo1 verify` e `mvn -f exemplo2 verify`. O build da documentação interrompe-se se um arquivo divergir entre versões consecutivas sem que a lição o altere de propósito; veja `documentacao/site/hooks/exemplos.py`.
+- `exemplo1` e `exemplo2`: a mesma aplicação ao fim das lições 1 e 2 do tutorial. Ficam fora do build e são verificadas com `mvn -f exemplo1 verify` e `mvn -f exemplo2 verify`. O build da documentação interrompe-se se um arquivo divergir entre versões consecutivas sem que a lição o altere de propósito; veja `site/src/main/mkdocs/hooks/exemplos.py`.
 - `gerador`: gerador de projetos D5.
-- `documentacao`: fonte do site.
+- `site`: módulo `d5-site`, que constrói o site da documentação a partir de `site/src/main/mkdocs`. O build usa Docker (imagem `squidfunk/mkdocs-material`), pois executa o MkDocs em um contêiner; sem Docker, o módulo não é construído. No Windows, execute o Maven no WSL, onde o `docker` está disponível.
 
 ## Publicação
-Somente o `d5-pai`, do `pom.xml` raiz, e os módulos de `framework` são publicados. A propriedade `publicacao` ativa o perfil de publicação e tira os módulos `exemplo` e `gerador` do build — use `-Dpublicacao`, e não `-Ppublicacao`, que ativa o perfil sem definir a propriedade:
+Somente o `d5-pai`, do `pom.xml` raiz, e os módulos de `framework` são publicados. A propriedade `publicacao` ativa o perfil de publicação e tira os módulos `exemplo`, `gerador` e `site` do build — use `-Dpublicacao`, e não `-Ppublicacao`, que ativa o perfil sem definir a propriedade:
 
 ```bash
 mvn -Dpublicacao clean deploy -DskipTests

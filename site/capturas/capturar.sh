@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # Regenera as capturas do Swagger UI usadas no tutorial.
 #
-# Uso: documentacao/capturas/capturar.sh [lição...]
+# Uso: site/capturas/capturar.sh [lição...]
 # Sem argumentos, regenera as três lições: 1-unidade-federativa, 2-municipio e 3-cliente.
 #
 # Para cada lição, empacota o projeto correspondente (exemplo1, exemplo2 ou exemplo), sobe o jar do
-# ui-backend na porta 8080 e grava as capturas em documentacao/site/docs/assets/tutorial/<lição>.
+# ui-backend na porta 8080 e grava as capturas em site/src/main/mkdocs/docs/assets/tutorial/<lição>.
 # Requer Java, Maven, Node.js 22 ou superior e Chrome; veja capturas.mjs.
 set -euo pipefail
 
 DIRETORIO="$(cd "$(dirname "$0")" && pwd)"
 RAIZ="$(cd "$DIRETORIO/../.." && pwd)"
-ASSETS="$RAIZ/documentacao/site/docs/assets/tutorial"
+ASSETS="$RAIZ/site/src/main/mkdocs/docs/assets/tutorial"
 
 exemplo_da_licao() {
 	case "$1" in

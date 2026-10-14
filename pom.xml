@@ -189,8 +189,8 @@
 	</dependencies>
 
 	<profiles>
-		<!-- Ativo por padrão. Desativado com -Dpublicacao, para que exemplo e
-		gerador não sejam publicados. -->
+		<!-- Ativo por padrão. Desativado com -Dpublicacao, para que exemplo, gerador e site
+		não sejam publicados. -->
 		<profile>
 			<id>completo</id>
 
@@ -203,6 +203,7 @@
 			<modules>
 				<module>exemplo</module>
 				<module>gerador</module>
+				<module>site</module>
 			</modules>
 		</profile>
 

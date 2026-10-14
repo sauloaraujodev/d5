@@ -50,3 +50,51 @@ body.zoom-ativo-fundo::before {
   max-width: 100%;
   max-height: 100%;
 }
+
+.gerador {
+  max-width: 30rem;
+}
+
+.gerador-campo {
+  margin-bottom: 1rem;
+}
+
+.gerador-campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.gerador-campo input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  font: inherit;
+}
+
+.gerador-campo input.invalido {
+  border-color: var(--md-code-hl-special-color, #d32f2f);
+}
+
+.gerador-grupo {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gerador-grupo .md-button {
+  margin: 0;
+}
+
+.gerador-erro {
+  display: none;
+  margin-top: 0.25rem;
+  color: var(--md-code-hl-special-color, #d32f2f);
+}
+
+.gerador-erro.visivel {
+  display: block;
+}

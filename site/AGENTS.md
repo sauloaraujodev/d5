@@ -23,9 +23,9 @@ Em tom imperativo, cada lição descreve, passo a passo, como desenvolver um agr
 
 Os snippets de cada lição incluem os arquivos do diretório com o projeto ao final dela — `exemplo1`, `exemplo2` e `exemplo`, respectivamente —, mas o título de cada bloco de código mostra o caminho em `exemplo`, onde o leitor desenvolve o projeto.
 
-Um arquivo presente em duas versões consecutivas é idêntico nelas, exceto os que a lição seguinte altera de propósito, listados em `ALTERACOES`, no hook `site/hooks/exemplos.py`. O hook verifica essa regra a cada build da documentação e o interrompe quando ela é violada. Ao alterar um arquivo de uma versão, replique a alteração nas demais versões em que ele aparece igual; ao fazer uma lição alterar um arquivo da anterior, registre-o em `ALTERACOES`.
+Um arquivo presente em duas versões consecutivas é idêntico nelas, exceto os que a lição seguinte altera de propósito, listados em `ALTERACOES`, no hook `src/main/mkdocs/hooks/exemplos.py`. O hook verifica essa regra a cada build da documentação e o interrompe quando ela é violada. Ao alterar um arquivo de uma versão, replique a alteração nas demais versões em que ele aparece igual; ao fazer uma lição alterar um arquivo da anterior, registre-o em `ALTERACOES`.
 
-As capturas do Swagger UI de cada lição ficam em `assets/tutorial/<lição>` e são geradas por `documentacao/capturas/capturar.sh`, nunca manualmente; veja `documentacao/capturas/README.md`.
+As capturas do Swagger UI de cada lição ficam em `assets/tutorial/<lição>` e são geradas por `site/capturas/capturar.sh`, nunca manualmente; veja `site/capturas/README.md`.
 
 Deve explicar apenas o necessário acerca do framework de D5 para que o leitor entenda o código de exemplo completamente.
 

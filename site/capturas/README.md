@@ -1,8 +1,8 @@
 # Capturas do tutorial
-Regenera as capturas do Swagger UI usadas nas lições do tutorial, em `documentacao/site/docs/assets/tutorial/<lição>`.
+Regenera as capturas do Swagger UI usadas nas lições do tutorial, em `site/src/main/mkdocs/docs/assets/tutorial/<lição>`.
 
 ```bash
-documentacao/capturas/capturar.sh
+site/capturas/capturar.sh
 ```
 
 Sem argumentos, regenera as três lições; para regenerar apenas algumas, informe-as como argumentos — `1-unidade-federativa`, `2-municipio` ou `3-cliente`.

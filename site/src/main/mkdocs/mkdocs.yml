@@ -2,6 +2,7 @@ site_name: D5
 site_description: D5 agiliza o desenvolvimento de aplicações web com DDD, arquitetura limpa, BDD, CQRS, programação defensiva, Spring Boot e Spring Data JPA.
 site_author: Saulo Araujo
 site_url: https://d5.sauloaraujo.dev
+use_directory_urls: false
 
 hooks:
   - hooks/exemplos.py
@@ -11,6 +12,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/zoom-diagrama.js
+  - javascripts/gerador.js
 
 markdown_extensions:
   - attr_list
@@ -35,6 +37,7 @@ theme:
 
 nav:
   - Visão geral: index.md
+  - Gerador: gerador.md
   - Tutorial:
       - tutorial/index.md
       - Lição 1 - Unidade federativa: tutorial/1-unidade-federativa.md

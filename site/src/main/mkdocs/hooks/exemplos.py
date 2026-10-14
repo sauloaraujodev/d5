@@ -86,14 +86,14 @@ def _problemas(raiz: Path, anterior: str, seguinte: str) -> list[str]:
 
 
 def on_config(config):
-    raiz = Path(config.config_file_path).resolve().parents[2]
+    raiz = Path(config.config_file_path).resolve().parents[4]
     problemas = []
     for anterior, seguinte in zip(VERSOES, VERSOES[1:]):
         problemas += _problemas(raiz, anterior, seguinte)
     if problemas:
         raise PluginError(
             "As versões do projeto de exemplo divergem. Replique a mudança nas demais versões ou, se a "
-            "lição altera o arquivo de propósito, registre-o em ALTERACOES, em documentacao/site/hooks/"
+            "lição altera o arquivo de propósito, registre-o em ALTERACOES, em site/src/main/mkdocs/hooks/"
             "exemplos.py:\n" + "\n".join(f"  - {problema}" for problema in problemas))
     log.info("Versões do projeto de exemplo coerentes: %s", ", ".join(VERSOES))
     return config
