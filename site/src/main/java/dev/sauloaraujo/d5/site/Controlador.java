@@ -1,4 +1,4 @@
-package dev.sauloaraujo.d5.gerador.web;
+package dev.sauloaraujo.d5.site;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.sauloaraujo.d5.gerador.nucleo.Gerador;
 
 @RestController
-@RequestMapping("gerador")
+@RequestMapping("api/gerador")
 public class Controlador {
 	private final Gerador gerador;
 

@@ -16,7 +16,6 @@
 	<modules>
 		<module>cli</module>
 		<module>nucleo</module>
-		<module>web</module>
 	</modules>
 
 	<dependencyManagement>
@@ -37,24 +36,6 @@
 				<groupId>net.lingala.zip4j</groupId>
 				<artifactId>zip4j</artifactId>
 				<version>2.11.6</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.webjars</groupId>
-				<artifactId>angularjs</artifactId>
-				<version>1.8.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.webjars</groupId>
-				<artifactId>bootstrap</artifactId>
-				<version>5.3.8</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.webjars.npm</groupId>
-				<artifactId>bootstrap-icons</artifactId>
-				<version>1.13.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

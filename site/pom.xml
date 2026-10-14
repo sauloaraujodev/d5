@@ -12,14 +12,32 @@
 	<artifactId>d5-site</artifactId>
 
 	<name>D5 Site</name>
-	<description>Site da documentação de D5, gerado com MkDocs e empacotado em META-INF/resources.</description>
+	<description>Aplicação web com a documentação de D5, gerada com MkDocs e servida na raiz, e o gerador de projetos.</description>
 
 	<properties>
 		<mkdocs.imagem>squidfunk/mkdocs-material:9.7</mkdocs.imagem>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>dev.sauloaraujo</groupId>
+			<artifactId>d5-gerador-nucleo</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
 			<!-- Os snippets do site incluem arquivos de framework e dos exemplos, então o MkDocs
 			roda com a raiz do repositório montada em /docs. Requer Docker. -->
 			<plugin>

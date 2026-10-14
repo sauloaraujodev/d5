@@ -42,7 +42,7 @@ Os módulos `d5-framework-*-teste` e `d5-framework-bdd` têm `packaging` `pom`; 
 - `framework`: módulos publicados no Maven Central.
 - `exemplo`: aplicação de exemplo construída no tutorial, no estado final, ao fim da lição 3.
 - `exemplo1` e `exemplo2`: a mesma aplicação ao fim das lições 1 e 2 do tutorial. Ficam fora do build e são verificadas com `mvn -f exemplo1 verify` e `mvn -f exemplo2 verify`. O build da documentação interrompe-se se um arquivo divergir entre versões consecutivas sem que a lição o altere de propósito; veja `site/src/main/mkdocs/hooks/exemplos.py`.
-- `gerador`: gerador de projetos D5.
+- `gerador`: gerador de projetos D5, com os módulos `nucleo` (geração) e `cli` (linha de comando). A interface web do gerador, junto com a documentação, é o módulo `site`.
 - `site`: módulo `d5-site`, que constrói o site da documentação a partir de `site/src/main/mkdocs`. O build usa Docker (imagem `squidfunk/mkdocs-material`), pois executa o MkDocs em um contêiner; sem Docker, o módulo não é construído. No Windows, execute o Maven no WSL, onde o `docker` está disponível.
 
 ## Publicação

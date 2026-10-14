@@ -1,4 +1,4 @@
-package dev.sauloaraujo.d5.gerador.web;
+package dev.sauloaraujo.d5.site;
 
 import java.util.Objects;
 import java.util.Set;
