@@ -17,8 +17,10 @@ O caminho de todas as operações é prefixado por /backend.
 
 Para cada ação que pode ser executada a partir de uma rota, existe uma operação POST cujo caminho substitui o último segmento do caminho da rota pelo nome da ação, por exemplo, incluir, alterar, excluir, etc.
 
-O framework já fornece, para todo agregado **A**, as operações padrão de inclusão (GET /**S**/**A**/inclusao e POST /**S**/**A**/incluir), alteração (GET /**S**/**A**/:**ID**/alteracao e POST /**S**/**A**/:**ID**/alterar), exclusão (GET /**S**/**A**/:**ID**/exclusao e POST /**S**/**A**/:**ID**/excluir) e pesquisa (GET /**S**/**A**/pesquisa). Apenas rotas e ações além dessas (por exemplo, bloquear, desbloquear) precisam ter suas operações especificadas.
+<#if d5Project.framework>
+O framework D5 já fornece, para todo agregado **A**, as operações padrão de inclusão (GET /**S**/**A**/inclusao e POST /**S**/**A**/incluir), alteração (GET /**S**/**A**/:**ID**/alteracao e POST /**S**/**A**/:**ID**/alterar), exclusão (GET /**S**/**A**/:**ID**/exclusao e POST /**S**/**A**/:**ID**/excluir) e pesquisa (GET /**S**/**A**/pesquisa). Apenas rotas e ações além dessas (por exemplo, bloquear, desbloquear) precisam ter suas operações especificadas.
 
+</#if>
 Especificações de operações possuem exemplos.
 
 Os estilos, template e código de um componente ficam em arquivos distintos.

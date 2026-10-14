@@ -15,7 +15,7 @@
 ## Tecnologias
 - Context Mapper 6.12.0
 - Java 25
-- Cucumber 7.34.7
+- Cucumber 7.34.8
 - Mockito 5.23.0
 - JSpecify 1.0
 - DBML (Database Markup Language) 10.1.1
