@@ -71,4 +71,45 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- Constrói a imagem de contêiner, sem Dockerfile, no daemon Docker local:
+		mvn -pl site -am package -Pimagem
+		A imagem fica no Docker local com o nome d5-site:<versão>. -->
+		<profile>
+			<id>imagem</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>3.4.5</version>
+						<configuration>
+							<from>
+								<image>eclipse-temurin:25-jre</image>
+							</from>
+							<to>
+								<image>d5-site:${project.version}</image>
+							</to>
+							<container>
+								<mainClass>dev.sauloaraujo.d5.site.SiteAplicacao</mainClass>
+								<ports>
+									<port>8080</port>
+								</ports>
+							</container>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>dockerBuild</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
