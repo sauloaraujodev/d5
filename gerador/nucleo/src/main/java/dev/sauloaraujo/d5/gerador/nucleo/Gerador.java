@@ -30,19 +30,18 @@ public class Gerador {
 
 	private static final String DIRETORIO_SKILLS = "agents/skills/";
 
-	private static final List<String> SKILLS = List.of("01-especificar-funcionalidade/SKILL.md",
-			"01-especificar-funcionalidade/references/REFERENCE.md", "02-especificar-testes/SKILL.md",
-			"03-projetar-software/SKILL.md", "03-projetar-software/references/REFERENCE.md",
-			"03.01-projetar-contextos-delimitados/SKILL.md", "03.02-projetar-objetos-valor/SKILL.md",
-			"03.03-projetar-entidades/SKILL.md", "03.04-projetar-agregados/SKILL.md",
-			"03.05-projetar-associacoes/SKILL.md", "03.06-projetar-servicos/SKILL.md",
-			"03.07-projetar-repositorios/SKILL.md", "03.08-validar-modelo/SKILL.md",
-			"03.08-validar-modelo/scripts/pom.xml", "04-desenvolver-dominio/SKILL.md", "05-desenvolver-testes/SKILL.md",
-			"06-projetar-banco/SKILL.md", "07-desenvolver-infraestrutura-dominio/SKILL.md",
-			"08-desenvolver-backend/SKILL.md", "09-desenvolver-frontend/SKILL.md", "programar-defensivamente/SKILL.md");
+	private static final List<String> SKILLS = List.of("especificar-funcionalidade/SKILL.md",
+			"especificar-funcionalidade/references/REFERENCE.md", "especificar-testes/SKILL.md",
+			"projetar-software/SKILL.md", "projetar-software/references/REFERENCE.md",
+			"projetar-contextos-delimitados/SKILL.md", "projetar-objetos-valor/SKILL.md", "projetar-entidades/SKILL.md",
+			"projetar-agregados/SKILL.md", "projetar-associacoes/SKILL.md", "projetar-servicos/SKILL.md",
+			"projetar-repositorios/SKILL.md", "validar-modelo/SKILL.md", "validar-modelo/scripts/pom.xml",
+			"desenvolver-dominio/SKILL.md", "desenvolver-testes/SKILL.md", "projetar-banco/SKILL.md",
+			"desenvolver-infraestrutura-dominio/SKILL.md", "desenvolver-backend/SKILL.md",
+			"desenvolver-frontend/SKILL.md", "programar-defensivamente/SKILL.md");
 
-	private static final List<String> SKILLS_FRAMEWORK = List.of("04-desenvolver-dominio-d5/SKILL.md",
-			"07-desenvolver-infraestrutura-dominio-d5/SKILL.md", "08-desenvolver-backend-d5/SKILL.md");
+	private static final List<String> SKILLS_FRAMEWORK = List.of("desenvolver-dominio-d5/SKILL.md",
+			"desenvolver-infraestrutura-dominio-d5/SKILL.md", "desenvolver-backend-d5/SKILL.md");
 
 	private final Configuration freemarker;
 

@@ -74,15 +74,15 @@ O controlador REST de **A** pertence ao pacote ${d5Project.groupId}.${d5Project.
 Todos os pacotes são anotados com @NullMarked.
 
 ## Processo de trabalho
-1) [Especificar funcionalidade](.agents/skills/01-especificar-funcionalidade/SKILL.md)
-2) [Especificar testes](.agents/skills/02-especificar-testes/SKILL.md)
-3) [Projetar software](.agents/skills/03-projetar-software/SKILL.md)
-4) [Desenvolver camada de domínio](.agents/skills/04-desenvolver-dominio<#if d5Project.framework>-d5</#if>/SKILL.md)
-5) [Desenvolver testes](.agents/skills/05-desenvolver-testes/SKILL.md)
-6) [Projetar banco de dados](.agents/skills/06-projetar-banco/SKILL.md)
-7) [Desenvolver camada de infraestrutura para a camada de domínio](.agents/skills/07-desenvolver-infraestrutura-dominio<#if d5Project.framework>-d5</#if>/SKILL.md)
-8) [Desenvolver backend](.agents/skills/08-desenvolver-backend<#if d5Project.framework>-d5</#if>/SKILL.md)
-9) [Desenvolver frontend](.agents/skills/09-desenvolver-frontend/SKILL.md)
+1) [Especificar funcionalidade](.agents/skills/especificar-funcionalidade/SKILL.md)
+2) [Especificar testes](.agents/skills/especificar-testes/SKILL.md)
+3) [Projetar software](.agents/skills/projetar-software/SKILL.md)
+4) [Desenvolver camada de domínio](.agents/skills/desenvolver-dominio<#if d5Project.framework>-d5</#if>/SKILL.md)
+5) [Desenvolver testes](.agents/skills/desenvolver-testes/SKILL.md)
+6) [Projetar banco de dados](.agents/skills/projetar-banco/SKILL.md)
+7) [Desenvolver camada de infraestrutura para a camada de domínio](.agents/skills/desenvolver-infraestrutura-dominio<#if d5Project.framework>-d5</#if>/SKILL.md)
+8) [Desenvolver backend](.agents/skills/desenvolver-backend<#if d5Project.framework>-d5</#if>/SKILL.md)
+9) [Desenvolver frontend](.agents/skills/desenvolver-frontend/SKILL.md)
 
 ## Execução
 mvn spring-boot:test-run -pl ui-backend

@@ -1,6 +1,6 @@
 ---
 name: programar-defensivamente
-description: Programar defensivamente
+description: Regras de programação defensiva do código principal, como nulidade com JSpecify e Optional, atributos final e validação de argumentos e de estado. Use ao escrever ou revisar o código Java de produção do projeto.
 ---
 Estas regras valem para o código principal, e não para o de teste, que precisa provocar situações inválidas e guardar estado mutável entre passos e testes.
 
