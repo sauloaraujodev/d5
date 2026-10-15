@@ -39,8 +39,8 @@ public class Controlador {
 		try {
 			Files.delete(arquivo);
 			try (var zip = FileSystems.newFileSystem(URI.create("jar:" + arquivo.toUri()), Map.of("create", "true"))) {
-				gerador.gerar(zip.getPath("/"), formulario.getGroupId(), nome, formulario.getSubdominios(),
-						formulario.isFramework(), formulario.isAgentes());
+				gerador.gerar(zip.getPath("/"), formulario.getGroupId(), nome, formulario.getVersao(),
+						formulario.getSubdominios(), formulario.isFramework(), formulario.isAgentes());
 			}
 			var corpo = new ByteArrayResource(Files.readAllBytes(arquivo));
 			var disposicao = "attachment; filename=" + nome + ".zip";

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>${groupId}</groupId>
 		<artifactId>${nome}-pai</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>${versao}</version>
 	</parent>
 
 	<artifactId>${nome}-ui-backend</artifactId>

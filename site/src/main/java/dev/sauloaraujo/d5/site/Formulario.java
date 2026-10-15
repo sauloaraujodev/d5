@@ -6,6 +6,7 @@ import java.util.Set;
 public class Formulario {
 	private String groupId;
 	private String nome;
+	private String versao = "1.0.0-SNAPSHOT";
 	private Set<String> subdominios;
 	private boolean framework = true;
 	private boolean agentes = true;
@@ -22,6 +23,14 @@ public class Formulario {
 
 	public String getNome() {
 		return nome;
+	}
+
+	public String getVersao() {
+		return versao;
+	}
+
+	public void setVersao(String versao) {
+		this.versao = Objects.requireNonNull(versao);
 	}
 
 	public Set<String> getSubdominios() {

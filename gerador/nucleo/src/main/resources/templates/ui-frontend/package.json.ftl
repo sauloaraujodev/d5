@@ -1,6 +1,6 @@
 {
   "name": "${nome}",
-  "version": "1.0.0-SNAPSHOT",
+  "version": "${versao}",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

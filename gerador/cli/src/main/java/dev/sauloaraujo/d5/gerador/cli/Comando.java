@@ -30,6 +30,10 @@ public class Comando implements Callable<Integer> {
 	@Option(names = { "-n", "--nome" }, required = true, description = "O nome do projeto.")
 	private @Nullable String nome;
 
+	@Option(names = { "-v",
+			"--versao" }, defaultValue = "1.0.0-SNAPSHOT", description = "A versão do projeto, no formato do versionamento semântico.")
+	private @Nullable String versao;
+
 	@Option(names = { "-s", "--subdominio" }, required = true, description = "Os subdomínios do domínio do projeto.")
 	private @Nullable Set<String> subdominios;
 
@@ -44,7 +48,7 @@ public class Comando implements Callable<Integer> {
 	@Override
 	public Integer call() throws Exception {
 		gerador.gerar(Objects.requireNonNull(diretorio), Objects.requireNonNull(groupId), Objects.requireNonNull(nome),
-				Objects.requireNonNull(subdominios), framework, agentes);
+				Objects.requireNonNull(versao), Objects.requireNonNull(subdominios), framework, agentes);
 		return 0;
 	}
 }

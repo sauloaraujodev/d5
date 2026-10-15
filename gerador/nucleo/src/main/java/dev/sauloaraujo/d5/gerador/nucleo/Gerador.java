@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.Resource;
@@ -29,6 +30,10 @@ import freemarker.template.TemplateExceptionHandler;
 public class Gerador {
 	private static final List<String> DIRETORIOS_PADRAO = List.of("src/main/java", "src/main/resources",
 			"src/test/java", "src/test/resources");
+
+	// Versão semântica, por exemplo, 1.0.0 ou 1.0.0-SNAPSHOT
+	private static final Pattern VERSAO = Pattern
+			.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?");
 
 	private static final String DIRETORIO_SKILLS = "agents/skills/";
 
@@ -58,17 +63,22 @@ public class Gerador {
 		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	}
 
-	public void gerar(File diretorio, String groupId, String nome, Set<String> subdominios, boolean framework,
-			boolean agentes) {
-		gerar(diretorio.toPath(), groupId, nome, subdominios, framework, agentes);
+	public void gerar(File diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework, boolean agentes) {
+		gerar(diretorio.toPath(), groupId, nome, versao, subdominios, framework, agentes);
 	}
 
-	public void gerar(Path diretorio, String groupId, String nome, Set<String> subdominios, boolean framework,
-			boolean agentes) {
+	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework, boolean agentes) {
 		Objects.requireNonNull(diretorio);
 		Objects.requireNonNull(groupId);
 		Objects.requireNonNull(nome);
+		Objects.requireNonNull(versao);
 		Objects.requireNonNull(subdominios);
+		// O package.json do frontend exige que a versão siga o versionamento semântico
+		if (!VERSAO.matcher(versao).matches()) {
+			throw new IllegalArgumentException("A versão " + versao + " não segue o versionamento semântico");
+		}
 		if (subdominios.isEmpty()) {
 			throw new IllegalArgumentException("É necessário informar ao menos um subdomínio");
 		}
@@ -77,19 +87,19 @@ public class Gerador {
 		var subdominiosOrdenados = new TreeSet<>(subdominios);
 		var artifactIdCompartilhado = nome + "-dominio-compartilhado";
 
-		gerarPomRaiz(raiz, groupId, nome, subdominiosOrdenados, framework);
+		gerarPomRaiz(raiz, groupId, nome, versao, subdominiosOrdenados, framework);
 
-		gerarDominioCompartilhado(raiz, groupId, nome, artifactIdCompartilhado, framework);
+		gerarDominioCompartilhado(raiz, groupId, nome, versao, artifactIdCompartilhado, framework);
 		for (var subdominio : subdominiosOrdenados) {
-			gerarDominio(raiz, groupId, nome, subdominio, artifactIdCompartilhado, framework);
+			gerarDominio(raiz, groupId, nome, versao, subdominio, artifactIdCompartilhado, framework);
 		}
 
-		gerarAplicacao(raiz, groupId, nome, subdominiosOrdenados, framework);
-		gerarInfraestrutura(raiz, groupId, nome, framework);
-		gerarUiBackend(raiz, groupId, nome, framework);
+		gerarAplicacao(raiz, groupId, nome, versao, subdominiosOrdenados, framework);
+		gerarInfraestrutura(raiz, groupId, nome, versao, framework);
+		gerarUiBackend(raiz, groupId, nome, versao, framework);
 
 		if (agentes) {
-			gerarAgentes(raiz, groupId, nome, subdominiosOrdenados, framework);
+			gerarAgentes(raiz, groupId, nome, versao, subdominiosOrdenados, framework);
 		}
 
 		try (var modulos = Files.list(raiz)) {
@@ -103,11 +113,12 @@ public class Gerador {
 		}
 
 		// Gerado depois dos diretórios padrão, que não se aplicam a um módulo Angular
-		gerarUiFrontend(raiz, groupId, nome);
+		gerarUiFrontend(raiz, groupId, nome, versao);
 	}
 
-	private void gerarAgentes(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
-		var projeto = Map.of("name", nome, "groupId", groupId, "version", "1.0.0-SNAPSHOT", "framework", framework,
+	private void gerarAgentes(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework) {
+		var projeto = Map.of("name", nome, "groupId", groupId, "version", versao, "framework", framework,
 				"subdomains", subdominios, "mavenRootProject", Map.of("artifactId", nome + "-pai"));
 		var modelo = Map.<String, Object>of("d5Project", projeto);
 
@@ -162,17 +173,18 @@ public class Gerador {
 		}
 	}
 
-	private void gerarPomRaiz(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
-		processar("pom-raiz.ftl",
-				Map.of("groupId", groupId, "nome", nome, "subdominios", subdominios, "framework", framework),
+	private void gerarPomRaiz(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework) {
+		processar("pom-raiz.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao, "subdominios",
+				subdominios, "framework", framework),
 				raiz.resolve("pom.xml"));
 	}
 
-	private void gerarDominioCompartilhado(Path raiz, String groupId, String nome, String artifactId,
+	private void gerarDominioCompartilhado(Path raiz, String groupId, String nome, String versao, String artifactId,
 			boolean framework) {
 		var modulo = raiz.resolve("dominio-compartilhado");
 
-		gerarPomDominio(modulo, groupId, nome, artifactId, null, framework);
+		gerarPomDominio(modulo, groupId, nome, versao, artifactId, null, framework);
 
 		var pacote = groupId + "." + nome + ".dominio";
 		var mainJava = modulo.resolve("src/main/java/" + pacote.replace('.', '/'));
@@ -180,38 +192,42 @@ public class Gerador {
 		processar("Autorizacao.java.ftl", Map.of("pacote", pacote), mainJava.resolve("Autorizacao.java"));
 	}
 
-	private void gerarDominio(Path raiz, String groupId, String nome, String subdominio, String artifactIdCompartilhado,
-			boolean framework) {
+	private void gerarDominio(Path raiz, String groupId, String nome, String versao, String subdominio,
+			String artifactIdCompartilhado, boolean framework) {
 		var modulo = raiz.resolve("dominio-" + subdominio);
 
-		gerarPomDominio(modulo, groupId, nome, nome + "-dominio-" + subdominio, artifactIdCompartilhado, framework);
+		gerarPomDominio(modulo, groupId, nome, versao, nome + "-dominio-" + subdominio, artifactIdCompartilhado,
+				framework);
 
 		var pacote = groupId + "." + nome + ".dominio." + subdominio;
 		var testeJava = modulo.resolve("src/test/java/" + pacote.replace('.', '/'));
 		processar("CucumberTests.java.ftl", Map.of("pacote", pacote), testeJava.resolve("CucumberTests.java"));
 	}
 
-	private void gerarPomDominio(Path modulo, String groupId, String nome, String artifactId,
+	private void gerarPomDominio(Path modulo, String groupId, String nome, String versao, String artifactId,
 			@Nullable String dominioCompartilhado, boolean framework) {
 		var modelo = new HashMap<String, Object>();
 		modelo.put("groupId", groupId);
 		modelo.put("nome", nome);
+		modelo.put("versao", versao);
 		modelo.put("artifactId", artifactId);
 		modelo.put("dominioCompartilhado", dominioCompartilhado);
 		modelo.put("framework", framework);
 		processar("pom-dominio.ftl", modelo, modulo.resolve("pom.xml"));
 	}
 
-	private void gerarAplicacao(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
-		processar("pom-aplicacao.ftl",
-				Map.of("groupId", groupId, "nome", nome, "subdominios", subdominios, "framework", framework),
+	private void gerarAplicacao(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework) {
+		processar("pom-aplicacao.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao, "subdominios",
+				subdominios, "framework", framework),
 				raiz.resolve("aplicacao/pom.xml"));
 	}
 
-	private void gerarInfraestrutura(Path raiz, String groupId, String nome, boolean framework) {
+	private void gerarInfraestrutura(Path raiz, String groupId, String nome, String versao, boolean framework) {
 		var modulo = raiz.resolve("infraestrutura");
 
-		processar("pom-infraestrutura.ftl", Map.of("groupId", groupId, "nome", nome, "framework", framework),
+		processar("pom-infraestrutura.ftl",
+				Map.of("groupId", groupId, "nome", nome, "versao", versao, "framework", framework),
 				modulo.resolve("pom.xml"));
 
 		var pacote = groupId + "." + nome + ".infraestrutura";
@@ -220,10 +236,11 @@ public class Gerador {
 				testeJava.resolve("InfraestruturaTesteAplicacao.java"));
 	}
 
-	private void gerarUiBackend(Path raiz, String groupId, String nome, boolean framework) {
+	private void gerarUiBackend(Path raiz, String groupId, String nome, String versao, boolean framework) {
 		var modulo = raiz.resolve("ui-backend");
 
-		processar("pom-ui-backend.ftl", Map.of("groupId", groupId, "nome", nome, "framework", framework),
+		processar("pom-ui-backend.ftl",
+				Map.of("groupId", groupId, "nome", nome, "versao", versao, "framework", framework),
 				modulo.resolve("pom.xml"));
 
 		var pacote = groupId + "." + nome;
@@ -245,10 +262,11 @@ public class Gerador {
 		}
 	}
 
-	private void gerarUiFrontend(Path raiz, String groupId, String nome) {
+	private void gerarUiFrontend(Path raiz, String groupId, String nome, String versao) {
 		var modulo = raiz.resolve("ui-frontend");
 
-		processar("pom-ui-frontend.ftl", Map.of("groupId", groupId, "nome", nome), modulo.resolve("pom.xml"));
+		processar("pom-ui-frontend.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao),
+				modulo.resolve("pom.xml"));
 
 		// Os templates FreeMarker têm a extensão .ftl; os demais arquivos, inclusive
 		// os binários, são copiados sem alteração. O .gitignore também é um template
@@ -257,7 +275,8 @@ public class Gerador {
 		listarRecursos("templates/" + DIRETORIO_UI_FRONTEND).forEach((caminho, recurso) -> {
 			if (caminho.endsWith(EXTENSAO_TEMPLATE)) {
 				var arquivo = caminho.substring(0, caminho.length() - EXTENSAO_TEMPLATE.length());
-				processar(DIRETORIO_UI_FRONTEND + caminho, Map.of("nome", nome), angular.resolve(arquivo));
+				processar(DIRETORIO_UI_FRONTEND + caminho, Map.of("nome", nome, "versao", versao),
+						angular.resolve(arquivo));
 			} else {
 				copiar(recurso, angular.resolve(caminho));
 			}

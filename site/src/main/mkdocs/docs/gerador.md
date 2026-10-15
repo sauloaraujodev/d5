@@ -13,6 +13,11 @@
 <input id="gerador-nome" type="text" name="nome" required pattern="[a-z]+">
 <small class="gerador-erro" data-vazio="Obrigatório">Deve conter apenas letras minúsculas</small>
 </div>
+<div class="gerador-campo">
+<label for="gerador-versao">Versão *</label>
+<input id="gerador-versao" type="text" name="versao" value="1.0.0-SNAPSHOT" required pattern="(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*)?">
+<small class="gerador-erro" data-vazio="Obrigatório">Deve seguir o <a href="https://semver.org/lang/pt-BR/" target="_blank">versionamento semântico</a>, por exemplo, 1.0.0-SNAPSHOT</small>
+</div>
 </div>
 <div class="gerador-coluna" id="gerador-subdominios">
 <div class="gerador-campo gerador-subdominio">
