@@ -1,4 +1,4 @@
-# Tutorial
+# Introdução
 Neste tutorial, você vai desenvolver, passo a passo, uma aplicação com o framework.
 
 ## Subdomínios
@@ -12,8 +12,8 @@ O tutorial é dividido em três lições, cada uma dedicada a um [agregado](../r
 
 | Lição | O que acrescenta | Projeto ao final da lição |
 | --- | --- | --- |
-| [1. Unidade federativa](1-unidade-federativa.md) | o projeto Maven e o primeiro agregado, implementado camada por camada: domínio, testes, aplicação, infraestrutura e API REST | `exemplo1` |
+| [1. Unidade federativa](1-unidade-federativa.md) | o projeto Maven, gerado pelo [gerador](../gerador.md), e o primeiro agregado, implementado camada por camada: domínio, testes, aplicação, infraestrutura e API REST | `exemplo1` |
 | [2. Município](2-municipio.md) | um agregado que referencia outro, com uma associação entre as entidades JPA, uma ação além das quatro operações básicas e a proteção contra a exclusão de um agregado referenciado | `exemplo2` |
-| [3. Cliente](3-cliente.md) | um novo subdomínio, que depende de outro, e um agregado com identificador gerado pelo banco de dados e um objeto de valor formado por vários atributos | `exemplo` |
+| [3. Cliente](3-cliente.md) | o subdomínio CRM, que passa a depender de outro, e um agregado com identificador gerado pelo banco de dados e um objeto de valor formado por vários atributos | `exemplo` |
 
 Os diretórios `exemplo1`, `exemplo2` e `exemplo` do repositório de D5 contêm o projeto completo ao final de cada lição. Todos usam os mesmos nomes de módulos e pacotes — em cada lição, você continua evoluindo o mesmo projeto, criado no diretório `exemplo`.

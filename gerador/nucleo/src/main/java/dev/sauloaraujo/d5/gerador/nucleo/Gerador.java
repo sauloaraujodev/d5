@@ -52,11 +52,13 @@ public class Gerador {
 		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	}
 
-	public void gerar(File diretorio, String groupId, String nome, Set<String> subdominios, boolean framework) {
-		gerar(diretorio.toPath(), groupId, nome, subdominios, framework);
+	public void gerar(File diretorio, String groupId, String nome, Set<String> subdominios, boolean framework,
+			boolean agentes) {
+		gerar(diretorio.toPath(), groupId, nome, subdominios, framework, agentes);
 	}
 
-	public void gerar(Path diretorio, String groupId, String nome, Set<String> subdominios, boolean framework) {
+	public void gerar(Path diretorio, String groupId, String nome, Set<String> subdominios, boolean framework,
+			boolean agentes) {
 		Objects.requireNonNull(diretorio);
 		Objects.requireNonNull(groupId);
 		Objects.requireNonNull(nome);
@@ -80,7 +82,9 @@ public class Gerador {
 		gerarInfraestrutura(raiz, groupId, nome, framework);
 		gerarUiBackend(raiz, groupId, nome, framework);
 
-		gerarAgentes(raiz, groupId, nome, subdominiosOrdenados, framework);
+		if (agentes) {
+			gerarAgentes(raiz, groupId, nome, subdominiosOrdenados, framework);
+		}
 
 		try (var modulos = Files.list(raiz)) {
 			for (var modulo : (Iterable<Path>) modulos::iterator) {

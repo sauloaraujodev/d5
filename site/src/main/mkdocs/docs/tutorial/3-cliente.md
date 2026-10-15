@@ -1,9 +1,9 @@
 # Lição 3: cliente
-Nesta lição, você vai criar o subdomínio CRM e seu agregado cliente, que referencia o município criado na [lição 2](2-municipio.md). Ao final, o projeto corresponde ao diretório `exemplo` do repositório de D5.
+Nesta lição, você vai implementar o subdomínio CRM e seu agregado cliente, que referencia o município criado na [lição 2](2-municipio.md). Ao final, o projeto corresponde ao diretório `exemplo` do repositório de D5.
 
 Como na lição 2, esta lição explica apenas o que muda em relação às anteriores:
 
-- um novo módulo de subdomínio, que depende de outro subdomínio;
+- um módulo de subdomínio que passa a depender de outro subdomínio;
 - um identificador artificial, gerado pelo banco de dados na inclusão;
 - um objeto de valor formado por vários atributos, o endereço;
 - uma regra que depende do estado de outro agregado: o cliente não pode ser vinculado a um município extinto;
@@ -11,29 +11,9 @@ Como na lição 2, esta lição explica apenas o que muda em relação às anter
 - o município passa a ser referenciado e, por isso, não pode mais ser excluído enquanto houver clientes nele.
 
 ## Projeto Maven
-O subdomínio CRM corresponde ao módulo `exemplo-dominio-crm`. Crie os diretórios do módulo executando os comandos:
+O subdomínio CRM corresponde ao módulo `exemplo-dominio-crm`, que o [gerador](../gerador.md) já criou na [lição 1](1-unidade-federativa.md), junto com a sua entrada no `pom.xml` do projeto raiz e a dependência do módulo de aplicação nele.
 
-=== "Bash"
-
-    ```bash
-    mkdir -p exemplo/dominio-crm/src/{main,test}/{java,resources}
-    ```
-
-=== "PowerShell"
-
-    ```powershell
-    foreach ($d in 'main/java','main/resources','test/java','test/resources') {
-        mkdir "exemplo/dominio-crm/src/$d" -Force > $null
-    }
-    ```
-
-Acrescente o módulo ao `pom.xml` do projeto raiz:
-
-```xml title="exemplo/pom.xml"
---8<-- "exemplo/pom.xml"
-```
-
-O cliente referencia o município e, para validar essa referência, seu serviço usa o repositório de município. Por isso, além do domínio compartilhado, o módulo `exemplo-dominio-crm` depende de `exemplo-dominio-geografia`:
+O cliente referencia o município e, para validar essa referência, seu serviço usa o repositório de município. Por isso, além do domínio compartilhado, o módulo `exemplo-dominio-crm` passa a depender de `exemplo-dominio-geografia`. Acrescente a dependência ao `pom.xml` do módulo:
 
 ```xml title="exemplo/dominio-crm/pom.xml"
 --8<-- "exemplo/dominio-crm/pom.xml"
@@ -41,13 +21,7 @@ O cliente referencia o município e, para validar essa referência, seu serviço
 
 Um módulo de subdomínio pode depender de outro, desde que as dependências entre eles não formem um ciclo — por isso Geografia nunca dependerá do CRM. Já o código IBGE do município não vai para o domínio compartilhado, ainda que passe a ser usado pelos dois subdomínios: ele pertence a Geografia, e o compartilhado só contém conceitos sem um subdomínio dono; veja [Dependências entre módulos de domínio](../referencia/convencoes.md#dependencias-entre-modulos-de-dominio).
 
-O módulo de aplicação, que vai conter o serviço de aplicação do cliente, passa a depender também de `exemplo-dominio-crm`:
-
-```xml title="exemplo/aplicacao/pom.xml"
---8<-- "exemplo/aplicacao/pom.xml"
-```
-
-Com essas mudanças, as dependências entre os módulos passam a ser:
+Com essa mudança, as dependências entre os módulos passam a ser:
 
 ```mermaid
 graph TD

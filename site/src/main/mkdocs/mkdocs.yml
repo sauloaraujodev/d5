@@ -40,7 +40,7 @@ nav:
   - Visão geral: index.md
   - Gerador: gerador.md
   - Tutorial:
-      - tutorial/index.md
+      - Introdução: tutorial/index.md
       - Lição 1 - Unidade federativa: tutorial/1-unidade-federativa.md
       - Lição 2 - Município: tutorial/2-municipio.md
       - Lição 3 - Cliente: tutorial/3-cliente.md

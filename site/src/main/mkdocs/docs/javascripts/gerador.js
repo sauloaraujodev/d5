@@ -46,7 +46,7 @@ function iniciarGerador() {
 	})
 
 	formulario.addEventListener("submit", (evento) => {
-		const validos = [...formulario.querySelectorAll("input")].map(validar)
+		const validos = [...formulario.querySelectorAll('input[type="text"]')].map(validar)
 		if (validos.includes(false)) {
 			evento.preventDefault()
 		}

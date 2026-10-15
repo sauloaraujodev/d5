@@ -8,6 +8,7 @@ public class Formulario {
 	private String nome;
 	private Set<String> subdominios;
 	private boolean framework = true;
+	private boolean agentes = true;
 
 	public Formulario(String groupId, String nome, Set<String> subdominios) {
 		this.groupId = Objects.requireNonNull(groupId);
@@ -33,5 +34,13 @@ public class Formulario {
 
 	public void setFramework(boolean framework) {
 		this.framework = framework;
+	}
+
+	public boolean isAgentes() {
+		return agentes;
+	}
+
+	public void setAgentes(boolean agentes) {
+		this.agentes = agentes;
 	}
 }

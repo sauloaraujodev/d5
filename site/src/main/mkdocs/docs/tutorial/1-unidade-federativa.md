@@ -1,88 +1,44 @@
 # Lição 1: unidade federativa
-Nesta lição, você vai criar o projeto e implementar, camada por camada, o agregado unidade federativa do subdomínio Geografia. Ao final, o projeto corresponde ao diretório `exemplo1` do repositório de D5.
+Nesta lição, você vai gerar o projeto e implementar, camada por camada, o agregado unidade federativa do subdomínio Geografia. Ao final, o projeto corresponde ao diretório `exemplo1` do repositório de D5.
 
 Para seguir o tutorial, você precisa do Java 25 e do Maven.
 
 ## Projeto Maven
-Seguindo as [convenções](../referencia/convencoes.md#maven), você deve criar um projeto com os módulos:
+Em vez de criar o projeto manualmente, use o [gerador](../gerador.md), que produz a estrutura de diretórios, os arquivos `pom.xml` e as classes de infraestrutura que não dependem do domínio, seguindo as [convenções](../referencia/convencoes.md#maven). Informe:
+
+- **groupId**: `com.example`;
+- **Nome do projeto**: `exemplo`;
+- **Subdomínios**: `geografia` e `crm`;
+- **Usar o framework D5**: marcado;
+- **Incluir AGENTS.md e skills**: desmarcado, porque este tutorial não utiliza agentes de IA.
+
+Extraia o arquivo `exemplo.zip` obtido. O projeto gerado tem os módulos:
 
 - **`exemplo-dominio-compartilhado`**, do qual os módulos correspondentes a subdomínios dependem e que vai conter os conceitos que não pertencem a nenhum subdomínio específico e são comuns a todos eles, como os papéis de autorização; veja [Dependências entre módulos de domínio](../referencia/convencoes.md#dependencias-entre-modulos-de-dominio);
 - **`exemplo-dominio-geografia`**, correspondente ao subdomínio Geografia;
+- **`exemplo-dominio-crm`**, correspondente ao subdomínio CRM, que permanece vazio até a [lição 3](3-cliente.md), quando o cliente é criado;
 - **`exemplo-aplicacao`**, com os serviços de aplicação, projeções e consultas de todos os subdomínios;
 - **`exemplo-infraestrutura`**, com as implementações JPA dos repositórios dos agregados de todos os subdomínios;
 - **`exemplo-ui-backend`**, com os controladores REST que expõem os agregados de todos os subdomínios e o `main` da aplicação Spring Boot.
 
-O módulo `exemplo-dominio-crm`, correspondente ao subdomínio CRM, só é criado na [lição 3](3-cliente.md), junto com o cliente.
-
 Diferente do domínio, que é decomposto em um módulo por subdomínio porque cada um tem suas próprias regras de negócio, a aplicação, a infraestrutura e o backend são camadas técnicas transversais que orquestram, persistem e expõem os agregados de todos os subdomínios da mesma forma — por isso cada uma é um único módulo.
 
 ### Diretórios
-Crie os diretórios do projeto executando os comandos:
-
-=== "Bash"
-
-    ```bash
-    mkdir -p exemplo/{dominio-compartilhado,dominio-geografia,aplicacao,infraestrutura,ui-backend}/src/{main,test}/{java,resources}
-    ```
-
-=== "PowerShell"
-
-    ```powershell
-    foreach ($m in 'dominio-compartilhado','dominio-geografia','aplicacao','infraestrutura','ui-backend') {
-        foreach ($d in 'main/java','main/resources','test/java','test/resources') {
-            mkdir "exemplo/$m/src/$d" -Force > $null
-        }
-    }
-    ```
-
-A estrutura de diretórios resultante é:
+Cada módulo segue a estrutura padrão do Maven, com `src/main/java`, `src/main/resources`, `src/test/java` e `src/test/resources`:
 
 ```
 exemplo
+├── pom.xml
 ├── dominio-compartilhado
-│   └── src
-│       ├── main
-│       │   ├── java
-│       │   └── resources
-│       └── test
-│           ├── java
-│           └── resources
 ├── dominio-geografia
-│   └── src
-│       ├── main
-│       │   ├── java
-│       │   └── resources
-│       └── test
-│           ├── java
-│           └── resources
+├── dominio-crm
 ├── aplicacao
-│   └── src
-│       ├── main
-│       │   ├── java
-│       │   └── resources
-│       └── test
-│           ├── java
-│           └── resources
 ├── infraestrutura
-│   └── src
-│       ├── main
-│       │   ├── java
-│       │   └── resources
-│       └── test
-│           ├── java
-│           └── resources
 └── ui-backend
-    └── src
-        ├── main
-        │   ├── java
-        │   └── resources
-        └── test
-            ├── java
-            └── resources
 ```
 
 ### Arquivos pom.xml
-Crie um `pom.xml` para o projeto raiz e um para cada módulo, seguindo as [convenções](../referencia/convencoes.md#maven). O raiz herda de [`d5-pai`](../referencia/framework/index.md#projeto-pai) — que define Java 25 e Spring Boot 4.1 e gerencia as versões dos módulos do framework, declarados, por isso, sem `<version>` — e declara os cinco módulos.
+O `pom.xml` do projeto raiz herda de [`d5-pai`](../referencia/framework/index.md#projeto-pai) — que define Java 25 e Spring Boot 4.1 e gerencia as versões dos módulos do framework, declarados, por isso, sem `<version>` — e declara os seis módulos.
 
 O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no repositório principal, porque a versão atual, `1.0.0-SNAPSHOT`, ainda não é uma versão final. Por isso, o `pom.xml` do projeto raiz declara esse repositório em `<repositories>`; os módulos o herdam.
 
@@ -90,11 +46,11 @@ O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no
 --8<-- "exemplo1/pom.xml"
 ```
 
-Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; o de subdomínio depende também do compartilhado. A aplicação depende de `d5-framework-aplicacao` e do módulo de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — o módulo de subdomínio chega transitivamente por ele. O backend depende de `d5-framework-ui-backend`, do módulo de aplicação cujos controladores expõem, do domínio compartilhado — cujos papéis de [autorização](#autorizacao) a configuração de segurança usa — e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST.
+Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; o de subdomínio depende também do compartilhado. A aplicação depende de `d5-framework-aplicacao` e dos módulos de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — os módulos de subdomínio chegam transitivamente por ele. O backend depende de `d5-framework-ui-backend`, do módulo de aplicação cujos controladores expõem, do domínio compartilhado — cujos papéis de [autorização](#autorizacao) a configuração de segurança usa — e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST.
 
 Cada módulo depende também, em escopo de teste, do [módulo de teste](../referencia/framework/index.md#modulos-de-teste) do framework correspondente à sua camada. Além disso, o backend declara o `spring-boot-maven-plugin`, que empacota a aplicação em um jar executável e oferece o objetivo `spring-boot:run`, usado [mais adiante](#testando-com-o-swagger-ui), e, como dependência opcional, o [Spring Boot DevTools](https://docs.spring.io/spring-boot/reference/using/devtools.html){target="_blank"}, que reinicia a aplicação automaticamente quando o código é recompilado durante o desenvolvimento.
 
-O diagrama a seguir ilustra essas dependências, tanto entre os módulos do exemplo quanto com os módulos do framework; uma seta de A para B indica que A depende de B, e uma seta tracejada indica uma dependência restrita ao tempo de execução:
+O diagrama a seguir ilustra essas dependências, tanto entre os módulos do exemplo quanto com os módulos do framework; uma seta de A para B indica que A depende de B, e uma seta tracejada indica uma dependência restrita ao tempo de execução. Por enquanto, `exemplo-dominio-crm` depende apenas do domínio compartilhado; a dependência dele em `exemplo-dominio-geografia` só é acrescentada na [lição 3](3-cliente.md):
 
 ```mermaid
 graph TD
@@ -109,6 +65,7 @@ graph TD
     subgraph exemplo
         DC[exemplo-dominio-compartilhado]
         DG[exemplo-dominio-geografia]
+        DR[exemplo-dominio-crm]
         AP[exemplo-aplicacao]
         IN[exemplo-infraestrutura]
         UI[exemplo-ui-backend]
@@ -116,8 +73,10 @@ graph TD
 
     DC --> FD
     DG --> DC
+    DR --> DC
     AP --> FA
     AP --> DG
+    AP --> DR
     IN --> FI
     IN --> AP
     UI --> FU
@@ -137,6 +96,12 @@ graph TD
 
     ```xml title="exemplo/dominio-geografia/pom.xml"
     --8<-- "exemplo1/dominio-geografia/pom.xml"
+    ```
+
+=== "dominio-crm"
+
+    ```xml title="exemplo/dominio-crm/pom.xml"
+    --8<-- "exemplo1/dominio-crm/pom.xml"
     ```
 
 === "aplicacao"
@@ -199,7 +164,7 @@ Serviços acessam unidades federativas persistidas através de um [repositório]
 ```
 
 #### Autorização
-As regras de autorização sobre um agregado usam papéis compartilhados por todos os subdomínios. Seguindo as [convenções](../referencia/convencoes.md#pacotes), declare-os em um `enum` no módulo `exemplo-dominio-compartilhado`, pacote `com.example.exemplo.dominio`. Antes, crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+As regras de autorização sobre um agregado usam papéis compartilhados por todos os subdomínios. Seguindo as [convenções](../referencia/convencoes.md#pacotes), o gerador já criou, no módulo `exemplo-dominio-compartilhado`, pacote `com.example.exemplo.dominio`, um `enum` que os declara, e o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/dominio-compartilhado/src/main/java/com/example/exemplo/dominio/package-info.java"
 --8<-- "exemplo1/dominio-compartilhado/src/main/java/com/example/exemplo/dominio/package-info.java"
@@ -219,7 +184,7 @@ Note que o serviço não leva nenhuma anotação do Spring: ele, os repositório
 ```
 
 #### Testes
-O comportamento do serviço é especificado com cenários em Gherkin e automatizado com [Cucumber](https://cucumber.io){target="_blank"}. Crie a suíte que conecta o Cucumber ao JUnit Platform e seleciona os cenários em `src/test/resources` — todo módulo de subdomínio tem a sua:
+O comportamento do serviço é especificado com cenários em Gherkin e automatizado com [Cucumber](https://cucumber.io){target="_blank"}. O gerador já criou a suíte que conecta o Cucumber ao JUnit Platform e seleciona os cenários em `src/test/resources` — todo módulo de subdomínio tem a sua:
 
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
 --8<-- "exemplo1/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
@@ -320,7 +285,7 @@ Implemente também [`IUnidadeFederativaAplicacaoRepositorio`](#repositorio-de-ap
 ```
 
 #### Testes do repositório
-Diferente do serviço, cujo comportamento é especificado com cenários em Gherkin sobre dublês, os repositórios são testados por integração contra um banco H2 embarcado, usando `@DataJpaTest`. Esse tipo de teste exige uma classe de configuração do Spring Boot no classpath de teste — crie uma mínima, anotada com `@SpringBootApplication`:
+Diferente do serviço, cujo comportamento é especificado com cenários em Gherkin sobre dublês, os repositórios são testados por integração contra um banco H2 embarcado, usando `@DataJpaTest`. Esse tipo de teste exige uma classe de configuração do Spring Boot no classpath de teste — o gerador já criou uma mínima, anotada com `@SpringBootApplication`:
 
 ```java title="exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/InfraestruturaTesteAplicacao.java"
 --8<-- "exemplo1/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/InfraestruturaTesteAplicacao.java"
@@ -353,7 +318,7 @@ O controlador estende [`AgregadoControladorAbstrato`](../referencia/framework/ui
 ```
 
 #### Segurança
-Restrinja o backend a usuários autenticados criando uma configuração de segurança, no pacote `com.example.exemplo.ui.backend.seguranca`, que estende [`SegurancaConfiguracaoAbstrata`](../referencia/framework/ui-backend.md#segurancaconfiguracaoabstrata): ela já protege `/backend/**` com autenticação HTTP Basic e CSRF baseado em cookie, restando declarar, em `autorizar`, quais endpoints liberar — sem nenhuma regra, todo endpoint sob `/backend/**` seria negado; aqui, todos passam a exigir apenas autenticação — e expor os usuários disponíveis através de um `UserDetailsService`. Este exemplo declara dois usuários em memória: `a`/`a`, com a [autorização](#autorizacao) `ADMINISTRADOR`, e `u`/`u`, com `USUARIO`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+O gerador criou uma configuração de segurança que restringe o backend a usuários autenticados, no pacote `com.example.exemplo.ui.backend.seguranca`, que estende [`SegurancaConfiguracaoAbstrata`](../referencia/framework/ui-backend.md#segurancaconfiguracaoabstrata): ela já protege `/backend/**` com autenticação HTTP Basic e CSRF baseado em cookie, restando declarar, em `autorizar`, quais endpoints liberar — sem nenhuma regra, todo endpoint sob `/backend/**` seria negado; aqui, todos passam a exigir apenas autenticação — e expor os usuários disponíveis através de um `UserDetailsService`. Ela declara dois usuários em memória: `a`/`a`, com a [autorização](#autorizacao) `ADMINISTRADOR`, e `u`/`u`, com `USUARIO`. O pacote tem um `package-info.java`, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/package-info.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/package-info.java"
@@ -364,14 +329,14 @@ Restrinja o backend a usuários autenticados criando uma configuração de segur
 ```
 
 #### Autenticação
-Para o cliente descobrir o usuário autenticado, crie um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo esse recurso em `Backend.PREFIXO + "autenticacao"`.
+Para o cliente descobrir o usuário autenticado, o gerador criou um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo esse recurso em `Backend.PREFIXO + "autenticacao"`.
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoControlador.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoControlador.java"
 ```
 
 #### Aplicação Spring Boot
-Por fim, crie a classe com o `main` que sobe a aplicação, anotada com `@SpringBootApplication`, no pacote raiz `com.example.exemplo`. É a partir do pacote dela que o component scan encontra os controladores e a configuração de segurança, e que o [registro de beans](../referencia/framework/comportamentos.md#registro-de-beans) encontra os serviços e as implementações de repositório de todos os subdomínios. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+Por fim, o gerador criou a classe com o `main` que sobe a aplicação, anotada com `@SpringBootApplication`, no pacote raiz `com.example.exemplo`. É a partir do pacote dela que o component scan encontra os controladores e a configuração de segurança, e que o [registro de beans](../referencia/framework/comportamentos.md#registro-de-beans) encontra os serviços e as implementações de repositório de todos os subdomínios. O pacote tem um `package-info.java`, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/package-info.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/package-info.java"

@@ -37,10 +37,14 @@ public class Comando implements Callable<Integer> {
 			"--framework" }, arity = "1", defaultValue = "true", description = "Se o projeto gerado deve depender do framework D5.")
 	private boolean framework;
 
+	@Option(names = { "-a",
+			"--agentes" }, arity = "1", defaultValue = "true", description = "Se o projeto gerado deve incluir o AGENTS.md e os skills.")
+	private boolean agentes;
+
 	@Override
 	public Integer call() throws Exception {
 		gerador.gerar(Objects.requireNonNull(diretorio), Objects.requireNonNull(groupId), Objects.requireNonNull(nome),
-				Objects.requireNonNull(subdominios), framework);
+				Objects.requireNonNull(subdominios), framework, agentes);
 		return 0;
 	}
 }

@@ -1,8 +1,8 @@
 # Gerador de projetos
 
-Gera, em um arquivo zip, a estrutura de um projeto D5: o `pom.xml` raiz, um módulo de domínio para cada subdomínio, a aplicação, a infraestrutura e a interface de backend.
-
 <form id="gerador" class="gerador" action="/api/gerador" method="post" novalidate>
+<div class="gerador-colunas">
+<div class="gerador-coluna">
 <div class="gerador-campo">
 <label for="gerador-group-id">groupId *</label>
 <input id="gerador-group-id" type="text" name="groupId" required pattern="[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*">
@@ -13,7 +13,8 @@ Gera, em um arquivo zip, a estrutura de um projeto D5: o `pom.xml` raiz, um mód
 <input id="gerador-nome" type="text" name="nome" required pattern="[a-z]+">
 <small class="gerador-erro" data-vazio="Obrigatório">Deve conter apenas letras minúsculas</small>
 </div>
-<div id="gerador-subdominios">
+</div>
+<div class="gerador-coluna" id="gerador-subdominios">
 <div class="gerador-campo gerador-subdominio">
 <label>Subdomínio *</label>
 <div class="gerador-grupo">
@@ -23,8 +24,14 @@ Gera, em um arquivo zip, a estrutura de um projeto D5: o `pom.xml` raiz, um mód
 <small class="gerador-erro" data-vazio="Obrigatório">Deve conter apenas letras minúsculas</small>
 </div>
 </div>
+</div>
+<div class="gerador-opcao">
+<input type="hidden" name="_framework" value="on">
+<label><input id="gerador-framework" type="checkbox" name="framework" checked> Usar o framework D5</label>
+</div>
+<div class="gerador-opcao">
+<input type="hidden" name="_agentes" value="on">
+<label><input id="gerador-agentes" type="checkbox" name="agentes" checked> Incluir AGENTS.md e skills</label>
+</div>
 <button type="submit" class="md-button md-button--primary">Gerar</button>
 </form>
-
-!!! note
-    O gerador só funciona quando esta página é servida pela aplicação `d5-site`, que expõe o endpoint `/api/gerador`.

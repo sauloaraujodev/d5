@@ -33,10 +33,10 @@ ALTERACOES = {
         f"{_GEOGRAFIA_INFRAESTRUTURA}/unidadefederativa/UnidadeFederativaRepositorio.java",
         f"{_GEOGRAFIA_INFRAESTRUTURA_TESTE}/unidadefederativa/UnidadeFederativaRepositorioTest.java",
     },
-    # Lição 3: o módulo dominio-crm é criado e o município passa a ser referenciado pelo cliente.
+    # Lição 3: o módulo dominio-crm passa a depender de dominio-geografia e o município passa a ser
+    # referenciado pelo cliente.
     ("exemplo2", "exemplo"): {
-        "pom.xml",
-        "aplicacao/pom.xml",
+        "dominio-crm/pom.xml",
         f"{_GEOGRAFIA_DOMINIO}/municipio/spi/IMunicipioRepositorio.java",
         f"{_GEOGRAFIA_DOMINIO}/municipio/MunicipioServico.java",
         f"{_GEOGRAFIA_DOMINIO_TESTE}/municipio/MunicipioStepDefinitions.java",
