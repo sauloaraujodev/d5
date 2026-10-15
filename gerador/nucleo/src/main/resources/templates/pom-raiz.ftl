@@ -66,5 +66,6 @@
 		<module>aplicacao</module>
 		<module>infraestrutura</module>
 		<module>ui-backend</module>
+		<module>ui-frontend</module>
 	</modules>
 </project>

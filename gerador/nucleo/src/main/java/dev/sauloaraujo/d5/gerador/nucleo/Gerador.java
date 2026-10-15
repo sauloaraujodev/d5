@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,10 @@ public class Gerador {
 			"src/test/java", "src/test/resources");
 
 	private static final String DIRETORIO_SKILLS = "agents/skills/";
+
+	private static final String DIRETORIO_UI_FRONTEND = "ui-frontend/";
+
+	private static final String EXTENSAO_TEMPLATE = ".ftl";
 
 	private static final List<String> SKILLS = List.of("especificar-funcionalidade/SKILL.md",
 			"especificar-funcionalidade/references/REFERENCE.md", "especificar-testes/SKILL.md",
@@ -95,6 +101,9 @@ public class Gerador {
 		} catch (IOException e) {
 			throw new IllegalStateException("Falha ao gerar " + raiz, e);
 		}
+
+		// Gerado depois dos diretórios padrão, que não se aplicam a um módulo Angular
+		gerarUiFrontend(raiz, groupId, nome);
 	}
 
 	private void gerarAgentes(Path raiz, String groupId, String nome, Set<String> subdominios, boolean framework) {
@@ -118,10 +127,15 @@ public class Gerador {
 	}
 
 	private void copiarD5(Path destino) {
+		listarRecursos("d5/").forEach((caminho, recurso) -> copiar(recurso, destino.resolve(caminho)));
+	}
+
+	private Map<String, Resource> listarRecursos(String diretorio) {
 		try {
 			var resolvedor = new PathMatchingResourcePatternResolver();
-			var raiz = resolvedor.getResource("classpath:d5/").getURI().getSchemeSpecificPart();
-			for (var recurso : resolvedor.getResources("classpath*:d5/**")) {
+			var raiz = resolvedor.getResource("classpath:" + diretorio).getURI().getSchemeSpecificPart();
+			var recursos = new TreeMap<String, Resource>();
+			for (var recurso : resolvedor.getResources("classpath*:" + diretorio + "**")) {
 				if (!recurso.isReadable()) {
 					continue;
 				}
@@ -129,14 +143,22 @@ public class Gerador {
 				if (!caminho.startsWith(raiz)) {
 					throw new IllegalStateException("Recurso " + caminho + " fora de " + raiz);
 				}
-				var arquivo = destino.resolve(caminho.substring(raiz.length()));
-				Files.createDirectories(arquivo.getParent());
-				try (var entrada = recurso.getInputStream()) {
-					Files.copy(entrada, arquivo, StandardCopyOption.REPLACE_EXISTING);
-				}
+				recursos.put(caminho.substring(raiz.length()), recurso);
+			}
+			return recursos;
+		} catch (IOException e) {
+			throw new IllegalStateException("Falha ao listar " + diretorio, e);
+		}
+	}
+
+	private void copiar(Resource recurso, Path destino) {
+		try {
+			Files.createDirectories(destino.getParent());
+			try (var entrada = recurso.getInputStream()) {
+				Files.copy(entrada, destino, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
-			throw new IllegalStateException("Falha ao copiar o D5", e);
+			throw new IllegalStateException("Falha ao gerar " + destino, e);
 		}
 	}
 
@@ -221,6 +243,25 @@ public class Gerador {
 			processar("AutenticacaoControlador.java.ftl", Map.of("pacote", pacote),
 					seguranca.resolve("AutenticacaoControlador.java"));
 		}
+	}
+
+	private void gerarUiFrontend(Path raiz, String groupId, String nome) {
+		var modulo = raiz.resolve("ui-frontend");
+
+		processar("pom-ui-frontend.ftl", Map.of("groupId", groupId, "nome", nome), modulo.resolve("pom.xml"));
+
+		// Os templates FreeMarker têm a extensão .ftl; os demais arquivos, inclusive
+		// os binários, são copiados sem alteração. O .gitignore também é um template
+		// porque o Maven não inclui arquivos com esse nome no JAR do gerador.
+		var angular = modulo.resolve("src/main/angular");
+		listarRecursos("templates/" + DIRETORIO_UI_FRONTEND).forEach((caminho, recurso) -> {
+			if (caminho.endsWith(EXTENSAO_TEMPLATE)) {
+				var arquivo = caminho.substring(0, caminho.length() - EXTENSAO_TEMPLATE.length());
+				processar(DIRETORIO_UI_FRONTEND + caminho, Map.of("nome", nome), angular.resolve(arquivo));
+			} else {
+				copiar(recurso, angular.resolve(caminho));
+			}
+		});
 	}
 
 	private void processar(String template, Map<String, Object> modelo, Path destino) {
