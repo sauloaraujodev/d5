@@ -15,7 +15,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "${nome}",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -31,6 +31,9 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           },
           "configurations": {

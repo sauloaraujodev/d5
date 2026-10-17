@@ -3,7 +3,7 @@
   "version": "${versao}",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config backend-proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -17,6 +17,9 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "@ng-bootstrap/ng-bootstrap": "^21.0.0",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
     "ngx-mask": "^22.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -25,6 +28,7 @@
     "@angular/build": "^22.2.2",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.0",
+    "@angular/localize": "^22.2.0",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",

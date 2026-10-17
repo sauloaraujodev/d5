@@ -8,6 +8,6 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-  <${nome}-root></${nome}-root>
+  <app-root></app-root>
 </body>
 </html>
