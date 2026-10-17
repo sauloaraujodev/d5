@@ -14,11 +14,9 @@ public abstract class AutenticacaoControladorAbstrato {
 	}
 
 	@GetMapping
-	public Object autenticacao() {
+	public AutenticacaoRecursoAbstrato autenticacao() {
 		return recurso();
 	}
 
-	protected Object recurso() {
-		return new AutenticacaoRecurso(segurancaServico.getUsuario());
-	}
+	protected abstract AutenticacaoRecursoAbstrato recurso();
 }

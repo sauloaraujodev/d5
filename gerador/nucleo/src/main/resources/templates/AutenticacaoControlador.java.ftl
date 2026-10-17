@@ -13,4 +13,9 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 	public AutenticacaoControlador(ISegurancaServico segurancaServico) {
 		super(segurancaServico);
 	}
+
+	@Override
+	protected AutenticacaoRecurso recurso() {
+		return new AutenticacaoRecurso(segurancaServico.getUsuario());
+	}
 }

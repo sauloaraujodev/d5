@@ -259,6 +259,8 @@ public class Gerador {
 					seguranca.resolve("SegurancaConfiguracao.java"));
 			processar("AutenticacaoControlador.java.ftl", Map.of("pacote", pacote),
 					seguranca.resolve("AutenticacaoControlador.java"));
+			processar("AutenticacaoRecurso.java.ftl", Map.of("pacote", pacote),
+					seguranca.resolve("AutenticacaoRecurso.java"));
 		}
 	}
 

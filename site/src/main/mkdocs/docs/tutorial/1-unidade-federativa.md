@@ -329,11 +329,17 @@ O gerador criou uma configuração de segurança que restringe o backend a usuá
 ```
 
 #### Autenticação
-Para o cliente descobrir o usuário autenticado, o gerador criou um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo esse recurso em `Backend.PREFIXO + "autenticacao"`.
+Para o cliente descobrir o usuário autenticado e o que ele pode fazer, o gerador criou um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo o recurso de autenticação em `Backend.PREFIXO + "autenticacao"`, e o próprio recurso, `AutenticacaoRecurso`, que estende [`AutenticacaoRecursoAbstrato`](../referencia/framework/ui-backend.md#autenticacaorecursoabstrato). Gerados, eles trazem apenas o nome do usuário. Aqui, o recurso foi alterado para acrescentar o atributo `unidadeFederativa`, com as [autorizações](#autorizacao) do usuário sobre o agregado, e o controlador, para recebê-las do [`UnidadeFederativaServico`](#servico): `criarAutorizacoes` é chamado sem identificador, pois essas autorizações valem para o agregado como um todo. Repita o atributo para cada agregado que o cliente precisar conhecer, por exemplo, para exibir ou ocultar as opções de menu.
+
+```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoRecurso.java"
+--8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoRecurso.java"
+```
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoControlador.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoControlador.java"
 ```
+
+O JSON devolvido tem, além de `usuario`, o objeto `unidadeFederativa` com `incluir`, `buscar`, `alterar` e `excluir`.
 
 #### Aplicação Spring Boot
 Por fim, o gerador criou a classe com o `main` que sobe a aplicação, anotada com `@SpringBootApplication`, no pacote raiz `com.example.exemplo`. É a partir do pacote dela que o component scan encontra os controladores e a configuração de segurança, e que o [registro de beans](../referencia/framework/comportamentos.md#registro-de-beans) encontra os serviços e as implementações de repositório de todos os subdomínios. O pacote tem um `package-info.java`, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):

@@ -185,7 +185,7 @@ Implementação de `CsrfTokenRequestAttributeHandler` que segue a [recomendaçã
 A seção [CSRF no Swagger UI](comportamentos.md#csrf-no-swagger-ui) descreve o efeito de `FiltroCookieCsrf` e `ManipuladorRequisicaoCsrfSpa` na prática.
 
 ### `AutenticacaoControladorAbstrato`
-Expõe, através de `GET` no caminho base da subclasse, o recurso devolvido pelo método protegido `recurso` — permitindo ao cliente descobrir, por exemplo, o nome do usuário autenticado. Por padrão, `recurso` devolve um [`AutenticacaoRecurso`](#autenticacaorecurso) com o usuário obtido do [`ISegurancaServico`](dominio.md#isegurancaservico) recebido no construtor, disponível às subclasses pelo atributo protegido `segurancaServico`; a subclasse pode sobrescrevê-lo para devolver outras informações. Assim como em [`AgregadoControladorAbstrato`](#agregadocontroladorabstrato), a subclasse deve ser anotada com `@RestController` e `@RequestMapping`. Sem usuário autenticado, a resposta é 401.
+Expõe, através de `GET` no caminho base da subclasse, o recurso devolvido pelo método protegido `recurso` — permitindo ao cliente descobrir, por exemplo, o nome do usuário autenticado. A subclasse deve implementar `recurso`, devolvendo uma subclasse de [`AutenticacaoRecursoAbstrato`](#autenticacaorecursoabstrato) com o usuário obtido do [`ISegurancaServico`](dominio.md#isegurancaservico) recebido no construtor, disponível às subclasses pelo atributo protegido `segurancaServico`, e com as demais informações que o cliente precisar, como as autorizações de cada agregado. Assim como em [`AgregadoControladorAbstrato`](#agregadocontroladorabstrato), a subclasse deve ser anotada com `@RestController` e `@RequestMapping`. Sem usuário autenticado, a resposta é 401.
 
 ```java title="AutenticacaoControladorAbstrato.java"
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/AutenticacaoControladorAbstrato.java"
@@ -193,11 +193,11 @@ Expõe, através de `GET` no caminho base da subclasse, o recurso devolvido pelo
 
 No tutorial, [`AutenticacaoControlador`](../../tutorial/1-unidade-federativa.md#autenticacao) estende `AutenticacaoControladorAbstrato`.
 
-### `AutenticacaoRecurso`
-Recurso devolvido por `AutenticacaoControladorAbstrato`, com o nome do usuário autenticado.
+### `AutenticacaoRecursoAbstrato`
+Base do recurso devolvido por `AutenticacaoControladorAbstrato`, com o nome do usuário autenticado. A subclasse acrescenta os atributos que o cliente precisar conhecer, como as autorizações de cada agregado.
 
-```java title="AutenticacaoRecurso.java"
---8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/AutenticacaoRecurso.java"
+```java title="AutenticacaoRecursoAbstrato.java"
+--8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/seguranca/AutenticacaoRecursoAbstrato.java"
 ```
 
 ## Conversão

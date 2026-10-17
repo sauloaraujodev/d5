@@ -2,10 +2,10 @@ package dev.sauloaraujo.d5.framework.ui.seguranca;
 
 import java.util.Objects;
 
-public class AutenticacaoRecurso {
+public abstract class AutenticacaoRecursoAbstrato {
 	private final String usuario;
 
-	public AutenticacaoRecurso(String usuario) {
+	protected AutenticacaoRecursoAbstrato(String usuario) {
 		this.usuario = Objects.requireNonNull(usuario);
 	}
 
