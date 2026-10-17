@@ -38,6 +38,8 @@ No framework de D5, classes que representam entidades implementam [`IEntidade`](
 ## Agregado
 Agregados são conjuntos coesos de entidades e objetos de valor. A entidade mais importante de um agregado é chamada de entidade raiz.
 
+Cada agregado é carregado, validado e persistido isoladamente. Por isso, um agregado referencia outro apenas pelo identificador da entidade raiz deste, e não por um objeto: por exemplo, um município referencia a unidade federativa a que pertence pelo código IBGE dela. Quando uma regra depende de outro agregado — como a existência da unidade federativa de um município —, ela é verificada pelo serviço, através do repositório do outro agregado.
+
 No framework de D5, classes que representam entidades raiz de agregados implementam [`IAgregado`](framework/dominio.md#iagregado).
 
 ## Serviço

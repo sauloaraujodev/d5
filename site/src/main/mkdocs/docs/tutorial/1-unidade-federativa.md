@@ -1,14 +1,15 @@
 # Lição 1: unidade federativa
 Nesta lição, você vai gerar o projeto e implementar, camada por camada, o agregado unidade federativa do subdomínio Geografia. Ao final, o projeto corresponde ao diretório `exemplo1` do repositório de D5.
 
-Para seguir o tutorial, você precisa do Java 25 e do Maven.
+Antes de começar, confira os [pré-requisitos](index.md#pre-requisitos) do tutorial.
 
 ## Projeto Maven
 Em vez de criar o projeto manualmente, use o [gerador](../gerador.md), que produz a estrutura de diretórios, os arquivos `pom.xml` e as classes de infraestrutura que não dependem do domínio, seguindo as [convenções](../referencia/convencoes.md#maven). Informe:
 
 - **groupId**: `com.example`;
 - **Nome do projeto**: `exemplo`;
-- **Subdomínios**: `geografia` e `crm`;
+- **Versão**: o valor sugerido, `1.0.0-SNAPSHOT`;
+- **Subdomínios**: `geografia` e `crm` — informe o primeiro e clique em **+** para acrescentar o campo do segundo;
 - **Usar o framework D5**: marcado;
 - **Incluir AGENTS.md e skills**: desmarcado, porque este tutorial não utiliza agentes de IA.
 
@@ -19,12 +20,13 @@ Extraia o arquivo `exemplo.zip` obtido. O projeto gerado tem os módulos:
 - **`exemplo-dominio-crm`**, correspondente ao subdomínio CRM, que permanece vazio até a [lição 3](3-cliente.md), quando o cliente é criado;
 - **`exemplo-aplicacao`**, com os serviços de aplicação, projeções e consultas de todos os subdomínios;
 - **`exemplo-infraestrutura`**, com as implementações JPA dos repositórios dos agregados de todos os subdomínios;
-- **`exemplo-ui-backend`**, com os controladores REST que expõem os agregados de todos os subdomínios e o `main` da aplicação Spring Boot.
+- **`exemplo-ui-backend`**, com os controladores REST que expõem os agregados de todos os subdomínios e o `main` da aplicação Spring Boot;
+- **`exemplo-ui-frontend`**, com a aplicação Angular que oferece a interface com o usuário. Este tutorial trata apenas do backend: não altere esse módulo.
 
-Diferente do domínio, que é decomposto em um módulo por subdomínio porque cada um tem suas próprias regras de negócio, a aplicação, a infraestrutura e o backend são camadas técnicas transversais que orquestram, persistem e expõem os agregados de todos os subdomínios da mesma forma — por isso cada uma é um único módulo.
+Os módulos correspondem às camadas da [arquitetura limpa](../referencia/arquitetura-limpa.md#camadas): domínio, aplicação, infraestrutura e UI. Diferente do domínio, que é decomposto em um módulo por subdomínio porque cada um tem suas próprias regras de negócio, a aplicação, a infraestrutura e o backend são camadas técnicas transversais que consultam, persistem e expõem os agregados de todos os subdomínios da mesma forma — por isso cada uma é um único módulo.
 
 ### Diretórios
-Cada módulo segue a estrutura padrão do Maven, com `src/main/java`, `src/main/resources`, `src/test/java` e `src/test/resources`:
+Cada módulo Java segue a estrutura padrão do Maven, com `src/main/java`, `src/main/resources`, `src/test/java` e `src/test/resources`. Já o módulo `ui-frontend` contém a aplicação Angular em `src/main/angular`:
 
 ```
 exemplo
@@ -34,11 +36,12 @@ exemplo
 ├── dominio-crm
 ├── aplicacao
 ├── infraestrutura
-└── ui-backend
+├── ui-backend
+└── ui-frontend
 ```
 
 ### Arquivos pom.xml
-O `pom.xml` do projeto raiz herda de [`d5-pai`](../referencia/framework/index.md#projeto-pai) — que define Java 25 e Spring Boot 4.1 e gerencia as versões dos módulos do framework, declarados, por isso, sem `<version>` — e declara os seis módulos.
+O `pom.xml` do projeto raiz herda de [`d5-pai`](../referencia/framework/index.md#projeto-pai) — que define Java 25 e Spring Boot 4.1 e gerencia as versões dos módulos do framework, declarados, por isso, sem `<version>` — e declara os sete módulos.
 
 O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no repositório principal, porque a versão atual, `1.0.0-SNAPSHOT`, ainda não é uma versão final. Por isso, o `pom.xml` do projeto raiz declara esse repositório em `<repositories>`; os módulos o herdam.
 
@@ -46,11 +49,11 @@ O `d5-pai` é publicado no repositório de snapshots do Maven Central, e não no
 --8<-- "exemplo1/pom.xml"
 ```
 
-Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; o de subdomínio depende também do compartilhado. A aplicação depende de `d5-framework-aplicacao` e dos módulos de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — os módulos de subdomínio chegam transitivamente por ele. O backend depende de `d5-framework-ui-backend`, do módulo de aplicação cujos controladores expõem, do domínio compartilhado — cujos papéis de [autorização](#autorizacao) a configuração de segurança usa — e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST.
+Cada módulo herda de `exemplo-pai`. O compartilhado depende de `d5-framework-dominio`; o de subdomínio depende apenas do compartilhado, através do qual recebe `d5-framework-dominio`. A aplicação depende de `d5-framework-aplicacao` e dos módulos de subdomínio cujos serviços de aplicação implementa. A infraestrutura depende de `d5-framework-infraestrutura` e do módulo de aplicação cujos repositórios de aplicação implementa — os módulos de subdomínio chegam transitivamente por ele. O backend depende de `d5-framework-ui-backend`, do módulo de aplicação cujos controladores expõem, do domínio compartilhado — cujos papéis de [autorização](#autorizacao) a configuração de segurança usa — e, apenas em tempo de execução, do módulo de infraestrutura — que fornece as implementações concretas dos repositórios — e de `d5-framework-springdoc`, que gera a documentação OpenAPI da API REST. Essas dependências seguem a [regra da dependência](../referencia/arquitetura-limpa.md#regra-da-dependencia) da arquitetura limpa: nenhum módulo de domínio ou de aplicação depende da infraestrutura ou da UI. Por fim, o frontend tem o `packaging` `pom` e não depende de nenhum outro módulo — o Maven não o compila, e a aplicação Angular é construída com as ferramentas do próprio Angular.
 
 Cada módulo depende também, em escopo de teste, do [módulo de teste](../referencia/framework/index.md#modulos-de-teste) do framework correspondente à sua camada. Além disso, o backend declara o `spring-boot-maven-plugin`, que empacota a aplicação em um jar executável e oferece o objetivo `spring-boot:run`, usado [mais adiante](#testando-com-o-swagger-ui), e, como dependência opcional, o [Spring Boot DevTools](https://docs.spring.io/spring-boot/reference/using/devtools.html){target="_blank"}, que reinicia a aplicação automaticamente quando o código é recompilado durante o desenvolvimento.
 
-O diagrama a seguir ilustra essas dependências, tanto entre os módulos do exemplo quanto com os módulos do framework; uma seta de A para B indica que A depende de B, e uma seta tracejada indica uma dependência restrita ao tempo de execução. Por enquanto, `exemplo-dominio-crm` depende apenas do domínio compartilhado; a dependência dele em `exemplo-dominio-geografia` só é acrescentada na [lição 3](3-cliente.md):
+O diagrama a seguir ilustra essas dependências, tanto entre os módulos do exemplo quanto com os módulos do framework, omitindo o frontend, que não tem nenhuma; uma seta de A para B indica que A depende de B, e uma seta tracejada indica uma dependência restrita ao tempo de execução. Por enquanto, `exemplo-dominio-crm` depende apenas do domínio compartilhado; a dependência dele em `exemplo-dominio-geografia` só é acrescentada na [lição 3](3-cliente.md):
 
 ```mermaid
 graph TD
@@ -122,6 +125,12 @@ graph TD
     --8<-- "exemplo1/ui-backend/pom.xml"
     ```
 
+=== "ui-frontend"
+
+    ```xml title="exemplo/ui-frontend/pom.xml"
+    --8<-- "exemplo1/ui-frontend/pom.xml"
+    ```
+
 ## Unidade federativa
 Uma unidade federativa é identificada por um código IBGE. Além disso, possui sigla e nome únicos. A sigla e o código IBGE são [objetos de valor](../referencia/ddd.md#objeto-de-valor) associados ao [agregado](../referencia/ddd.md#agregado) unidade federativa. Seguindo as [convenções](../referencia/convencoes.md#pacotes), o pacote dos três é `com.example.exemplo.dominio.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
@@ -146,14 +155,14 @@ O código IBGE é formado por dois dígitos e, portanto, também herda de [`Obje
 ```
 
 #### Agregado
-Unidade federativa, código IBGE e sigla formam um [agregado](../referencia/framework/dominio.md#iagregado), com `UnidadeFederativa` como raiz — por isso ela implementa `IAgregado`, parametrizada pelo tipo do identificador. Seu construtor [valida os argumentos](../referencia/programacao.md#validacao-de-argumentos), rejeitando um nome em branco.
+Unidade federativa, código IBGE e sigla formam um [agregado](../referencia/framework/dominio.md#iagregado), com `UnidadeFederativa` como raiz — por isso ela implementa `IAgregado`, parametrizada pelo tipo do identificador. Seu construtor [valida os argumentos](../referencia/programacao.md#validacao-de-argumentos), rejeitando um nome em branco. Como as demais classes do domínio, ela é [`final`](../referencia/programacao.md#classes-final).
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativa.java"
 --8<-- "exemplo1/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativa.java"
 ```
 
 #### Repositório
-Serviços acessam unidades federativas persistidas através de um [repositório](../referencia/ddd.md#repositorio). Seguindo as [convenções](../referencia/convencoes.md#pacotes), a interface do repositório fica no pacote `com.example.exemplo.dominio.geografia.unidadefederativa.spi` e estende [`IAgregadoRepositorio`](../referencia/framework/dominio.md#iagregadorepositorio). Adicionalmente, expõe `existePorSigla` e `existePorNome`, que o serviço usa para garantir que a sigla e o nome de uma unidade federativa sejam únicos. Ambos recebem o identificador da própria unidade federativa a ignorar na verificação, para que alterá-la não a faça conflitar consigo mesma. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+Serviços acessam unidades federativas persistidas através de um [repositório](../referencia/ddd.md#repositorio). Seguindo as [convenções](../referencia/convencoes.md#pacotes), a interface do repositório fica no pacote `com.example.exemplo.dominio.geografia.unidadefederativa.spi` — o domínio declara a interface, e a infraestrutura a implementa; veja [Inversão de dependência e pacotes `spi`](../referencia/arquitetura-limpa.md#inversao-de-dependencia-e-pacotes-spi) — e estende [`IAgregadoRepositorio`](../referencia/framework/dominio.md#iagregadorepositorio). Adicionalmente, expõe `existePorSigla` e `existePorNome`, que o serviço usa para garantir que a sigla e o nome de uma unidade federativa sejam únicos. Ambos recebem o identificador da própria unidade federativa a ignorar na verificação, para que alterá-la não a faça conflitar consigo mesma. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/spi/package-info.java"
 --8<-- "exemplo1/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/spi/package-info.java"
@@ -190,20 +199,28 @@ O comportamento do serviço é especificado com cenários em Gherkin e automatiz
 --8<-- "exemplo1/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/CucumberTests.java"
 ```
 
-Escreva os cenários cobrindo inclusão, busca, alteração e exclusão de uma unidade federativa, incluindo as regras de autorização e de unicidade de sigla e nome:
+Escreva os cenários cobrindo inclusão, busca, alteração e exclusão de uma unidade federativa, incluindo as regras de autorização e de unicidade de sigla e nome. O comentário `# language: pt`, na primeira linha, faz o Cucumber reconhecer as palavras-chave do Gherkin em português — `Funcionalidade`, `Contexto`, `Cenário`, `Dado`, `Quando`, `Então` e `E`:
 
 ```gherkin title="exemplo/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
 --8<-- "exemplo1/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
 ```
 
-Implemente as step definitions que ligam os cenários ao serviço. Como `UnidadeFederativaServico` depende das abstrações `ISegurancaServico` e `IUnidadeFederativaRepositorio`, use o [Mockito](https://site.mockito.org){target="_blank"} para dublá-las: a segurança simula a autorização do usuário, e o repositório simula a persistência através de um mapa em memória, preservando as mesmas regras de unicidade que uma implementação real deve respeitar — inclusive a comparação de nomes que ignora maiúsculas e minúsculas.
+Implemente as step definitions que ligam os cenários ao serviço. Como `UnidadeFederativaServico` depende das abstrações `ISegurancaServico` e `IUnidadeFederativaRepositorio`, use o [Mockito](https://site.mockito.org){target="_blank"} para dublá-las: a segurança simula a autorização do usuário, e o repositório simula a persistência através de um mapa em memória, preservando as mesmas regras de unicidade que uma implementação real deve respeitar — inclusive a comparação de nomes que ignora maiúsculas e minúsculas. Cada método anotado com `@Dado`, `@Quando` ou `@Entao` implementa os passos cujo texto corresponde à sua expressão, na qual `{string}` captura um texto entre aspas e o passa como argumento. O comportamento de cada método dos dublês é definido com `when(...).thenAnswer(...)` ou, para os métodos `void`, como `alterar` e `excluir`, que não podem ser passados a `when`, com `doAnswer(...).when(...)`.
 
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
 --8<-- "exemplo1/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
 ```
 
+Execute os cenários no diretório `exemplo`:
+
+```bash
+mvn -pl dominio-geografia -am test
+```
+
+`-pl` restringe o build ao módulo `dominio-geografia`, e `-am` inclui nele os módulos dos quais esse módulo depende — aqui, `dominio-compartilhado` —, que, sem essa opção, o Maven procuraria no repositório local. O resultado deve informar 16 testes, um por cenário, sem falhas.
+
 ### Aplicação
-A pesquisa de unidades federativas, ao contrário das demais operações, não passa pelas regras do [agregado](../referencia/ddd.md#agregado): ela consulta diretamente uma [projeção](../referencia/framework/aplicacao.md#projecao) somente leitura, com paginação, ordenação e filtro. Seguindo as [convenções](../referencia/convencoes.md#pacotes), as classes ficam no módulo `exemplo-aplicacao`, pacote `com.example.exemplo.aplicacao.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
+A pesquisa de unidades federativas, ao contrário das demais operações, não passa pelas regras do [agregado](../referencia/ddd.md#agregado): ela pertence ao [lado de consulta](../referencia/cqrs.md#lado-de-consulta) e consulta diretamente uma [projeção](../referencia/framework/aplicacao.md#projecao) somente leitura, com paginação, ordenação e filtro. Seguindo as [convenções](../referencia/convencoes.md#pacotes), as classes ficam no módulo `exemplo-aplicacao`, pacote `com.example.exemplo.aplicacao.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
 ```java title="exemplo/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/package-info.java"
 --8<-- "exemplo1/aplicacao/src/main/java/com/example/exemplo/aplicacao/geografia/unidadefederativa/package-info.java"
@@ -303,6 +320,12 @@ Escreva também os testes do repositório de aplicação, cobrindo a pesquisa se
 --8<-- "exemplo1/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaAplicacaoRepositorioTest.java"
 ```
 
+Execute os testes da infraestrutura — com `-am`, o Maven executa também os cenários do domínio:
+
+```bash
+mvn -pl infraestrutura -am test
+```
+
 ### UI
 Unidade federativa é exposta como uma API REST no módulo `exemplo-ui-backend`, pacote `com.example.exemplo.ui.backend.geografia.unidadefederativa`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
@@ -311,7 +334,7 @@ Unidade federativa é exposta como uma API REST no módulo `exemplo-ui-backend`,
 ```
 
 #### Controlador
-O controlador estende [`AgregadoControladorAbstrato`](../referencia/framework/ui-backend.md#agregadocontroladorabstrato), parametrizado pelo identificador, agregado, autorizações, projeção e consulta de unidade federativa, e recebe pelo construtor o [`UnidadeFederativaServico`](#servico) e o [`UnidadeFederativaAplicacaoServico`](#servico-de-aplicacao). O `@RequestMapping` combina o prefixo [`Backend.PREFIXO`](../referencia/framework/ui-backend.md#backend) com o caminho `geografia/unidade-federativa`. O parâmetro `identificador` dos endpoints é recebido diretamente como `UnidadeFederativaCodigoIbge` graças à [serialização de objetos de valor](../referencia/framework/comportamentos.md#serializacao-de-objetos-de-valor), e as operações de escrita são executadas em uma transação graças ao [gerenciamento de transações](../referencia/framework/comportamentos.md#gerenciamento-de-transacoes).
+O controlador estende [`AgregadoControladorAbstrato`](../referencia/framework/ui-backend.md#agregadocontroladorabstrato), parametrizado pelo identificador, agregado, autorizações, projeção e consulta de unidade federativa, e recebe pelo construtor o [`UnidadeFederativaServico`](#servico) e o [`UnidadeFederativaAplicacaoServico`](#servico-de-aplicacao). O `@RequestMapping` combina o prefixo [`Backend.PREFIXO`](../referencia/framework/ui-backend.md#backend) com o caminho `geografia/unidade-federativa`. O parâmetro `identificador` dos endpoints é recebido diretamente como `UnidadeFederativaCodigoIbge` graças à [serialização de objetos de valor](../referencia/framework/comportamentos.md#serializacao-de-objetos-de-valor), e as operações de escrita são executadas em uma transação graças ao [gerenciamento de transações](../referencia/framework/comportamentos.md#gerenciamento-de-transacoes) — que é também o motivo de o controlador, ao contrário das classes do domínio e da aplicação, não ser [`final`](../referencia/programacao.md#classes-final).
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/geografia/unidadefederativa/UnidadeFederativaControlador.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/geografia/unidadefederativa/UnidadeFederativaControlador.java"
@@ -329,7 +352,7 @@ O gerador criou uma configuração de segurança que restringe o backend a usuá
 ```
 
 #### Autenticação
-Para o cliente descobrir o usuário autenticado e o que ele pode fazer, o gerador criou um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo o recurso de autenticação em `Backend.PREFIXO + "autenticacao"`, e o próprio recurso, `AutenticacaoRecurso`, que estende [`AutenticacaoRecursoAbstrato`](../referencia/framework/ui-backend.md#autenticacaorecursoabstrato). Gerados, eles trazem apenas o nome do usuário. Aqui, o recurso foi alterado para acrescentar o atributo `unidadeFederativa`, com as [autorizações](#autorizacao) do usuário sobre o agregado, e o controlador, para recebê-las do [`UnidadeFederativaServico`](#servico): `criarAutorizacoes` é chamado sem identificador, pois essas autorizações valem para o agregado como um todo. Repita o atributo para cada agregado que o cliente precisar conhecer, por exemplo, para exibir ou ocultar as opções de menu.
+Para o cliente descobrir o usuário autenticado e o que ele pode fazer, o gerador criou um controlador que estende [`AutenticacaoControladorAbstrato`](../referencia/framework/ui-backend.md#autenticacaocontroladorabstrato), expondo o recurso de autenticação em `Backend.PREFIXO + "autenticacao"`, e o próprio recurso, `AutenticacaoRecurso`, que estende [`AutenticacaoRecursoAbstrato`](../referencia/framework/ui-backend.md#autenticacaorecursoabstrato). Gerados, eles trazem apenas o nome do usuário. Altere o recurso, acrescentando o atributo `unidadeFederativa`, com as [autorizações](#autorizacao) do usuário sobre o agregado, e altere o controlador, para recebê-las do [`UnidadeFederativaServico`](#servico): `criarAutorizacoes` é chamado sem identificador, pois essas autorizações valem para o agregado como um todo. Ao acrescentar outros agregados, repita o atributo para cada um que o cliente precisar conhecer, por exemplo, para exibir ou ocultar as opções de menu.
 
 ```java title="exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoRecurso.java"
 --8<-- "exemplo1/ui-backend/src/main/java/com/example/exemplo/ui/backend/seguranca/AutenticacaoRecurso.java"
@@ -432,6 +455,6 @@ O código IBGE e a sigla trafegam como strings simples graças à [serializaçã
 
 ![Resposta 200 da exclusão definitiva](../assets/tutorial/1-unidade-federativa/08-excluir-resposta.png)
 
-Como o usuário `u` não é administrador, repetir as operações de escrita autenticado como `u` deve falhar de acordo com as autorizações definidas em [`UnidadeFederativaServico`](#servico) — a pesquisa e os formulários de alteração e de exclusão, que dependem apenas da autorização de busca, são permitidos a qualquer usuário autenticado, mas as operações de escrita respondem 403.
+Para trocar de usuário, clique em **Authorize**, em seguida em **Logout** e autentique-se novamente, desta vez como `u`/`u`. Como o usuário `u` não é administrador, repetir as operações de escrita autenticado como `u` deve falhar de acordo com as autorizações definidas em [`UnidadeFederativaServico`](#servico) — a pesquisa e os formulários de alteração e de exclusão, que dependem apenas da autorização de busca, são permitidos a qualquer usuário autenticado, mas as operações de escrita respondem 403.
 
 Na [lição 2](2-municipio.md), você vai acrescentar ao subdomínio Geografia o município, que referencia a unidade federativa.

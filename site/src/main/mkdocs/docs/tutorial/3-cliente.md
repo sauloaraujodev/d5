@@ -21,7 +21,7 @@ O cliente referencia o município e, para validar essa referência, seu serviço
 
 Um módulo de subdomínio pode depender de outro, desde que as dependências entre eles não formem um ciclo — por isso Geografia nunca dependerá do CRM. Já o código IBGE do município não vai para o domínio compartilhado, ainda que passe a ser usado pelos dois subdomínios: ele pertence a Geografia, e o compartilhado só contém conceitos sem um subdomínio dono; veja [Dependências entre módulos de domínio](../referencia/convencoes.md#dependencias-entre-modulos-de-dominio).
 
-Com essa mudança, as dependências entre os módulos passam a ser:
+Com essa mudança, as dependências entre os módulos passam a ser as do diagrama a seguir, que, como o da [lição 1](1-unidade-federativa.md#arquivos-pomxml), omite o frontend:
 
 ```mermaid
 graph TD
@@ -58,7 +58,7 @@ graph TD
     UI -.-> IN
 ```
 
-A infraestrutura e o backend não mudam: o novo módulo de subdomínio chega a eles transitivamente pelo módulo de aplicação.
+Os `pom.xml` da infraestrutura e do backend não mudam: o novo módulo de subdomínio chega a eles transitivamente pelo módulo de aplicação.
 
 ## Cliente
 Um cliente possui CPF único, nome e endereço. Diferente da unidade federativa e do município, cujo identificador é um código definido pelo IBGE, o identificador do cliente é artificial: ele é gerado pelo banco de dados quando o cliente é incluído. Seguindo as [convenções](../referencia/convencoes.md#pacotes), o pacote do agregado é `com.example.exemplo.dominio.crm.cliente`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
@@ -153,7 +153,7 @@ Em `MunicipioServico`, sobrescreva `validarExclusao` para impedir a exclusão de
 --8<-- "exemplo/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/municipio/MunicipioServico.java"
 ```
 
-Note que o subdomínio Geografia continua sem depender do subdomínio CRM: o serviço de município não sabe que são clientes que o referenciam. Acrescente aos cenários do município a exclusão de um município referenciado e, às step definitions, a simulação dos municípios referenciados:
+Note que o subdomínio Geografia continua sem depender do subdomínio CRM: o serviço de município não sabe que são clientes que o referenciam. Acrescente aos cenários do município a exclusão de um município referenciado e, às step definitions, a simulação dos municípios referenciados e o passo que verifica que o município continua a existir depois da exclusão rejeitada:
 
 ```gherkin title="exemplo/dominio-geografia/src/test/resources/features/municipio.feature"
 --8<-- "exemplo/dominio-geografia/src/test/resources/features/municipio.feature"
@@ -162,6 +162,14 @@ Note que o subdomínio Geografia continua sem depender do subdomínio CRM: o ser
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/municipio/MunicipioStepDefinitions.java"
 --8<-- "exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/municipio/MunicipioStepDefinitions.java"
 ```
+
+Execute os cenários dos dois subdomínios — com `-am`, o Maven inclui no build `dominio-geografia`, do qual `dominio-crm` agora depende, e executa também os seus cenários:
+
+```bash
+mvn -pl dominio-crm -am test
+```
+
+O resultado deve informar 43 testes em Geografia e 19 no CRM, sem falhas.
 
 ### Aplicação
 As classes de aplicação do cliente ficam no pacote `com.example.exemplo.aplicacao.crm.cliente`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
@@ -273,6 +281,12 @@ Acrescente aos testes do repositório de município a verificação de `existeRe
 --8<-- "exemplo/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioRepositorioTest.java"
 ```
 
+Execute os testes da infraestrutura:
+
+```bash
+mvn -pl infraestrutura -am test
+```
+
 ### UI
 O cliente é exposto no pacote `com.example.exemplo.ui.backend.crm.cliente`, com o caminho `crm/cliente`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null), e o controlador, como o da [unidade federativa](1-unidade-federativa.md#controlador):
 
@@ -284,12 +298,15 @@ O cliente é exposto no pacote `com.example.exemplo.ui.backend.crm.cliente`, com
 --8<-- "exemplo/ui-backend/src/main/java/com/example/exemplo/ui/backend/crm/cliente/ClienteControlador.java"
 ```
 
+#### Autenticação
+Como o município na [lição 2](2-municipio.md#autenticacao), o cliente não precisa entrar no [recurso de autenticação](1-unidade-federativa.md#autenticacao): não altere `AutenticacaoRecurso` nem `AutenticacaoControlador`.
+
 #### Testando com o Swagger UI
-Suba novamente `BackendAplicacao`, acesse o Swagger UI e autentique-se como na [lição 1](1-unidade-federativa.md#testando-com-o-swagger-ui). As operações de cliente aparecem sob a tag `cliente-controlador`:
+Suba novamente `BackendAplicacao`, como na [lição 2](2-municipio.md#testando-com-o-swagger-ui) — pela linha de comando, executando de novo o `mvn install` antes do `spring-boot:run` —, acesse o Swagger UI e autentique-se como na [lição 1](1-unidade-federativa.md#testando-com-o-swagger-ui). As operações de cliente aparecem sob a tag `cliente-controlador`:
 
 ![Operações de ClienteControlador no Swagger UI](../assets/tutorial/3-cliente/01-visao-geral.png)
 
-Inclua a unidade federativa e o município de São Paulo, como nas lições anteriores, e, em seguida, inclua um cliente através de `POST /backend/crm/cliente/incluir`. O identificador é omitido, porque é gerado na inclusão, e o complemento do endereço é opcional:
+Como o banco de dados em memória é recriado a cada inicialização, inclua de novo a unidade federativa e o município de São Paulo, como nas lições anteriores — sem o município, a inclusão do cliente responde 404. Em seguida, inclua um cliente através de `POST /backend/crm/cliente/incluir`. O corpo de exemplo sugerido pelo Swagger UI traz o atributo `identificador`: remova-o, porque o identificador é gerado na inclusão e, se informado, a inclusão responde 422. O complemento do endereço é opcional e também pode ser removido:
 
 ```json
 {

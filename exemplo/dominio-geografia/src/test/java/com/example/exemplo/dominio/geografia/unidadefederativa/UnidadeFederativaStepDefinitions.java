@@ -214,6 +214,11 @@ public final class UnidadeFederativaStepDefinitions {
 		assertTrue(unidadesFederativas.containsKey(codigoIbge));
 	}
 
+	@Entao("a unidade federativa de código IBGE {string} continua a existir")
+	public void a_unidade_federativa_continua_a_existir(String codigoIbge) {
+		assertTrue(unidadesFederativas.containsKey(codigoIbge));
+	}
+
 	@Entao("a inclusão é rejeitada por falta de autorização")
 	public void a_inclusao_e_rejeitada_por_falta_de_autorizacao() {
 		assertInstanceOf(NaoAutorizadoExcecao.class, excecaoCapturada);

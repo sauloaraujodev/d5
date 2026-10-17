@@ -138,7 +138,7 @@ Funcionalidade: Gerenciar municípios
     E que o município de código IBGE "3550308" é referenciado
     Quando eu tento excluir o município de código IBGE "3550308"
     Então a exclusão é rejeitada porque o município "3550308" é referenciado
-    E o município de código IBGE "3550308" passa a existir
+    E o município de código IBGE "3550308" continua a existir
 
   Cenário: Extinguir um município
     Dado que sou um administrador do cadastro de municípios

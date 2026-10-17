@@ -265,6 +265,11 @@ public final class MunicipioStepDefinitions {
 		assertTrue(municipios.containsKey(codigoIbge));
 	}
 
+	@Entao("o município de código IBGE {string} continua a existir")
+	public void o_municipio_continua_a_existir(String codigoIbge) {
+		assertTrue(municipios.containsKey(codigoIbge));
+	}
+
 	@Entao("a inclusão do município é rejeitada por falta de autorização")
 	public void a_inclusao_e_rejeitada_por_falta_de_autorizacao() {
 		assertInstanceOf(NaoAutorizadoExcecao.class, excecaoCapturada);

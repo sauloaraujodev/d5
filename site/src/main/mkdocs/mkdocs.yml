@@ -46,6 +46,8 @@ nav:
       - Lição 3 - Cliente: tutorial/3-cliente.md
   - Referência:
       - DDD: referencia/ddd.md
+      - Arquitetura limpa: referencia/arquitetura-limpa.md
+      - CQRS: referencia/cqrs.md
       - Convenções: referencia/convencoes.md
       - Framework:
           - Visão geral: referencia/framework/index.md

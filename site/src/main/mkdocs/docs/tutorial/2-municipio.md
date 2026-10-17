@@ -56,7 +56,7 @@ O nome de um município é único apenas na unidade federativa a que ele pertenc
 #### Serviço
 Como na unidade federativa, o serviço estende [`AgregadoServicoAbstrato`](../referencia/framework/dominio.md#agregadoservicoabstrato), agora parametrizado por `MunicipioAutorizacoes`, e libera a busca a qualquer usuário e as demais operações — inclusive extinguir — somente a administradores. As autorizações dependem apenas do usuário, e não do estado do município: um administrador continua autorizado a alterar e a extinguir um município extinto, e é o serviço que rejeita essas operações, [validando o estado](../referencia/programacao.md#validacao-de-estado) do município. Autorização e estado são coisas distintas — a primeira diz quem pode executar uma operação; o segundo, se a operação é possível —, e por isso a rejeição de uma operação sobre um município extinto responde 409, e não 403. Além de `IMunicipioRepositorio`, ele recebe [`IUnidadeFederativaRepositorio`](1-unidade-federativa.md#repositorio), para verificar a existência da unidade federativa do município. Em `validarInclusao` e `validarAlteracao`, o serviço [valida o argumento](../referencia/programacao.md#validacao-de-argumentos), rejeitando um município recebido já extinto, que só pode se tornar extinto pela ação de extinguir. Em `validarInclusaoAlteracao`, o serviço:
 
-- usa `validarExistencia`, com o modelo de mensagem de [`UnidadeFederativaServico`](1-unidade-federativa.md#servico), para exigir que a unidade federativa exista;
+- usa `validarExistencia`, com o modelo de mensagem de [`UnidadeFederativaServico`](1-unidade-federativa.md#servico), para exigir que a unidade federativa exista — caso contrário, lança [`AgregadoInexistenteExcecao`](../referencia/framework/dominio.md#agregadoinexistenteexcecao), e a requisição responde 404, como quando o próprio município não existe;
 - usa `validarInexistencia` e `existePorNome` para exigir que o nome seja único na unidade federativa.
 
 Em `validarAlteracao`, depois de validar o argumento, o serviço também rejeita a alteração de um município extinto, [validando o estado](../referencia/programacao.md#validacao-de-estado) do município existente. A regra sobre o município recebido não fica em `validarInclusaoAlteracao` por causa da [ordem das validações](../referencia/framework/dominio.md#agregadoservicoabstrato) de `AgregadoServicoAbstrato`: `validarInclusao` é chamado antes da verificação de inexistência do identificador, e `validarAlteracao`, depois da verificação de existência do município, mas ambos antes de `validarInclusaoAlteracao`. Assim, a inclusão de um município extinto é rejeitada como extinção indevida mesmo que seu código já exista, e a alteração de um município extinto é rejeitada porque ele está extinto mesmo que o nome recebido já seja usado na unidade federativa. Já a alteração de um município inexistente responde 404, ainda que ele seja recebido extinto. Por fim, `extinguir` valida a autorização `extinguir` com `validarAutorizacao` e a existência do município com `validarExistencia` — ambos herdados de `AgregadoServicoAbstrato` — e persiste o município devolvido por `Municipio.extinguir`.
@@ -73,6 +73,8 @@ Escreva os cenários cobrindo, além da inclusão, da busca, da alteração e da
 ```
 
 As step definitions dublam, além da segurança e do repositório de municípios, o repositório de unidades federativas, que simula a existência das unidades federativas através de um conjunto de identificadores. A suíte do Cucumber do subdomínio, criada na lição 1, já seleciona os novos cenários.
+
+Os passos, porém, são compartilhados por todos os cenários do subdomínio: a suíte procura as step definitions em todas as classes do pacote `com.example.exemplo.dominio.geografia` e de seus subpacotes, e duas expressões iguais, ainda que em classes diferentes, interrompem os cenários que as usam com uma `DuplicateStepDefinitionException`. Por isso, os passos do município têm textos próprios — por exemplo, `que sou um administrador do cadastro de municípios`, e não `que sou um usuário administrador`, já definido nas step definitions da unidade federativa.
 
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/municipio/MunicipioStepDefinitions.java"
 --8<-- "exemplo2/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/municipio/MunicipioStepDefinitions.java"
@@ -93,7 +95,7 @@ Em `UnidadeFederativaServico`, sobrescreva `validarExclusao` para usar `existeRe
 --8<-- "exemplo2/dominio-geografia/src/main/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaServico.java"
 ```
 
-Acrescente aos cenários da unidade federativa a exclusão de uma unidade federativa referenciada e, às step definitions, a simulação das unidades federativas referenciadas, através de um conjunto de identificadores:
+Acrescente aos cenários da unidade federativa a exclusão de uma unidade federativa referenciada e, às step definitions, a simulação das unidades federativas referenciadas, através de um conjunto de identificadores, e o passo que verifica que a unidade federativa continua a existir depois da exclusão rejeitada:
 
 ```gherkin title="exemplo/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
 --8<-- "exemplo2/dominio-geografia/src/test/resources/features/unidade-federativa.feature"
@@ -102,6 +104,14 @@ Acrescente aos cenários da unidade federativa a exclusão de uma unidade federa
 ```java title="exemplo/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
 --8<-- "exemplo2/dominio-geografia/src/test/java/com/example/exemplo/dominio/geografia/unidadefederativa/UnidadeFederativaStepDefinitions.java"
 ```
+
+Execute os cenários, como na [lição 1](1-unidade-federativa.md#testes):
+
+```bash
+mvn -pl dominio-geografia -am test
+```
+
+O resultado deve informar 42 testes, os 17 cenários da unidade federativa e os 25 do município, sem falhas.
 
 ### Aplicação
 As classes de aplicação do município ficam no pacote `com.example.exemplo.aplicacao.geografia.municipio`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
@@ -154,7 +164,7 @@ A persistência de município fica no pacote `com.example.exemplo.infraestrutura
 ```
 
 #### Entidade JPA
-Diferente do agregado, que referencia a unidade federativa apenas pelo código, a entidade JPA do município a mapeia por uma associação `@ManyToOne` com `UnidadeFederativaJpa`, cuja coluna, `UFI_ID`, é uma chave estrangeira: o banco de dados rejeita, assim, um município de uma unidade federativa inexistente e a exclusão de uma unidade federativa com municípios, ainda que os serviços já impeçam essas situações. A associação é apenas um detalhe da persistência e é preguiçosa (`FetchType.LAZY`), para que ler um município não carregue a unidade federativa. Como a unidade federativa é derivada do identificador, a coluna também não pode ser alterada. A coluna `extinto` também é anotada com `@NotNull`: mesmo sendo de um tipo primitivo, que nunca é `null`, o Hibernate só a declara `not null` no banco de dados com essa anotação. A restrição de unicidade sobre a unidade federativa e o nome reforça no banco de dados a unicidade validada pelo serviço, mas, como a do nome da unidade federativa, diferencia maiúsculas de minúsculas.
+Diferente do agregado, que referencia a unidade federativa apenas pelo código, a entidade JPA do município a mapeia por uma associação `@ManyToOne` com `UnidadeFederativaJpa`, cuja coluna, `UFI_ID`, é uma chave estrangeira: o banco de dados rejeita, assim, um município de uma unidade federativa inexistente e a exclusão de uma unidade federativa com municípios, ainda que os serviços já impeçam essas situações. A associação é apenas um detalhe da persistência e é preguiçosa (`FetchType.LAZY`), para que ler um município não carregue a unidade federativa. Como a unidade federativa é derivada do identificador, a coluna também não pode ser alterada. O atributo `extinto`, mapeado para a coluna `MUN_EX`, também é anotado com `@NotNull`: mesmo sendo de um tipo primitivo, que nunca é `null`, o Hibernate só declara a coluna `not null` no banco de dados com essa anotação. A restrição de unicidade sobre a unidade federativa e o nome reforça no banco de dados a unicidade validada pelo serviço, mas, como a do nome da unidade federativa, diferencia maiúsculas de minúsculas.
 
 ```java title="exemplo/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"
 --8<-- "exemplo2/infraestrutura/src/main/java/com/example/exemplo/infraestrutura/geografia/municipio/MunicipioJpa.java"
@@ -211,6 +221,12 @@ Acrescente aos testes do repositório de unidade federativa a verificação de `
 --8<-- "exemplo2/infraestrutura/src/test/java/com/example/exemplo/infraestrutura/geografia/unidadefederativa/UnidadeFederativaRepositorioTest.java"
 ```
 
+Execute os testes da infraestrutura:
+
+```bash
+mvn -pl infraestrutura -am test
+```
+
 ### UI
 O município é exposto no pacote `com.example.exemplo.ui.backend.geografia.municipio`. Crie o `package-info.java` desse pacote, anotado com [`@NullMarked`](../referencia/programacao.md#evite-null):
 
@@ -225,12 +241,15 @@ Além das operações herdadas de [`AgregadoControladorAbstrato`](../referencia/
 --8<-- "exemplo2/ui-backend/src/main/java/com/example/exemplo/ui/backend/geografia/municipio/MunicipioControlador.java"
 ```
 
+#### Autenticação
+O município não precisa entrar no [recurso de autenticação](1-unidade-federativa.md#autenticacao): não altere `AutenticacaoRecurso` nem `AutenticacaoControlador`. O recurso continua trazendo apenas o usuário e as autorizações sobre a unidade federativa.
+
 #### Testando com o Swagger UI
-Suba novamente `BackendAplicacao` e acesse o Swagger UI, autenticando-se como na [lição 1](1-unidade-federativa.md#testando-com-o-swagger-ui). As operações de município aparecem sob a tag `municipio-controlador`, inclusive a de extinguir:
+Encerre a aplicação, se ela ainda estiver em execução, e suba novamente `BackendAplicacao` — pela IDE ou executando de novo, no diretório `exemplo`, os dois comandos da [lição 1](1-unidade-federativa.md#testando-com-o-swagger-ui): sem o `mvn install`, o `spring-boot:run` usaria os módulos instalados no repositório Maven local ao final da lição 1, que não têm o município. Em seguida, acesse o Swagger UI e autentique-se como na lição 1. As operações de município aparecem sob a tag `municipio-controlador`, inclusive a de extinguir:
 
 ![Operações de MunicipioControlador no Swagger UI, incluindo extinguir](../assets/tutorial/2-municipio/01-visao-geral.png)
 
-Inclua a unidade federativa de São Paulo, como na lição 1, e, em seguida, inclua o município de São Paulo através de `POST /backend/geografia/municipio/incluir` — o indicador de extinção pode ser omitido:
+Como o banco de dados em memória é recriado a cada inicialização, inclua de novo a unidade federativa de São Paulo, como na lição 1 — sem ela, a inclusão do município responde 404. Em seguida, inclua o município de São Paulo através de `POST /backend/geografia/municipio/incluir`. O corpo de exemplo sugerido pelo Swagger UI traz, além de `identificador` e `nome`, os atributos `extinto`, com o valor `true`, e `unidadeFederativa`: remova os dois. Com `extinto` igual a `true`, a inclusão responde 422, porque um município só se torna extinto pela ação de extinguir; omitido, o indicador assume `false`. Já `unidadeFederativa` aparece no exemplo porque o município a expõe através de `getUnidadeFederativa`, mas é derivada do identificador e, por isso, ignorada na requisição:
 
 ```json
 {

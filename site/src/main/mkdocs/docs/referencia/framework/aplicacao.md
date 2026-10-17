@@ -1,5 +1,5 @@
 # d5-framework-aplicacao
-Possui interfaces e classes para o lado de consulta de um [agregado](../ddd.md#agregado):
+Possui interfaces e classes para o [lado de consulta](../cqrs.md#lado-de-consulta) de um [agregado](../ddd.md#agregado):
 
 - [projeção](#projecao);
 - [ordenação](#ordenacao);

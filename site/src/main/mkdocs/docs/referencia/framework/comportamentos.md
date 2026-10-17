@@ -57,7 +57,7 @@ A transação não impede, por si só, que duas requisições concorrentes passe
 --8<-- "framework/ui-backend/src/main/java/dev/sauloaraujo/d5/framework/ui/transacao/PostMappingTransactionAttributeSource.java"
 ```
 
-A configuração abaixo registra esse `TransactionAttributeSource` e o conecta a um `TransactionInterceptor`, aplicado a todo bean do contexto através de um `BeanFactoryTransactionAttributeSourceAdvisor` — dispensando a anotação `@EnableTransactionManagement` e qualquer `@Transactional` explícito.
+A configuração abaixo registra esse `TransactionAttributeSource` e o conecta a um `TransactionInterceptor`, aplicado a todo bean do contexto através de um `BeanFactoryTransactionAttributeSourceAdvisor` — dispensando a anotação `@EnableTransactionManagement` e qualquer `@Transactional` explícito. O advisor envolve cada controlador em um proxy que é uma subclasse dele; por isso, um controlador com métodos mapeados para `POST` não pode ser `final` — se for, a aplicação não inicia, com a mensagem `Cannot subclass final class`.
 
 Como o `DefaultAdvisorAutoProxyCreator` é um `BeanPostProcessor`, ele e os beans de que depende são criados antes dos demais, quando nem todos os `BeanPostProcessor` estão registrados. Por isso, como na configuração de transações do próprio Spring, os métodos `@Bean` são estáticos e os beans são marcados com `@Role(BeanDefinition.ROLE_INFRASTRUCTURE)`, e o `TransactionInterceptor` não recebe o gerenciador de transações: ele o obtém do contexto apenas na primeira chamada transacional. Assim, o gerenciador de transações e o `EntityManagerFactory` não são criados antecipadamente, e o Spring não registra avisos de beans que deixaram de ser processados por todos os `BeanPostProcessor`.
 

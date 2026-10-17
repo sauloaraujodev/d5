@@ -2,7 +2,7 @@
 Este documento descreve cada página da documentação de D5.
 
 ## Convenções gerais
-O leitor do tutorial sabe Java e Maven. Os demais conceitos usados por D5 — DDD, arquitetura limpa, CQRS, programação defensiva e o framework — são explicados nas páginas de referência; o tutorial só linka para elas.
+O leitor do tutorial sabe Java e Maven. Os demais conceitos usados por D5 — DDD, arquitetura limpa, CQRS, programação defensiva e o framework — são explicados nas páginas de referência; o tutorial só linka para elas. As bibliotecas sobre as quais D5 é construído — Spring Boot, Jakarta Persistence, Spring Data JPA, Spring Security, Cucumber, JUnit e Mockito — não são ensinadas: `tutorial/index.md` lista, em Pré-requisitos, links para a documentação de cada uma, e as lições explicam apenas os detalhes delas que o código de exemplo usa de forma pouco evidente.
 
 Cada página usa H1 para o título e H2, H3... para as seções, refletindo a hierarquia do conteúdo.
 
@@ -16,12 +16,14 @@ Ao adicionar, remover ou alterar uma interface, classe ou convenção do framewo
 Menciona os principais conceitos de engenharia de software e tecnologias utilizados em D5.
 
 ## tutorial/index.md
-Apresenta os subdomínios da aplicação de exemplo e as lições do tutorial, indicando o que cada uma acrescenta e o diretório do repositório com o projeto ao final dela.
+Lista os pré-requisitos do tutorial e apresenta os subdomínios da aplicação de exemplo e as lições do tutorial, indicando o que cada uma acrescenta e o diretório do repositório com o projeto ao final dela.
 
 ## tutorial/*.md (lições)
 Em tom imperativo, cada lição descreve, passo a passo, como desenvolver um agregado da aplicação de exemplo com o framework de D5: `1-unidade-federativa.md`, `2-municipio.md` e `3-cliente.md`. Cada lição parte do projeto deixado pela anterior e explica apenas o que acrescenta ou altera.
 
 Os snippets de cada lição incluem os arquivos do diretório com o projeto ao final dela — `exemplo1`, `exemplo2` e `exemplo`, respectivamente —, mas o título de cada bloco de código mostra o caminho em `exemplo`, onde o leitor desenvolve o projeto.
+
+Cada versão contém todos os arquivos que o gerador cria — inclusive os do módulo `ui-frontend`, ainda que nenhuma lição trate dele —, de modo que uma alteração nos templates do gerador é replicada nas três versões.
 
 Um arquivo presente em duas versões consecutivas é idêntico nelas, exceto os que a lição seguinte altera de propósito, listados em `ALTERACOES`, no hook `src/main/mkdocs/hooks/exemplos.py`. O hook verifica essa regra a cada build da documentação e o interrompe quando ela é violada. Ao alterar um arquivo de uma versão, replique a alteração nas demais versões em que ele aparece igual; ao fazer uma lição alterar um arquivo da anterior, registre-o em `ALTERACOES`.
 
@@ -30,6 +32,8 @@ As capturas do Swagger UI de cada lição ficam em `assets/tutorial/<lição>` e
 Deve explicar apenas o necessário acerca do framework de D5 para que o leitor entenda o código de exemplo completamente.
 
 Conceitos de DDD são mencionados com links para eles em `referencia/ddd.md`.
+
+Conceitos de arquitetura limpa e de CQRS são mencionados com links para eles em `referencia/arquitetura-limpa.md` e `referencia/cqrs.md`.
 
 Convenções são mencionadas com links para elas em `referencia/convencoes.md`.
 
@@ -41,6 +45,12 @@ Comportamentos automáticos são mencionados com links para eles em `referencia/
 
 ## referencia/ddd.md
 Descreve, sucintamente, os conceitos de DDD utilizados em D5.
+
+## referencia/arquitetura-limpa.md
+Descreve, sucintamente, a arquitetura limpa e como D5 a aplica: as camadas e seus módulos, a regra da dependência e os pacotes `spi`.
+
+## referencia/cqrs.md
+Descreve, sucintamente, o CQRS e como D5 o aplica: o lado de comando, no domínio, e o lado de consulta, na aplicação.
 
 ## referencia/convencoes.md
 Detalha todas as convenções de D5.

@@ -17,6 +17,15 @@ A exceção são os contratos de bibliotecas e frameworks que não admitem `Opti
 ## Atributos `final`
 Atributos devem ser declarados como `final`.
 
+## Classes `final`
+As classes concretas do domínio e da aplicação — agregados, objetos de valor, serviços, autorizações, projeções e consultas — devem ser declaradas como `final`. Uma subclasse poderia sobrescrever seus métodos e, assim, contornar as validações que mantêm seus objetos em um estado válido.
+
+A regra não vale para as classes que o Spring ou o JPA estendem em tempo de execução, criando subclasses — os proxies — que interceptam as chamadas a seus métodos:
+
+- as entidades JPA, que a especificação do Jakarta Persistence não admite como `final`;
+- as classes anotadas com `@Configuration` ou `@SpringBootApplication`, cujos métodos `@Bean` o Spring intercepta;
+- os controladores cujos métodos são mapeados para `POST`, que o framework envolve em uma transação; veja [Gerenciamento de transações](framework/comportamentos.md#gerenciamento-de-transacoes).
+
 ## Validação de argumentos
 Construtores e métodos devem validar seus argumentos com [`Objects.requireNonNull`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Objects.html){target="_blank"} e os métodos da classe [`Validate`](https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/Validate.html){target="_blank"} da biblioteca [Commons Lang](https://commons.apache.org/proper/commons-lang/){target="_blank"}.
 

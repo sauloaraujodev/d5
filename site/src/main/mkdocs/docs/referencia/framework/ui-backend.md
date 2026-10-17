@@ -54,7 +54,7 @@ Implementação de `IPesquisaRecurso` que recebe a consulta e o resultado direta
 ### `AgregadoControladorAbstrato`
 Expõe as operações de um [serviço](dominio.md#iagregadoservico) e de um [serviço de aplicação](aplicacao.md#iagregadoaplicacaoservico) como endpoints REST. É parametrizada pelo identificador `I`, pelo agregado `A`, pelas autorizações `U`, pela projeção `P` e pela consulta `C`, e recebe no construtor o serviço e o serviço de aplicação.
 
-A classe não declara `@RestController` nem o caminho base dos endpoints: a subclasse deve ser anotada com `@RestController` e com `@RequestMapping(Backend.PREFIXO + "...")`. Os caminhos abaixo são relativos a esse caminho base:
+A classe não declara `@RestController` nem o caminho base dos endpoints: a subclasse deve ser anotada com `@RestController` e com `@RequestMapping(Backend.PREFIXO + "...")`. A subclasse não pode ser `final`, porque os métodos mapeados para `POST` são envolvidos em uma transação por um proxy que a estende; veja [Gerenciamento de transações](comportamentos.md#gerenciamento-de-transacoes). Os caminhos abaixo são relativos a esse caminho base:
 
 <div class="tabela-centralizada" markdown="1">
 

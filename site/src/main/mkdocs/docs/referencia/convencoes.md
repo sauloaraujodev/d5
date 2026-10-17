@@ -18,7 +18,7 @@ O domínio compartilhado contém apenas os conceitos que não pertencem a nenhum
 Todo módulo de subdomínio depende do domínio compartilhado. Um módulo de subdomínio pode depender também de outro, quando seus conceitos referenciam os do outro, desde que as dependências entre os módulos de subdomínio não formem um ciclo.
 
 ## Pacotes
-Nesta seção, `${groupId}` é o `groupId` do projeto raiz e de seus módulos. Já `${agregado}` é o nome de um agregado.
+Nesta seção, `${groupId}` é o `groupId` do projeto raiz e de seus módulos. Já `${agregado}` é o nome de um agregado em minúsculas, com as palavras juntas, sem separador — por exemplo, `unidadefederativa`.
 
 | Elemento | Módulo | Pacote |
 | --- | --- | --- |
@@ -30,12 +30,14 @@ Nesta seção, `${groupId}` é o `groupId` do projeto raiz e de seus módulos. J
 | Implementação do repositório, entidade JPA e interface Spring Data JPA de um agregado `${agregado}` | `${aplicacao}-infraestrutura` | `${groupId}.${aplicacao}.infraestrutura.${subdominio}.${agregado}` |
 | Implementação do repositório de aplicação de um agregado `${agregado}` | `${aplicacao}-infraestrutura` | `${groupId}.${aplicacao}.infraestrutura.${subdominio}.${agregado}` |
 | Controlador REST de um agregado `${agregado}` | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}.ui.backend.${subdominio}.${agregado}` |
-| Configuração de segurança e controlador de autenticação | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}.ui.backend.seguranca` |
+| Configuração de segurança, controlador de autenticação e recurso de autenticação | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}.ui.backend.seguranca` |
 | Classe com o `main` da aplicação Spring Boot | `${aplicacao}-ui-backend` | `${groupId}.${aplicacao}` |
 | Suíte do Cucumber de um subdomínio | `${aplicacao}-dominio-${subdominio}`, em `src/test/java` | `${groupId}.${aplicacao}.dominio.${subdominio}` |
 | Step definitions de um agregado `${agregado}` | `${aplicacao}-dominio-${subdominio}`, em `src/test/java` | `${groupId}.${aplicacao}.dominio.${subdominio}.${agregado}` |
 | Testes do repositório e do repositório de aplicação de um agregado `${agregado}` | `${aplicacao}-infraestrutura`, em `src/test/java` | `${groupId}.${aplicacao}.infraestrutura.${subdominio}.${agregado}` |
 | Configuração Spring Boot dos testes de infraestrutura | `${aplicacao}-infraestrutura`, em `src/test/java` | `${groupId}.${aplicacao}.infraestrutura` |
+
+Os pacotes `spi` contêm as interfaces que uma camada usa e que outra camada implementa; veja [Inversão de dependência e pacotes `spi`](arquitetura-limpa.md#inversao-de-dependencia-e-pacotes-spi).
 
 ## Caminhos
 Nesta seção, `${agregado-hifenizado}` é o nome de um agregado em minúsculas, com as palavras separadas por hífen — por exemplo, `unidade-federativa`.
@@ -67,6 +69,7 @@ Nesta seção, `${Agregado}` é o nome de um agregado, em `PascalCase`.
 | Papéis de autorização (`enum`) | `Autorizacao` |
 | Configuração de segurança | `SegurancaConfiguracao` |
 | Controlador de autenticação | `AutenticacaoControlador` |
+| Recurso de autenticação | `AutenticacaoRecurso` |
 | Classe com o `main` da aplicação Spring Boot | `BackendAplicacao` |
 | Suíte do Cucumber | `CucumberTests` |
 | Step definitions | `${Agregado}StepDefinitions` |

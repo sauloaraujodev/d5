@@ -109,4 +109,4 @@ Funcionalidade: Gerenciar unidades federativas
     E que a unidade federativa de código IBGE "35" é referenciada
     Quando eu tento excluir a unidade federativa de código IBGE "35"
     Então a exclusão é rejeitada porque a unidade federativa "35" é referenciada
-    E a unidade federativa de código IBGE "35" passa a existir
+    E a unidade federativa de código IBGE "35" continua a existir
