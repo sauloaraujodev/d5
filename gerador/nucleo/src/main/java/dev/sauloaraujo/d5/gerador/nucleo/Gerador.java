@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -37,8 +38,6 @@ public class Gerador {
 
 	private static final String DIRETORIO_SKILLS = "agents/skills/";
 
-	private static final String DIRETORIO_UI_FRONTEND = "ui-frontend/";
-
 	private static final String EXTENSAO_TEMPLATE = ".ftl";
 
 	private static final List<String> SKILLS = List.of("especificar-funcionalidade/SKILL.md",
@@ -65,16 +64,27 @@ public class Gerador {
 
 	public void gerar(File diretorio, String groupId, String nome, String versao, Set<String> subdominios,
 			boolean framework, boolean agentes) {
-		gerar(diretorio.toPath(), groupId, nome, versao, subdominios, framework, agentes);
+		gerar(diretorio, groupId, nome, versao, subdominios, framework, agentes, Frontend.ANGULAR);
+	}
+
+	public void gerar(File diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework, boolean agentes, Frontend frontend) {
+		gerar(diretorio.toPath(), groupId, nome, versao, subdominios, framework, agentes, frontend);
 	}
 
 	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<String> subdominios,
 			boolean framework, boolean agentes) {
+		gerar(diretorio, groupId, nome, versao, subdominios, framework, agentes, Frontend.ANGULAR);
+	}
+
+	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+			boolean framework, boolean agentes, Frontend frontend) {
 		Objects.requireNonNull(diretorio);
 		Objects.requireNonNull(groupId);
 		Objects.requireNonNull(nome);
 		Objects.requireNonNull(versao);
 		Objects.requireNonNull(subdominios);
+		Objects.requireNonNull(frontend);
 		// O package.json do frontend exige que a versão siga o versionamento semântico
 		if (!VERSAO.matcher(versao).matches()) {
 			throw new IllegalArgumentException("A versão " + versao + " não segue o versionamento semântico");
@@ -99,7 +109,7 @@ public class Gerador {
 		gerarUiBackend(raiz, groupId, nome, versao, framework);
 
 		if (agentes) {
-			gerarAgentes(raiz, groupId, nome, versao, subdominiosOrdenados, framework);
+			gerarAgentes(raiz, groupId, nome, versao, subdominiosOrdenados, framework, frontend);
 		}
 
 		try (var modulos = Files.list(raiz)) {
@@ -112,14 +122,15 @@ public class Gerador {
 			throw new IllegalStateException("Falha ao gerar " + raiz, e);
 		}
 
-		// Gerado depois dos diretórios padrão, que não se aplicam a um módulo Angular
-		gerarUiFrontend(raiz, groupId, nome, versao);
+		// Gerado depois dos diretórios padrão, que não se aplicam a um módulo de frontend
+		gerarUiFrontend(raiz, groupId, nome, versao, frontend);
 	}
 
 	private void gerarAgentes(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
-			boolean framework) {
-		var projeto = Map.of("name", nome, "groupId", groupId, "version", versao, "framework", framework,
-				"subdomains", subdominios, "mavenRootProject", Map.of("artifactId", nome + "-pai"));
+			boolean framework, Frontend frontend) {
+		var projeto = Map.of("name", nome, "groupId", groupId, "version", versao, "framework", framework, "frontend",
+				frontend.name().toLowerCase(Locale.ROOT), "subdomains", subdominios, "mavenRootProject",
+				Map.of("artifactId", nome + "-pai"));
 		var modelo = Map.<String, Object>of("d5Project", projeto);
 
 		if (framework) {
@@ -175,9 +186,8 @@ public class Gerador {
 
 	private void gerarPomRaiz(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
 			boolean framework) {
-		processar("pom-raiz.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao, "subdominios",
-				subdominios, "framework", framework),
-				raiz.resolve("pom.xml"));
+		processar("pom-raiz.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao, "subdominios", subdominios,
+				"framework", framework), raiz.resolve("pom.xml"));
 	}
 
 	private void gerarDominioCompartilhado(Path raiz, String groupId, String nome, String versao, String artifactId,
@@ -219,8 +229,7 @@ public class Gerador {
 	private void gerarAplicacao(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
 			boolean framework) {
 		processar("pom-aplicacao.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao, "subdominios",
-				subdominios, "framework", framework),
-				raiz.resolve("aplicacao/pom.xml"));
+				subdominios, "framework", framework), raiz.resolve("aplicacao/pom.xml"));
 	}
 
 	private void gerarInfraestrutura(Path raiz, String groupId, String nome, String versao, boolean framework) {
@@ -264,7 +273,7 @@ public class Gerador {
 		}
 	}
 
-	private void gerarUiFrontend(Path raiz, String groupId, String nome, String versao) {
+	private void gerarUiFrontend(Path raiz, String groupId, String nome, String versao, Frontend frontend) {
 		var modulo = raiz.resolve("ui-frontend");
 
 		processar("pom-ui-frontend.ftl", Map.of("groupId", groupId, "nome", nome, "versao", versao),
@@ -273,14 +282,14 @@ public class Gerador {
 		// Os templates FreeMarker têm a extensão .ftl; os demais arquivos, inclusive
 		// os binários, são copiados sem alteração. O .gitignore também é um template
 		// porque o Maven não inclui arquivos com esse nome no JAR do gerador.
-		var angular = modulo.resolve("src/main/angular");
-		listarRecursos("templates/" + DIRETORIO_UI_FRONTEND).forEach((caminho, recurso) -> {
+		var aplicacao = modulo.resolve(frontend.getDiretorioAplicacao());
+		listarRecursos("templates/" + frontend.getDiretorioTemplates()).forEach((caminho, recurso) -> {
 			if (caminho.endsWith(EXTENSAO_TEMPLATE)) {
 				var arquivo = caminho.substring(0, caminho.length() - EXTENSAO_TEMPLATE.length());
-				processar(DIRETORIO_UI_FRONTEND + caminho, Map.of("nome", nome, "versao", versao),
-						angular.resolve(arquivo));
+				processar(frontend.getDiretorioTemplates() + caminho, Map.of("nome", nome, "versao", versao),
+						aplicacao.resolve(arquivo));
 			} else {
-				copiar(recurso, angular.resolve(caminho));
+				copiar(recurso, aplicacao.resolve(caminho));
 			}
 		});
 	}

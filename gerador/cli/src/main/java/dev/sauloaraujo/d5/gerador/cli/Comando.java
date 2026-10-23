@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+import dev.sauloaraujo.d5.gerador.nucleo.Frontend;
 import dev.sauloaraujo.d5.gerador.nucleo.Gerador;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -45,10 +46,15 @@ public class Comando implements Callable<Integer> {
 			"--agentes" }, arity = "1", defaultValue = "true", description = "Se o projeto gerado deve incluir o AGENTS.md e os skills.")
 	private boolean agentes;
 
+	@Option(names = { "-t",
+			"--frontend" }, defaultValue = "angular", description = "A tecnologia do frontend: angular ou react.")
+	private @Nullable String frontend;
+
 	@Override
 	public Integer call() throws Exception {
 		gerador.gerar(Objects.requireNonNull(diretorio), Objects.requireNonNull(groupId), Objects.requireNonNull(nome),
-				Objects.requireNonNull(versao), Objects.requireNonNull(subdominios), framework, agentes);
+				Objects.requireNonNull(versao), Objects.requireNonNull(subdominios), framework, agentes,
+				Frontend.de(Objects.requireNonNull(frontend)));
 		return 0;
 	}
 }

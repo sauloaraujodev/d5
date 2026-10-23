@@ -38,5 +38,10 @@
 <input type="hidden" name="_agentes" value="on">
 <label><input id="gerador-agentes" type="checkbox" name="agentes" checked> Incluir AGENTS.md e skills</label>
 </div>
+<div class="gerador-opcao">
+<span>Frontend:</span>
+<label><input type="radio" name="frontend" value="ANGULAR" checked> Angular</label>
+<label><input type="radio" name="frontend" value="REACT"> React</label>
+</div>
 <button type="submit" class="md-button md-button--primary">Gerar</button>
 </form>

@@ -1,0 +1,7 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "type": "npm", "script": "start", "isBackground": true, "problemMatcher": [] },
+    { "type": "npm", "script": "test:watch", "isBackground": true, "problemMatcher": [] }
+  ]
+}

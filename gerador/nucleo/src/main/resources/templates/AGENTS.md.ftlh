@@ -20,9 +20,18 @@
 - JSpecify 1.0
 - DBML (Database Markup Language) 10.1.1
 - Spring Boot 4.1.1
+<#if d5Project.frontend == "react">
+- React 19.3.0
+- React Router 8.5.0
+- TanStack Query 5.104.0
+- React Hook Form 7.90.0
+- React Bootstrap 2.10.10
+- Bootstrap 5.3.8
+<#else>
 - Angular 22.1.4
 - NG Bootstrap 21.0.0
 - Bootstrap 5.3.8
+</#if>
 <#if d5Project.framework>- D5 1.0.0-SNAPSHOT</#if>
 
 ## Subdomínios
@@ -41,7 +50,7 @@
 - aplicacao (serviços de aplicação, projeções de entidades e SPIs da camada de aplicação, por exemplo, interfaces de repositórios de aplicação)
 - infraestrutura (implementações das SPIs)
 - ui-backend (controladores REST do backend para o frontend)
-- ui-frontend (aplicação Angular do frontend)
+- ui-frontend (aplicação ${(d5Project.frontend == "react")?then("React", "Angular")} do frontend)
 
 Um conceito que pertence a um subdomínio fica no módulo dele, mesmo que outros subdomínios o usem. Todo módulo dominio-**S** depende de dominio-compartilhado e pode depender também do módulo de outro subdomínio cujos conceitos ele referencia, desde que as dependências entre módulos de subdomínio não formem um ciclo.
 

@@ -11,7 +11,8 @@ Em vez de criar o projeto manualmente, use o [gerador](../gerador.md), que produ
 - **Versão**: o valor sugerido, `1.0.0-SNAPSHOT`;
 - **Subdomínios**: `geografia` e `crm` — informe o primeiro e clique em **+** para acrescentar o campo do segundo;
 - **Usar o framework D5**: marcado;
-- **Incluir AGENTS.md e skills**: desmarcado, porque este tutorial não utiliza agentes de IA.
+- **Incluir AGENTS.md e skills**: desmarcado, porque este tutorial não utiliza agentes de IA;
+- **Frontend**: Angular.
 
 Extraia o arquivo `exemplo.zip` obtido. O projeto gerado tem os módulos:
 

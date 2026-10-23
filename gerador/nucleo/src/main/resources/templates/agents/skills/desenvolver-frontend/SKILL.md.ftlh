@@ -1,6 +1,6 @@
 ---
 name: desenvolver-frontend
-description: Desenvolve em Angular as rotas e componentes de uma funcionalidade e especifica as operações do backend que eles usam. Use depois de desenvolver o backend.
+description: Desenvolve em ${(d5Project.frontend == "react")?then("React", "Angular")} as rotas e componentes de uma funcionalidade e especifica as operações do backend que eles usam. Use depois de desenvolver o backend.
 ---
 Desenvolver o frontend de uma funcionalidade **F** associada a um agregado **A** de um subdomínio **S** consiste em:
 
@@ -11,7 +11,11 @@ O nome de uma rota **R** é um substantivo singular, por exemplo, inclusao, alte
 
 Se **R** não está associada a uma instância específica de um agregado, seu caminho é /**S**/**A**/**R**. Caso contrário, seu caminho é /**S**/**A**/:**ID**/**R** onde **ID** é o identificador de **A**.
 
+<#if d5Project.frontend == "react">
+Para cada rota, existe uma operação GET com mesmo caminho da rota, que responde os dados que a rota exibe inicialmente e um loader da rota que executa essa operação (por meio de uma consulta do TanStack Query) e é utilizado pelo componente da rota.
+<#else>
 Para cada rota, existe uma operação GET com mesmo caminho da rota, que responde os dados que a rota exibe inicialmente e um resolvedor que executa essa operação e é utilizado pelo componente da rota.
+</#if>
 
 O caminho de todas as operações é prefixado por /backend.
 
@@ -23,4 +27,8 @@ O framework D5 já fornece, para todo agregado **A**, as operações padrão de 
 </#if>
 Especificações de operações possuem exemplos.
 
+<#if d5Project.frontend == "react">
+Um componente fica em um único arquivo .tsx, com o mesmo nome do componente. Toda chamada ao backend usa `chamarApi` (em `src/d5/api.ts`), dentro de `useQuery` para leituras e de `useMutation` para ações; ela cuida da sessão, do CSRF e da reautenticação. Formulários usam React Hook Form. As rotas ficam em `src/app/rotas.tsx`, dentro da rota `RotaProtegida`, e cada uma carrega seu componente com `lazy`.
+<#else>
 Os estilos, template e código de um componente ficam em arquivos distintos.
+</#if>

@@ -3,6 +3,8 @@ package dev.sauloaraujo.d5.site;
 import java.util.Objects;
 import java.util.Set;
 
+import dev.sauloaraujo.d5.gerador.nucleo.Frontend;
+
 public class Formulario {
 	private String groupId;
 	private String nome;
@@ -10,6 +12,7 @@ public class Formulario {
 	private Set<String> subdominios;
 	private boolean framework = true;
 	private boolean agentes = true;
+	private Frontend frontend = Frontend.ANGULAR;
 
 	public Formulario(String groupId, String nome, Set<String> subdominios) {
 		this.groupId = Objects.requireNonNull(groupId);
@@ -51,5 +54,13 @@ public class Formulario {
 
 	public void setAgentes(boolean agentes) {
 		this.agentes = agentes;
+	}
+
+	public Frontend getFrontend() {
+		return frontend;
+	}
+
+	public void setFrontend(Frontend frontend) {
+		this.frontend = Objects.requireNonNull(frontend);
 	}
 }
