@@ -33,6 +33,12 @@
 					<include>*/pom.xml</include>
 					<include>*/src/**</include>
 				</includes>
+				<!-- Artefatos do frontend do exemplo, ignorados pelo git -->
+				<excludes>
+					<exclude>**/node_modules/**</exclude>
+					<exclude>**/.angular/**</exclude>
+					<exclude>**/dist/**</exclude>
+				</excludes>
 			</resource>
 		</resources>
 	</build>
