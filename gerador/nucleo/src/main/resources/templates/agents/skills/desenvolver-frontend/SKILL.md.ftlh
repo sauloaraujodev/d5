@@ -12,7 +12,7 @@ O nome de uma rota **R** é um substantivo singular, por exemplo, inclusao, alte
 Se **R** não está associada a uma instância específica de um agregado, seu caminho é /**S**/**A**/**R**. Caso contrário, seu caminho é /**S**/**A**/:**ID**/**R** onde **ID** é o identificador de **A**.
 
 <#if d5Project.frontend == "react">
-Para cada rota, existe uma operação GET com mesmo caminho da rota, que responde os dados que a rota exibe inicialmente e um loader da rota que executa essa operação (por meio de uma consulta do TanStack Query) e é utilizado pelo componente da rota.
+Para cada rota, existe uma operação GET com mesmo caminho da rota, que responde os dados que a rota exibe inicialmente e um loader da rota que executa essa operação e cujos dados são utilizados pelo componente da rota.
 <#else>
 Para cada rota, existe uma operação GET com mesmo caminho da rota, que responde os dados que a rota exibe inicialmente e um resolvedor que executa essa operação e é utilizado pelo componente da rota.
 </#if>
@@ -27,8 +27,20 @@ O framework D5 já fornece, para todo agregado **A**, as operações padrão de 
 </#if>
 Especificações de operações possuem exemplos.
 
+Cada agregado **A** que o usuário acessa pelo menu da aplicação tem nele um item, exibido apenas quando o usuário possui a autorização buscar de **A**, lida com autorizacoesDe('**a**'), onde **a** é o nome de **A** iniciado em minúscula. Essas autorizações são respondidas por GET /backend/autenticacao, ao qual o backend de **A** as acrescenta.
+
 <#if d5Project.frontend == "react">
-Um componente fica em um único arquivo .tsx, com o mesmo nome do componente. Toda chamada ao backend usa `chamarApi` (em `src/d5/api.ts`), dentro de `useQuery` para leituras e de `useMutation` para ações; ela cuida da sessão, do CSRF e da reautenticação. Formulários usam React Hook Form. As rotas ficam em `src/app/rotas.tsx`, dentro da rota `RotaProtegida`, e cada uma carrega seu componente com `lazy`.
+A aplicação fica em ui-frontend/src/main/react, e os caminhos a seguir são relativos a esse diretório.
+
+Um componente fica em um único arquivo .tsx, com o mesmo nome do componente. As rotas ficam em `src/app/rotas.tsx`, dentro da rota `RotaProtegida`, e cada uma carrega seu componente e seu loader com `lazy`.
+
+Toda chamada ao backend usa `chamarApi` (em `src/d5/api.ts`), que cuida da sessão, do CSRF e da reautenticação. A operação GET de uma rota é uma consulta do TanStack Query declarada com `queryOptions`: o loader a executa com `clienteConsultas.ensureQueryData`, e o componente lê seus dados com `useSuspenseQuery` e as mesmas opções (ver `consultaAutenticacao` e `exigirAutenticacao` em `src/d5/autenticacao.ts`). Ações usam `useMutation` e, ao terminarem, invalidam com `clienteConsultas.invalidateQueries` as consultas cujos dados alteraram.
+
+Um erro lançado por um loader, como o 404 de um identificador inexistente, é exibido por `ErroRota`, o ErrorBoundary da rota `RotaProtegida`. O erro de uma ação é publicado com `publicar('erro', mensagemErro(erro))`, onde `publicar` vem de `useNotificacoes` e `mensagemErro`, de `src/d5/api.ts`, extrai a mensagem respondida pelo backend.
+
+Formulários usam React Hook Form.
 <#else>
+A aplicação fica em ui-frontend/src/main/angular.
+
 Os estilos, template e código de um componente ficam em arquivos distintos.
 </#if>

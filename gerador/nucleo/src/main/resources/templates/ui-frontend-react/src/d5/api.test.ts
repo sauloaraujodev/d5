@@ -1,4 +1,4 @@
-import { chamarApi, ErroHttp, registrarReautenticador } from './api';
+import { chamarApi, ErroHttp, mensagemErro, registrarReautenticador } from './api';
 import { chaveAutenticacao, clienteConsultas } from './cliente-consultas';
 
 function resposta(status: number, corpo?: unknown) {
@@ -86,5 +86,22 @@ describe('chamarApi', () => {
     expect(clienteConsultas.getQueryData(chaveAutenticacao)).toBeNull();
     expect(fetchSimulado.mock.calls.at(-1)![0]).toBe('/backend/sair');
     desfazer();
+  });
+});
+
+describe('mensagemErro', () => {
+  it('usa a mensagem respondida pelo backend', () => {
+    expect(mensagemErro(new ErroHttp(404, { mensagem: 'Município inexistente.' }))).toBe(
+      'Município inexistente.',
+    );
+  });
+
+  it('usa uma mensagem genérica quando o erro não traz uma', () => {
+    expect(mensagemErro(new ErroHttp(500, 'falha'))).toBe(
+      'Não foi possível concluir a operação. Tente novamente.',
+    );
+    expect(mensagemErro(new TypeError('Failed to fetch'))).toBe(
+      'Não foi possível concluir a operação. Tente novamente.',
+    );
   });
 });

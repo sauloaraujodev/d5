@@ -17,6 +17,20 @@ export class ErroHttp extends Error {
   }
 }
 
+/**
+ * Mensagem para o usuário de um erro do backend, que responde `{ "mensagem": "..." }`, ou uma
+ * mensagem genérica quando o erro não traz uma.
+ */
+export function mensagemErro(erro: unknown): string {
+  const corpo = erro instanceof ErroHttp ? erro.corpo : null;
+  if (typeof corpo === 'object' && corpo !== null && 'mensagem' in corpo) {
+    if (typeof corpo.mensagem === 'string') {
+      return corpo.mensagem;
+    }
+  }
+  return 'Não foi possível concluir a operação. Tente novamente.';
+}
+
 export interface OpcoesApi {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   /** Serializado como JSON. */

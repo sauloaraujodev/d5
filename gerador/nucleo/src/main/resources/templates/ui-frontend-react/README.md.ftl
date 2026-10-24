@@ -36,4 +36,4 @@ Os artefatos ficam em `dist/`.
 - `chamarApi` envia o cookie de sessão e o token CSRF a toda chamada a `/backend`. Para consumir o backend, use `chamarApi` dentro de `useQuery`/`useMutation` (ou de loaders das rotas).
 - Se a sessão expira durante o uso (401), `chamarApi` pede a reautenticação em um modal, sem sair da página, e repete a chamada. Se o usuário desiste, a sessão é encerrada e ele volta ao login.
 - O estado da autenticação é uma consulta do TanStack Query; leia-o com `useAutenticacao()`.
-- Rotas que exigem autenticação ficam dentro da rota `RotaProtegida` em `src/app/rotas.tsx`.
+- Rotas que exigem autenticação ficam dentro da rota `RotaProtegida` em `src/app/rotas.tsx`. Um erro lançado pelo loader de uma delas é exibido por `ErroRota`, sem sair do layout; `mensagemErro` extrai a mensagem respondida pelo backend.
