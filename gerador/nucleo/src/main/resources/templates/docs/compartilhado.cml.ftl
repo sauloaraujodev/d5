@@ -1,4 +1,6 @@
 Domain dominio {
+	domainVisionStatement = "${descricao}"
+
 <#list subdominios as subdominio>
 	Subdomain ${subdominio.nome} {
 		type = ${subdominio.tipo}

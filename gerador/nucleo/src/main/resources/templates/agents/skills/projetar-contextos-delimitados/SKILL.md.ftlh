@@ -2,7 +2,7 @@
 name: projetar-contextos-delimitados
 description: Organiza o modelo do Context Mapper em um contexto delimitado compartilhado e um por subdomínio, com as relações entre eles. Use no início de projetar-software e ao criar um subdomínio ou uma dependência entre subdomínios.
 ---
-O gerador de projetos já criou docs/compartilhado/projeto.cml, docs/**S**/projeto.cml de cada subdomínio **S** e docs/projeto.cml, com a estrutura descrita a seguir. O tipo e a descrição de cada subdomínio, informados na geração, estão em `type` e `domainVisionStatement` de sua declaração em docs/compartilhado/projeto.cml. Ao acrescentar um subdomínio, siga o mesmo modelo.
+O gerador de projetos já criou docs/compartilhado/projeto.cml, docs/**S**/projeto.cml de cada subdomínio **S** e docs/projeto.cml, com a estrutura descrita a seguir. A descrição do projeto está em `domainVisionStatement` do `Domain`, e o tipo e a descrição de cada subdomínio, informados na geração, estão em `type` e `domainVisionStatement` de sua declaração, em docs/compartilhado/projeto.cml. Ao acrescentar um subdomínio, siga o mesmo modelo.
 
 Conceitualmente, existe um único contexto delimitado, pois a linguagem onipresente é válida em todo o software. Entretanto, como o Context Mapper não permite que um contexto delimitado seja definido em vários arquivos, [compartilhado/projeto.cml](../../../docs/compartilhado/projeto.cml) declara o domínio do software, seus subdomínios e o contexto delimitado compartilhado contendo o módulo compartilhado, que encapsula o projeto de software do módulo Maven dominio-compartilhado. Esse módulo contém apenas conceitos que não pertencem a nenhum subdomínio específico e são comuns a todos eles, por exemplo, os papéis de autorização.
 

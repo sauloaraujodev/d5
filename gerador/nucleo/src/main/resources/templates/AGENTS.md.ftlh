@@ -1,5 +1,7 @@
 # ${d5Project.name}
 
+${d5Project.description?no_esc}
+
 ## Engenharia de software
 - MDE (Model-Driven Engineering)
 - DDD (Domain-Driven Design)

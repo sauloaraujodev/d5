@@ -36,6 +36,10 @@ public class Comando implements Callable<Integer> {
 	@Option(names = { "-n", "--nome" }, required = true, description = "O nome do projeto.")
 	private @Nullable String nome;
 
+	@Option(names = { "-p",
+			"--descricao-projeto" }, required = true, description = "A descrição do projeto, incluída em AGENTS.md e docs/projeto.cml.")
+	private @Nullable String descricao;
+
 	@Option(names = { "-v",
 			"--versao" }, defaultValue = "1.0.0-SNAPSHOT", description = "A versão do projeto, no formato do versionamento semântico.")
 	private @Nullable String versao;
@@ -80,7 +84,7 @@ public class Comando implements Callable<Integer> {
 		var subdominiosInformados = Objects.requireNonNull(subdominios).stream().map(SubdominioOpcoes::paraSubdominio)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		gerador.gerar(Objects.requireNonNull(diretorio), Objects.requireNonNull(groupId), Objects.requireNonNull(nome),
-				Objects.requireNonNull(versao), subdominiosInformados, framework, agentes,
+				Objects.requireNonNull(descricao), Objects.requireNonNull(versao), subdominiosInformados, framework, agentes,
 				Frontend.de(Objects.requireNonNull(frontend)));
 		return 0;
 	}

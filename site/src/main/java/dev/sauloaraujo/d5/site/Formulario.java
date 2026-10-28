@@ -11,6 +11,7 @@ import dev.sauloaraujo.d5.gerador.nucleo.Subdominio;
 public class Formulario {
 	private String groupId;
 	private String nome;
+	private String descricao;
 	private String versao = "1.0.0-SNAPSHOT";
 	private Set<Subdominio> subdominios;
 	private boolean framework = true;
@@ -18,9 +19,10 @@ public class Formulario {
 	private Frontend frontend = Frontend.ANGULAR;
 
 	// Os subdomínios chegam como subdominios[0].nome, subdominios[0].tipo, etc.
-	public Formulario(String groupId, String nome, List<Subdominio> subdominios) {
+	public Formulario(String groupId, String nome, String descricao, List<Subdominio> subdominios) {
 		this.groupId = Objects.requireNonNull(groupId);
 		this.nome = Objects.requireNonNull(nome);
+		this.descricao = Objects.requireNonNull(descricao);
 		this.subdominios = new LinkedHashSet<>(Objects.requireNonNull(subdominios));
 	}
 
@@ -30,6 +32,10 @@ public class Formulario {
 
 	public String getNome() {
 		return nome;
+	}
+
+	public String getDescricao() {
+		return descricao;
 	}
 
 	public String getVersao() {

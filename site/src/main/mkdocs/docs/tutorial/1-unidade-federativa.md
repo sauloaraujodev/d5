@@ -8,6 +8,7 @@ Em vez de criar o projeto manualmente, use o [gerador](../gerador.md), que produ
 
 - **groupId**: `com.example`;
 - **Nome do projeto**: `exemplo`;
+- **Descrição**: `Projeto de exemplo do tutorial de D5`;
 - **Versão**: o valor sugerido, `1.0.0-SNAPSHOT`;
 - **Subdomínios**: informe o primeiro e clique em **+** para acrescentar os campos do segundo. Cada subdomínio tem nome, tipo e descrição:
     - nome `geografia`, tipo **Subdomínio de suporte** e descrição `Unidades federativas e municípios do Brasil`;
