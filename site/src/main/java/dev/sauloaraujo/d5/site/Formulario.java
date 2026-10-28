@@ -1,23 +1,27 @@
 package dev.sauloaraujo.d5.site;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import dev.sauloaraujo.d5.gerador.nucleo.Frontend;
+import dev.sauloaraujo.d5.gerador.nucleo.Subdominio;
 
 public class Formulario {
 	private String groupId;
 	private String nome;
 	private String versao = "1.0.0-SNAPSHOT";
-	private Set<String> subdominios;
+	private Set<Subdominio> subdominios;
 	private boolean framework = true;
 	private boolean agentes = true;
 	private Frontend frontend = Frontend.ANGULAR;
 
-	public Formulario(String groupId, String nome, Set<String> subdominios) {
+	// Os subdomínios chegam como subdominios[0].nome, subdominios[0].tipo, etc.
+	public Formulario(String groupId, String nome, List<Subdominio> subdominios) {
 		this.groupId = Objects.requireNonNull(groupId);
 		this.nome = Objects.requireNonNull(nome);
-		this.subdominios = Objects.requireNonNull(subdominios);
+		this.subdominios = new LinkedHashSet<>(Objects.requireNonNull(subdominios));
 	}
 
 	public String getGroupId() {
@@ -36,7 +40,7 @@ public class Formulario {
 		this.versao = Objects.requireNonNull(versao);
 	}
 
-	public Set<String> getSubdominios() {
+	public Set<Subdominio> getSubdominios() {
 		return subdominios;
 	}
 

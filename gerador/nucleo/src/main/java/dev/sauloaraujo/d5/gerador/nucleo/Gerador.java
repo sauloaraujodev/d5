@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -62,22 +63,22 @@ public class Gerador {
 		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	}
 
-	public void gerar(File diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+	public void gerar(File diretorio, String groupId, String nome, String versao, Set<Subdominio> subdominios,
 			boolean framework, boolean agentes) {
 		gerar(diretorio, groupId, nome, versao, subdominios, framework, agentes, Frontend.ANGULAR);
 	}
 
-	public void gerar(File diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+	public void gerar(File diretorio, String groupId, String nome, String versao, Set<Subdominio> subdominios,
 			boolean framework, boolean agentes, Frontend frontend) {
 		gerar(diretorio.toPath(), groupId, nome, versao, subdominios, framework, agentes, frontend);
 	}
 
-	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<Subdominio> subdominios,
 			boolean framework, boolean agentes) {
 		gerar(diretorio, groupId, nome, versao, subdominios, framework, agentes, Frontend.ANGULAR);
 	}
 
-	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<String> subdominios,
+	public void gerar(Path diretorio, String groupId, String nome, String versao, Set<Subdominio> subdominios,
 			boolean framework, boolean agentes, Frontend frontend) {
 		Objects.requireNonNull(diretorio);
 		Objects.requireNonNull(groupId);
@@ -93,8 +94,16 @@ public class Gerador {
 			throw new IllegalArgumentException("É necessário informar ao menos um subdomínio");
 		}
 
+		var subdominiosPorNome = new TreeMap<String, Subdominio>();
+		for (var subdominio : subdominios) {
+			Objects.requireNonNull(subdominio);
+			if (subdominiosPorNome.put(subdominio.nome(), subdominio) != null) {
+				throw new IllegalArgumentException("O subdomínio " + subdominio.nome() + " foi informado mais de uma vez");
+			}
+		}
+
 		var raiz = diretorio.resolve(nome);
-		var subdominiosOrdenados = new TreeSet<>(subdominios);
+		var subdominiosOrdenados = new TreeSet<>(subdominiosPorNome.keySet());
 		var artifactIdCompartilhado = nome + "-dominio-compartilhado";
 
 		gerarPomRaiz(raiz, groupId, nome, versao, subdominiosOrdenados, framework);
@@ -109,7 +118,7 @@ public class Gerador {
 		gerarUiBackend(raiz, groupId, nome, versao, framework);
 
 		if (agentes) {
-			gerarAgentes(raiz, groupId, nome, versao, subdominiosOrdenados, framework, frontend);
+			gerarAgentes(raiz, groupId, nome, versao, subdominiosPorNome.values(), framework, frontend);
 		}
 
 		try (var modulos = Files.list(raiz)) {
@@ -122,14 +131,19 @@ public class Gerador {
 			throw new IllegalStateException("Falha ao gerar " + raiz, e);
 		}
 
-		// Gerado depois dos diretórios padrão, que não se aplicam a um módulo de frontend
+		// Gerados depois dos diretórios padrão, que não se aplicam a um módulo de frontend
+		// nem ao diretório de documentação
 		gerarUiFrontend(raiz, groupId, nome, versao, frontend);
+		if (agentes) {
+			gerarDocumentacao(raiz, subdominiosPorNome.values());
+		}
 	}
 
-	private void gerarAgentes(Path raiz, String groupId, String nome, String versao, Set<String> subdominios,
-			boolean framework, Frontend frontend) {
+	private void gerarAgentes(Path raiz, String groupId, String nome, String versao,
+			Collection<Subdominio> subdominios, boolean framework, Frontend frontend) {
 		var projeto = Map.of("name", nome, "groupId", groupId, "version", versao, "framework", framework, "frontend",
-				frontend.name().toLowerCase(Locale.ROOT), "subdomains", subdominios, "mavenRootProject",
+				frontend.name().toLowerCase(Locale.ROOT), "subdomains",
+				subdominios.stream().map(subdominio -> modelo(subdominio, false)).toList(), "mavenRootProject",
 				Map.of("artifactId", nome + "-pai"));
 		var modelo = Map.<String, Object>of("d5Project", projeto);
 
@@ -146,6 +160,30 @@ public class Gerador {
 		for (var skill : skills) {
 			processar(DIRETORIO_SKILLS + skill + ".ftlh", modelo, raiz.resolve(".agents/skills/" + skill));
 		}
+	}
+
+	// Os modelos do Context Mapper, de acordo com o skill projetar-contextos-delimitados
+	private void gerarDocumentacao(Path raiz, Collection<Subdominio> subdominios) {
+		var docs = raiz.resolve("docs");
+		var cml = subdominios.stream().map(subdominio -> modelo(subdominio, true)).toList();
+		var nomes = subdominios.stream().map(Subdominio::nome).toList();
+
+		processar("docs/compartilhado.cml.ftl", Map.of("subdominios", cml), docs.resolve("compartilhado/projeto.cml"));
+		for (var nome : nomes) {
+			processar("docs/subdominio.cml.ftl", Map.of("nome", nome), docs.resolve(nome + "/projeto.cml"));
+		}
+		processar("docs/projeto.cml.ftl", Map.of("subdominios", nomes), docs.resolve("projeto.cml"));
+		processar("docs/projeto.dbml.ftl", Map.of(), docs.resolve("projeto.dbml"));
+	}
+
+	private static Map<String, String> modelo(Subdominio subdominio, boolean literalCml) {
+		return Map.of("nome", subdominio.nome(), "tipo", literalCml ? subdominio.tipo().name() : subdominio.tipo().getRotulo(),
+				"descricao", literalCml ? paraLiteralCml(subdominio.descricao()) : subdominio.descricao());
+	}
+
+	// O texto vai entre aspas no modelo, em uma única linha
+	private static String paraLiteralCml(String texto) {
+		return texto.strip().replaceAll("\\s+", " ").replace("\\", "\\\\").replace("\"", "\\\"");
 	}
 
 	private void copiarD5(Path destino) {

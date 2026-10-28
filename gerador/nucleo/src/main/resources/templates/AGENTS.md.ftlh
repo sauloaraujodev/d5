@@ -36,7 +36,7 @@
 
 ## Subdomínios
 <#list d5Project.subdomains as subdomain>
-- ${subdomain}
+- ${subdomain.nome} (${subdomain.tipo}): ${subdomain.descricao?no_esc}
 </#list>
 
 ## Maven

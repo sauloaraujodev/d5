@@ -20,13 +20,30 @@
 </div>
 </div>
 <div class="gerador-coluna" id="gerador-subdominios">
-<div class="gerador-campo gerador-subdominio">
+<div class="gerador-subdominio">
+<div class="gerador-campo">
 <label>Subdomínio *</label>
 <div class="gerador-grupo">
-<input type="text" name="subdominios" required pattern="[a-z]+">
+<input type="text" name="subdominios[0].nome" required pattern="[a-z]+">
 <button type="button" class="md-button md-button--primary gerador-incluir" title="Incluir subdomínio">+</button>
 </div>
 <small class="gerador-erro" data-vazio="Obrigatório">Deve conter apenas letras minúsculas</small>
+</div>
+<div class="gerador-campo">
+<label>Tipo *</label>
+<select name="subdominios[0].tipo" required>
+<option value="">Selecione</option>
+<option value="CORE_DOMAIN">Subdomínio principal</option>
+<option value="SUPPORTING_DOMAIN">Subdomínio de suporte</option>
+<option value="GENERIC_SUBDOMAIN">Subdomínio genérico</option>
+</select>
+<small class="gerador-erro" data-vazio="Obrigatório">Obrigatório</small>
+</div>
+<div class="gerador-campo">
+<label>Descrição *</label>
+<input type="text" name="subdominios[0].descricao" required pattern=".*\S.*">
+<small class="gerador-erro" data-vazio="Obrigatório">Obrigatório</small>
+</div>
 </div>
 </div>
 </div>

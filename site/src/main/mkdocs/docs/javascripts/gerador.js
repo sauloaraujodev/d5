@@ -1,4 +1,6 @@
 // Validação e inclusão de subdomínios do formulário de gerador.md. O envio é um POST comum para /api/gerador.
+// Os campos de cada subdomínio são nomeados subdominios[i].nome, .tipo e .descricao, e o índice i é
+// renumerado quando um subdomínio é incluído ou excluído.
 function iniciarGerador() {
 	const formulario = document.getElementById("gerador")
 	if (!formulario || formulario.dataset.iniciado) {
@@ -7,6 +9,16 @@ function iniciarGerador() {
 	formulario.dataset.iniciado = "true"
 	const subdominios = document.getElementById("gerador-subdominios")
 	const modelo = subdominios.firstElementChild.cloneNode(true)
+
+	const campos = (bloco) => bloco.querySelectorAll('input[type="text"], select')
+
+	const renumerar = () => {
+		;[...subdominios.children].forEach((bloco, indice) => {
+			campos(bloco).forEach((campo) => {
+				campo.name = campo.name.replace(/^subdominios\[\d+\]/, `subdominios[${indice}]`)
+			})
+		})
+	}
 
 	const validar = (campo) => {
 		const mensagem = campo.closest(".gerador-campo").querySelector(".gerador-erro")
@@ -29,8 +41,8 @@ function iniciarGerador() {
 			return
 		}
 		if (botao.classList.contains("gerador-incluir")) {
-			const primeiro = subdominios.firstElementChild.querySelector("input")
-			if (!validar(primeiro)) {
+			const validos = [...campos(subdominios.lastElementChild)].map(validar)
+			if (validos.includes(false)) {
 				return
 			}
 			const novo = modelo.cloneNode(true)
@@ -38,15 +50,21 @@ function iniciarGerador() {
 			remover.textContent = "−"
 			remover.title = "Excluir subdomínio"
 			remover.className = "md-button gerador-excluir"
-			novo.querySelector("input").value = ""
+			campos(novo).forEach((campo) => {
+				campo.value = ""
+				campo.classList.remove("invalido")
+			})
+			novo.querySelectorAll(".gerador-erro").forEach((erro) => erro.classList.remove("visivel"))
 			subdominios.append(novo)
+			renumerar()
 		} else if (botao.classList.contains("gerador-excluir")) {
 			botao.closest(".gerador-subdominio").remove()
+			renumerar()
 		}
 	})
 
 	formulario.addEventListener("submit", (evento) => {
-		const validos = [...formulario.querySelectorAll('input[type="text"]')].map(validar)
+		const validos = [...campos(formulario)].map(validar)
 		if (validos.includes(false)) {
 			evento.preventDefault()
 		}

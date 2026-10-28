@@ -9,7 +9,9 @@ Em vez de criar o projeto manualmente, use o [gerador](../gerador.md), que produ
 - **groupId**: `com.example`;
 - **Nome do projeto**: `exemplo`;
 - **Versão**: o valor sugerido, `1.0.0-SNAPSHOT`;
-- **Subdomínios**: `geografia` e `crm` — informe o primeiro e clique em **+** para acrescentar o campo do segundo;
+- **Subdomínios**: informe o primeiro e clique em **+** para acrescentar os campos do segundo. Cada subdomínio tem nome, tipo e descrição:
+    - nome `geografia`, tipo **Subdomínio de suporte** e descrição `Unidades federativas e municípios do Brasil`;
+    - nome `crm`, tipo **Subdomínio principal** e descrição `Relacionamento com os clientes`;
 - **Usar o framework D5**: marcado;
 - **Incluir AGENTS.md e skills**: desmarcado, porque este tutorial não utiliza agentes de IA;
 - **Frontend**: Angular.

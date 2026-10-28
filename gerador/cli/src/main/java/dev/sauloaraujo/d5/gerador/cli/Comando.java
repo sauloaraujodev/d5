@@ -1,15 +1,20 @@
 package dev.sauloaraujo.d5.gerador.cli;
 
 import java.io.File;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import dev.sauloaraujo.d5.gerador.nucleo.Frontend;
 import dev.sauloaraujo.d5.gerador.nucleo.Gerador;
+import dev.sauloaraujo.d5.gerador.nucleo.Subdominio;
+import dev.sauloaraujo.d5.gerador.nucleo.TipoSubdominio;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -35,8 +40,10 @@ public class Comando implements Callable<Integer> {
 			"--versao" }, defaultValue = "1.0.0-SNAPSHOT", description = "A versão do projeto, no formato do versionamento semântico.")
 	private @Nullable String versao;
 
-	@Option(names = { "-s", "--subdominio" }, required = true, description = "Os subdomínios do domínio do projeto.")
-	private @Nullable Set<String> subdominios;
+	// Cada subdomínio é um grupo de opções: -s nome -y tipo -e descrição. O grupo se repete para
+	// cada subdomínio.
+	@ArgGroup(exclusive = false, multiplicity = "1..*")
+	private @Nullable List<SubdominioOpcoes> subdominios;
 
 	@Option(names = { "-f",
 			"--framework" }, arity = "1", defaultValue = "true", description = "Se o projeto gerado deve depender do framework D5.")
@@ -50,10 +57,30 @@ public class Comando implements Callable<Integer> {
 			"--frontend" }, defaultValue = "angular", description = "A tecnologia do frontend: angular ou react.")
 	private @Nullable String frontend;
 
+	static class SubdominioOpcoes {
+		@Option(names = { "-s", "--subdominio" }, required = true, description = "O nome de um subdomínio do domínio do projeto.")
+		private @Nullable String nome;
+
+		@Option(names = { "-y",
+				"--tipo" }, required = true, description = "O tipo do subdomínio: ${COMPLETION-CANDIDATES}.")
+		private @Nullable TipoSubdominio tipo;
+
+		@Option(names = { "-e",
+				"--descricao" }, required = true, description = "A descrição do subdomínio, incluída em docs/projeto.cml.")
+		private @Nullable String descricao;
+
+		Subdominio paraSubdominio() {
+			return new Subdominio(Objects.requireNonNull(nome), Objects.requireNonNull(tipo),
+					Objects.requireNonNull(descricao));
+		}
+	}
+
 	@Override
 	public Integer call() throws Exception {
+		var subdominiosInformados = Objects.requireNonNull(subdominios).stream().map(SubdominioOpcoes::paraSubdominio)
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 		gerador.gerar(Objects.requireNonNull(diretorio), Objects.requireNonNull(groupId), Objects.requireNonNull(nome),
-				Objects.requireNonNull(versao), Objects.requireNonNull(subdominios), framework, agentes,
+				Objects.requireNonNull(versao), subdominiosInformados, framework, agentes,
 				Frontend.de(Objects.requireNonNull(frontend)));
 		return 0;
 	}

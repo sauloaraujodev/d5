@@ -82,7 +82,8 @@ body.zoom-ativo-fundo::before {
   color: var(--md-default-fg-color--light);
 }
 
-.gerador-campo input {
+.gerador-campo input,
+.gerador-campo select {
   box-sizing: border-box;
   width: 100%;
   padding: 0.3rem 0.5rem;
@@ -94,14 +95,26 @@ body.zoom-ativo-fundo::before {
   line-height: 1.4;
 }
 
-.gerador-campo input:focus {
+.gerador-campo input:focus,
+.gerador-campo select:focus {
   outline: 2px solid var(--md-accent-fg-color);
   outline-offset: -1px;
   border-color: transparent;
 }
 
-.gerador-campo input.invalido {
+.gerador-campo input.invalido,
+.gerador-campo select.invalido {
   border-color: var(--md-code-hl-special-color, #d32f2f);
+}
+
+.gerador-subdominio + .gerador-subdominio {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.gerador-subdominio .gerador-campo:last-child {
+  margin-bottom: 0;
 }
 
 .gerador-opcao {
